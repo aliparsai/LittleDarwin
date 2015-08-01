@@ -285,6 +285,9 @@ def main(argv):
         else:
             databasePath = options.alternateDb
 
+        resultsDatabasePath = databasePath + "-results"
+        reportGenerator.initiateDatabase(resultsDatabasePath)
+
         try:
             if os.path.basename(options.buildPath) == "pom.xml":
                 assert os.path.isfile(options.buildPath)

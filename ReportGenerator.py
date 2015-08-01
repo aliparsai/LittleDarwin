@@ -1,11 +1,15 @@
 import os
+import shelve
 
 __author__ = 'APSXR'
 
 
 class ReportGenerator(object):
     def __init__(self):
-        pass
+        self.database = None
+
+    def initiateDatabase(self, databasePath):
+        self.database = shelve.open(databasePath, "c")
 
     def generateHTMLFinalReport(self, resultData, reportPath):
         reportBeginning = """
@@ -152,6 +156,8 @@ class ReportGenerator(object):
                 return ''
             else:
                 return str(inputVar)
+
+        self.database[filePath] = (survived, killed)
 
         reportBeginning = """
             <html>
