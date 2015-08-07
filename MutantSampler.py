@@ -60,6 +60,7 @@ if __name__ == "__main__":
 
     optionParser.add_option("-s", "--source", action="store", dest="sourcedb", default="***dummy***", help="Source database")
     optionParser.add_option("-t", "--target", action="store", dest="targetdb", default="***dummy***", help="Target database")
+    # optionParser.add_option("-f", "--fixed-size", action="store", dest="fixedsize", default="***dummy***", help="Target database")
 
     (options, args) = optionParser.parse_args()
 
