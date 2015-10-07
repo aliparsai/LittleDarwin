@@ -4,49 +4,49 @@ import shelve
 import random
 import scipy.stats.stats
 
-
-def weightedChoice(choices, count):
-    selectedSet = set()
-    remainingCount = count
-    remainingChoices = dict()
-
-    for i in range(0, len(choices), 1):
-        remainingChoices[i] = choices[i]
-
-    while remainingCount > 0:
-        r = random.sample(range(0, sum(remainingChoices.values())+1, 1), remainingCount)
-        r.sort(reverse=True)
-        # index = 0
-        upto = 0
-
-        for index, w in remainingChoices.iteritems():
-            if len(r) == 0:
-                break
-            if upto + w > r[-1]:
-                selectedSet.add(index)
-                r.pop()
-                remainingChoices[index] = 0
-            upto += w
-            # index += 1
-
-        remainingCount = count - len(selectedSet)
-
-    return selectedSet
-
-
-def weightedSampling(choices, size):
-    # sampleSet = set()
-    weightList = list()
-    mutantList = list()
-
-    for c_a, c_b, w in choices:
-        weightList.append(w)
-        mutantList.append((c_a, c_b))
-
-    # while len(sampleSet) < size:
-    return [mutantList[x] for x in weightedChoice(weightList, size)]
-
-    # return list(sampleSet)
+#
+# def weightedChoice(choices, count):
+#     selectedSet = set()
+#     remainingCount = count
+#     remainingChoices = dict()
+#
+#     for i in range(0, len(choices), 1):
+#         remainingChoices[i] = choices[i]
+#
+#     while remainingCount > 0:
+#         r = random.sample(range(0, sum(remainingChoices.values())+1, 1), remainingCount)
+#         r.sort(reverse=True)
+#         # index = 0
+#         upto = 0
+#
+#         for index, w in remainingChoices.iteritems():
+#             if len(r) == 0:
+#                 break
+#             if upto + w > r[-1]:
+#                 selectedSet.add(index)
+#                 r.pop()
+#                 remainingChoices[index] = 0
+#             upto += w
+#             # index += 1
+#
+#         remainingCount = count - len(selectedSet)
+#
+#     return selectedSet
+#
+#
+# def weightedSampling(choices, size):
+#     # sampleSet = set()
+#     weightList = list()
+#     mutantList = list()
+#
+#     for c_a, c_b, w in choices:
+#         weightList.append(w)
+#         mutantList.append((c_a, c_b))
+#
+#     # while len(sampleSet) < size:
+#     return [mutantList[x] for x in weightedChoice(weightList, size)]
+#
+#     # return list(sampleSet)
 
 
 class SamplingExperiment(object):
@@ -54,6 +54,8 @@ class SamplingExperiment(object):
         try:
             self.resultsDatabase = shelve.open(resultsDatabase, "r")
             self.mutationDatabase = shelve.open(sourceDatabase, "r")
+            self.mutantCount = len(self.mutationDatabase.keys())
+            assert self.mutantCount == len(self.resultsDatabase.keys())
 
         except Exception:
             print("Error opening databases.")
@@ -158,26 +160,25 @@ class SamplingExperiment(object):
 
 
 if __name__ == "__main__":
-    exp = SamplingExperiment(
-        "/home/perham/Study/LittleDarwin/Cases/joda-time-2.8.1/src/mutated/mutationdatabase",
-        "/home/perham/Study/LittleDarwin/Cases/joda-time-2.8.1/src/mutated/mutationdatabase-results")
+    exp = SamplingExperiment(os.path.join(sys.argv[1], "mutationdatabase"),
+                             os.path.join(sys.argv[1], "mutationdatabase-results"))
     pearson = list()
     kendall = list()
-    for i in range(5, 4871, 1):
+    for i in range(1, 100, 1):
         sys.stdout.write(str(i) + "\r")
         sys.stdout.flush()
         sumPearson = 0.0
         sumKendall = 0.0
+        sampleSize = int(i * exp.mutantCount / 100)
         for j in range(0, 10, 1):
-            p, k = exp.experimentOnce(i)
+            p, k = exp.experimentOnce(sampleSize)
             sumPearson += p
             sumKendall += k
 
         pearson.append(int(sumPearson * 1000))
         kendall.append(int(sumKendall * 1000))
 
-    with open("joda-time-fixed-rate.csv", 'w') as output:
-        output.write(",".join(str(x) for x in pearson))
-        output.write("\r\n")
-        output.write(",".join(str(x) for x in kendall))
-        output.write("\r\n")
+    with open(sys.argv[2], 'w') as output:
+        assert len(pearson) == len(kendall)
+        for counter in range(0, len(pearson), 1):
+            output.write(str(pearson[counter]) + "," + str(kendall[counter]) + "\n")
