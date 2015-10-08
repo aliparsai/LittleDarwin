@@ -2,6 +2,7 @@ import os
 import sys
 import shelve
 import random
+import math
 import scipy.stats.stats
 
 def weightedChoice(choices, count):
@@ -181,8 +182,15 @@ if __name__ == "__main__":
         sampleSize = int(i * exp.mutantCount / 100)
         for j in range(0, 10, 1):
             p, k = exp.experimentOnce(sampleSize)
+
+            if math.isnan(p):
+                p = 0.0
+            if math.isnan(k):
+                k = 0.0
+
             sumPearson += p
             sumKendall += k
+
 
         pearson.append(int(sumPearson * 1000))
         kendall.append(int(sumKendall * 1000))
