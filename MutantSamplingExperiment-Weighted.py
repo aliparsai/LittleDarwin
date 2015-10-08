@@ -4,7 +4,6 @@ import shelve
 import random
 import scipy.stats.stats
 
-
 def weightedChoice(choices, count):
     selectedSet = set()
     remainingCount = count
@@ -51,14 +50,24 @@ def weightedSampling(choices, size):
 
 class SamplingExperiment(object):
     def __init__(self, sourceDatabase, resultsDatabase):
+        self.resultsDatabase = shelve.open(resultsDatabase, "r")
+
         try:
             self.resultsDatabase = shelve.open(resultsDatabase, "r")
             self.mutationDatabase = shelve.open(sourceDatabase, "r")
-            self.mutantCount = len(self.mutationDatabase.keys())
-            assert self.mutantCount == len(self.resultsDatabase.keys())
 
         except Exception:
             print("Error opening databases.")
+            # print Exception.message.getter()
+            sys.exit(1)
+
+        self.unitCount = len(self.mutationDatabase.keys())
+        assert self.unitCount == len(self.resultsDatabase.keys())
+
+        self.mutantCount = 0
+        for key in self.mutationDatabase.keys():
+            self.mutantCount += len(self.mutationDatabase[key])
+
 
     def mutantSamplerFixedSize(self, size):
         sampledDatabase = dict()
