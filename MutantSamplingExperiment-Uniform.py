@@ -52,7 +52,7 @@ import scipy.stats.stats
 
 class SamplingExperiment(object):
     def __init__(self, sourceDatabase, resultsDatabase):
-        self.resultsDatabase = shelve.open(resultsDatabase, "r")
+        # self.resultsDatabase = shelve.open(resultsDatabase, "r")
 
         try:
             self.resultsDatabase = shelve.open(resultsDatabase, "r")
