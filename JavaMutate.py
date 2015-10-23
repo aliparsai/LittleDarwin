@@ -3,6 +3,7 @@ from JavaParser import JavaParser
 from JavaParse import JavaParse
 import copy
 from antlr4.tree.Tree import TerminalNodeImpl
+from random import shuffle
 
 sys.setrecursionlimit(50000)
 
@@ -17,8 +18,40 @@ class JavaMutate(object):
         else:
             self.javaParseObject = JavaParse(self.verbose)
 
-    def applyMutators(self, tree, type):
+    def findMutableNodes(self, tree):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
+        pass
+
+    def runHigherOrderProcedure(self, tree, nodeGroup):
+        pass
+
+    def applyHigherOrderMutators(self, tree, higherOrder):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        # Find all mutable nodes
+        nodes = self.findMutableNodes(tree)
+
+        # Combine all nodes
+        shuffle(nodes)
+        nodeGroups = list()
+
+        for i in range(0, len(nodes) - higherOrder + 1, higherOrder):
+            nodeGroups.append([nodes[j] for j in range(i, i + higherOrder, 1)])
+
+        # Run mutation operators
+
+        mutatedTreeTexts = list()
+
+        for nodeGroup in nodeGroups:
+            mutatedTreeTexts.append(self.runHigherOrderProcedure(tree, nodeGroup))
+
+    def applyMutators(self, tree, higherOrder, type):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        if higherOrder > 1:
+            return self.applyHigherOrderMutators(tree, higherOrder)
+
+
         mutatedTrees = list()
         mutationTypeCount = dict()
 

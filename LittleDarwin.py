@@ -177,14 +177,22 @@ def main(argv):
                             help="commands to run after each build")
     optionParser.add_option("--use-alternate-database", action="store", dest="alternateDb", default="***dummy***",
                             help="path to alternative database")
-
     optionParser.add_option("--license", action="store_true", dest="isLicenseActive", default=False,
                             help="output the license and exit")
+    optionParser.add_option("--higher-order", type="int", action="store", dest="higherOrder", default=1,
+                            help="define order of mutation")
+
+
     (options, args) = optionParser.parse_args()
 
     if options.isLicenseActive:
         License.outputLicense()
         sys.exit(0)
+
+    if options.higherOrder <= 1:
+        higherOrder = 1
+    else:
+        higherOrder = options.higherOrder
 
     # there is an upside in not running two phases together. we may include the ability to edit some mutants later.
     if options.isBuildActive and options.isMutationActive:
@@ -242,7 +250,7 @@ def main(argv):
 
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.
-            mutated, mutantTypes = javaMutate.applyMutators(tree, "all")
+            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, "all")
 
             print "--> mutations found: ", len(mutated)
 
