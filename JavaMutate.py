@@ -112,72 +112,182 @@ class JavaMutate(object):
 
         return (mutatedTrees, mutationTypeCount)
 
-    def negateConditionalsMutator(self, tree):
-        assert isinstance(tree, JavaParser.CompilationUnitContext)
-        mutatedTreesTexts = list()
-        expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
-
-        while len(expressionList) > 0:
-            # tmpTree = copy.deepcopy(tree)
-            expressionIndex = expressionList.pop()
-
-            node = self.javaParseObject.getNode(tree, expressionIndex)
-            assert isinstance(node, JavaParser.ParExpressionContext)
-            assert isinstance(node.children[0], TerminalNodeImpl)
-            assert isinstance(node.children[2], TerminalNodeImpl)
-            mutationBefore = "----> before: " + node.getText()
-            if self.verbose:
-                print mutationBefore
-            originalText0 = copy.deepcopy(node.children[0].symbol.text)
-            node.children[0].symbol.text = u"(!("
-            originalText2 = copy.deepcopy(node.children[2].symbol.text)
-            node.children[2].symbol.text = u"))"
-            mutationAfter = "----> after: " + node.getText()
-            if self.verbose:
-                print mutationAfter
-            mutatedTreesTexts.append((
-                "/* LittleDarwin generated mutant\n mutant type: negateConditionalsMutator\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
-                    " ".join(tree.getText().rsplit("<EOF>", 1)))))
-            # mutatedTreesTexts.append(tree.getText())
-            node.children[0].symbol.text = copy.deepcopy(originalText0)
-            node.children[2].symbol.text = copy.deepcopy(originalText2)
-
-        return mutatedTreesTexts
+    # def negateConditionalsMutator(self, tree, mode="return_text"):
+    #     assert isinstance(tree, JavaParser.CompilationUnitContext)
+    #
+    #
+    #     if mode == "return_text":
+    #
+    #
+    #         mutatedTreesTexts = list()
+    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+    #
+    #         while len(expressionList) > 0:
+    #             # tmpTree = copy.deepcopy(tree)
+    #             expressionIndex = expressionList.pop()
+    #
+    #             node = self.javaParseObject.getNode(tree, expressionIndex)
+    #             assert isinstance(node, JavaParser.ParExpressionContext)
+    #             assert isinstance(node.children[0], TerminalNodeImpl)
+    #             assert isinstance(node.children[2], TerminalNodeImpl)
+    #             mutationBefore = "----> before: " + node.getText()
+    #             if self.verbose:
+    #                 print mutationBefore
+    #             originalText0 = copy.deepcopy(node.children[0].symbol.text)
+    #             node.children[0].symbol.text = u"(!("
+    #             originalText2 = copy.deepcopy(node.children[2].symbol.text)
+    #             node.children[2].symbol.text = u"))"
+    #             mutationAfter = "----> after: " + node.getText()
+    #             if self.verbose:
+    #                 print mutationAfter
+    #             mutatedTreesTexts.append((
+    #                 "/* LittleDarwin generated mutant\n mutant type: negateConditionalsMutator\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+    #                     " ".join(tree.getText().rsplit("<EOF>", 1)))))
+    #             # mutatedTreesTexts.append(tree.getText())
+    #             node.children[0].symbol.text = copy.deepcopy(originalText0)
+    #             node.children[2].symbol.text = copy.deepcopy(originalText2)
+    #
+    #         return mutatedTreesTexts
+    #
+    #     elif mode == "return_nodes":
+    #         nodeList = list()
+    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+    #
+    #         for exp in expressionList:
+    #             nodeList.append([exp, "negateConditionalsMutator"])
 
 
     # Method Level Mutants """
 
-    def arithmeticOperatorReplacementBinary(self, tree):
+    """
+    Mutation operator guidelines:
+    input: tree, mode, single node index
+    output: tree, text, node list
+
+    ----- mode: return_text
+                return_nodes
+                return_tree
+    """
+
+    def arithmeticOperatorReplacementBinary(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
-        mutatedTreesTexts = list()
-        expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
 
-        while len(expressionList) > 0:
-            # tmpTree = copy.deepcopy(tree)
-            expressionIndex = expressionList.pop()
+        if mode == "return_text":
 
-            node = self.javaParseObject.getNode(tree, expressionIndex)
+            mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+            # nodeList = list()
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], JavaParser.ExpressionContext) and isinstance(node.children[1],
+                                                                                                  TerminalNodeImpl) and isinstance(
+                            node.children[2], JavaParser.ExpressionContext)):
+                        continue  # not a binary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[1].symbol.text == u"+" or node.children[1].symbol.text == u"-" or node.children[
+                    1].symbol.text == u"*" or node.children[1].symbol.text == u"/" or node.children[1].symbol.text == u"%"):
+                    continue  # not an arithmetic operator
+
+                if node.children[0].getText()[0] == '\"' or node.children[2].getText()[0] == '\"':
+                    continue  # string concatenation, don't change
+
+                # nodeList.append([expressionIndex, "ArithmeticOperatorReplacementBinary"])
+
+                mutationBefore = "----> before: " + node.getText()
+
+                if self.verbose:
+                    print mutationBefore
+
+                # if mode == "return_text" or mode == "return_tree":
+                originalText = copy.deepcopy(node.children[1].symbol.text)
+
+                if originalText == u"+":
+                    node.children[1].symbol.text = u"-"
+                elif originalText == u"-":
+                    node.children[1].symbol.text = u"+"
+                elif originalText == u"/":
+                    node.children[1].symbol.text = u"*"
+                elif originalText == u"*":
+                    node.children[1].symbol.text = u"/"
+                elif originalText == u"%":
+                    node.children[1].symbol.text = u"/"
+                else:
+                    assert False
+
+                mutationAfter = "----> after: " + node.getText()
+                if self.verbose:
+                    print mutationAfter
+                mutatedTreesTexts.append((
+                        "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementBinary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
+
+                node.children[1].symbol.text = copy.deepcopy(originalText)
+
+            return mutatedTreesTexts
+
+
+        elif mode == "return_nodes":
+            # mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+            nodeList = list()
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], JavaParser.ExpressionContext) and isinstance(node.children[1],
+                                                                                                  TerminalNodeImpl) and isinstance(
+                            node.children[2], JavaParser.ExpressionContext)):
+                        continue  # not a binary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[1].symbol.text == u"+" or node.children[1].symbol.text == u"-" or node.children[
+                    1].symbol.text == u"*" or node.children[1].symbol.text == u"/" or node.children[1].symbol.text == u"%"):
+                    continue  # not an arithmetic operator
+
+                if node.children[0].getText()[0] == '\"' or node.children[2].getText()[0] == '\"':
+                    continue  # string concatenation, don't change
+
+                nodeList.append([expressionIndex, "ArithmeticOperatorReplacementBinary"])
+
+
+            return nodeList
+
+        if mode == "return_tree":
+            assert nodeIndex is not None
+
+            node = self.javaParseObject.getNode(tree, nodeIndex)
             assert isinstance(node, JavaParser.ExpressionContext)
 
             try:
-                if not (isinstance(node.children[0], JavaParser.ExpressionContext) and isinstance(node.children[1],
-                                                                                                  TerminalNodeImpl) and isinstance(
-                        node.children[2], JavaParser.ExpressionContext)):
-                    continue  # not a binary expression
+                if not (isinstance(node.children[0], JavaParser.ExpressionContext) and isinstance(node.children[1], TerminalNodeImpl) and isinstance(node.children[2], JavaParser.ExpressionContext)):
+                    assert False
+
             except Exception, e:
-                continue
+                assert False
 
             if not (node.children[1].symbol.text == u"+" or node.children[1].symbol.text == u"-" or node.children[
                 1].symbol.text == u"*" or node.children[1].symbol.text == u"/" or node.children[1].symbol.text == u"%"):
-                continue  # not an arithmetic operator
+                assert False
 
             if node.children[0].getText()[0] == '\"' or node.children[2].getText()[0] == '\"':
-                continue  # string concatenation, don't change
+                assert False
 
-            mutationBefore = "----> before: " + node.getText()
-            if self.verbose:
-                print mutationBefore
-            originalText = copy.deepcopy(node.children[1].symbol.text)
+            originalText = node.children[1].symbol.text
 
             if originalText == u"+":
                 node.children[1].symbol.text = u"-"
@@ -192,44 +302,104 @@ class JavaMutate(object):
             else:
                 assert False
 
-            mutationAfter = "----> after: " + node.getText()
-            if self.verbose:
-                print mutationAfter
-            mutatedTreesTexts.append((
-                "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementBinary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
-                    " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
-
-            node.children[1].symbol.text = copy.deepcopy(originalText)
-
-        return mutatedTreesTexts
+            return tree
 
 
-    def arithmeticOperatorReplacementUnary(self, tree):
+
+
+    def arithmeticOperatorReplacementUnary(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
-        mutatedTreesTexts = list()
-        expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
 
-        while len(expressionList) > 0:
-            # tmpTree = copy.deepcopy(tree)
-            expressionIndex = expressionList.pop()
+        if mode == "return_text":
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+            mutatedTreesTexts = list()
+            # nodeList = list()
 
-            node = self.javaParseObject.getNode(tree, expressionIndex)
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
+                                                                                      JavaParser.ExpressionContext)):
+                        continue  # not a unary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[0].symbol.text == u"+" or node.children[0].symbol.text == u"-"):
+                    continue  # not an arithmetic operator
+
+                mutationBefore = "----> before: " + node.getText()
+                if self.verbose:
+                    print mutationBefore
+                originalText = copy.deepcopy(node.children[0].symbol.text)
+
+                if originalText == u"+":
+                    node.children[0].symbol.text = u"-"
+                elif originalText == u"-":
+                    node.children[0].symbol.text = u"+"
+                else:
+                    assert False
+
+                mutationAfter = "----> after: " + node.getText()
+                if self.verbose:
+                    print mutationAfter
+                mutatedTreesTexts.append((
+                    "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementUnary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
+
+                node.children[0].symbol.text = copy.deepcopy(originalText)
+
+            return mutatedTreesTexts
+
+        elif mode == "return_nodes":
+            # mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+            nodeList = list()
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
+                                                                                      JavaParser.ExpressionContext)):
+                        continue  # not a unary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[0].symbol.text == u"+" or node.children[0].symbol.text == u"-"):
+                    continue  # not an arithmetic operator
+
+
+                nodeList.append([expressionIndex, "ArithmeticOperatorReplacementUnary"])
+
+            return nodeList
+
+        if mode == "return_tree":
+            assert nodeIndex is not None
+
+            node = self.javaParseObject.getNode(tree, nodeIndex)
             assert isinstance(node, JavaParser.ExpressionContext)
 
             try:
                 if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
                                                                                       JavaParser.ExpressionContext)):
-                    continue  # not a unary expression
+                    assert False
+
             except Exception, e:
-                continue
+                    assert False
 
             if not (node.children[0].symbol.text == u"+" or node.children[0].symbol.text == u"-"):
-                continue  # not an arithmetic operator
+                assert False
 
-            mutationBefore = "----> before: " + node.getText()
-            if self.verbose:
-                print mutationBefore
-            originalText = copy.deepcopy(node.children[0].symbol.text)
+            originalText = node.children[0].symbol.text
 
             if originalText == u"+":
                 node.children[0].symbol.text = u"-"
@@ -238,16 +408,7 @@ class JavaMutate(object):
             else:
                 assert False
 
-            mutationAfter = "----> after: " + node.getText()
-            if self.verbose:
-                print mutationAfter
-            mutatedTreesTexts.append((
-                "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementUnary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
-                    " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
-
-            node.children[0].symbol.text = copy.deepcopy(originalText)
-
-        return mutatedTreesTexts
+            return tree
 
     def arithmeticOperatorReplacementShortcut(self, tree):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
