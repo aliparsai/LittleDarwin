@@ -817,7 +817,6 @@ class JavaMutate(object):
             if not (node.children[1].symbol.text == u"&&" or node.children[1].symbol.text == u"||"):
                 assert False
 
-
             originalText = node.children[1].symbol.text
 
             if originalText == u"&&":
@@ -829,54 +828,104 @@ class JavaMutate(object):
 
             return tree
 
-
-
-    def conditionalOperatorDeletion(self, tree):  # covered by negateConditionals
+    def conditionalOperatorDeletion(self, tree, mode="return_text", nodeIndex=None):  # covered by negateConditionals
         assert isinstance(tree, JavaParser.CompilationUnitContext)
-        mutatedTreesTexts = list()
-        expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
 
-        while len(expressionList) > 0:
-            # tmpTree = copy.deepcopy(tree)
-            expressionIndex = expressionList.pop()
+        if mode == "return_text":
 
-            node = self.javaParseObject.getNode(tree, expressionIndex)
+            mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
+                                                                                      JavaParser.ExpressionContext)):
+                        continue  # not a unary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[0].symbol.text == u"!"):
+                    continue  # not a unary conditional operator
+
+                mutationBefore = "----> before: " + node.getText()
+                if self.verbose:
+                    print mutationBefore
+                originalText = copy.deepcopy(node.children[0].symbol.text)
+
+                if originalText == u"!":
+                    node.children[0].symbol.text = u" "
+                else:
+                    assert False
+
+                mutationAfter = "----> after: " + node.getText()
+                if self.verbose:
+                    print mutationAfter
+                mutatedTreesTexts.append((
+                    "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorDeletion\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
+
+                node.children[0].symbol.text = copy.deepcopy(originalText)
+
+            return mutatedTreesTexts
+
+        elif mode == "return_nodes":
+
+            nodeList = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ExpressionContext)
+
+                try:
+                    if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
+                                                                                      JavaParser.ExpressionContext)):
+                        continue  # not a unary expression
+                except Exception, e:
+                    continue
+
+                if not (node.children[0].symbol.text == u"!"):
+                    continue  # not a unary conditional operator
+
+                nodeList.append([expressionIndex, "ConditionalOperatorDeletion"])
+
+            return nodeList
+
+        elif mode == "return_tree":
+            assert nodeIndex is not None
+            node = self.javaParseObject.getNode(tree, nodeIndex)
             assert isinstance(node, JavaParser.ExpressionContext)
 
             try:
                 if not (isinstance(node.children[0], TerminalNodeImpl) and isinstance(node.children[1],
-                                                                                      JavaParser.ExpressionContext)):
-                    continue  # not a unary expression
+                                                                                  JavaParser.ExpressionContext)):
+                    assert False
             except Exception, e:
-                continue
+                assert False
 
             if not (node.children[0].symbol.text == u"!"):
-                continue  # not a unary conditional operator
+                assert False
 
-            mutationBefore = "----> before: " + node.getText()
-            if self.verbose:
-                print mutationBefore
-            originalText = copy.deepcopy(node.children[0].symbol.text)
+            originalText = node.children[0].symbol.text
 
             if originalText == u"!":
                 node.children[0].symbol.text = u" "
             else:
                 assert False
 
-            mutationAfter = "----> after: " + node.getText()
-            if self.verbose:
-                print mutationAfter
-            mutatedTreesTexts.append((
-                "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorDeletion\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
-                    " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
+            return tree
 
-            node.children[0].symbol.text = copy.deepcopy(originalText)
-
-        return mutatedTreesTexts
-
-
-    # def conditionalOperatorInsertion(self, tree): # covered by negateConditionals, both generate too many mutations
-    # pass
+    def conditionalOperatorInsertion(self, tree):   # covered by negateConditionals, both generate too many mutations
+        pass
 
     def shiftOperatorReplacement(self, tree):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
