@@ -138,22 +138,31 @@ class JavaMutate(object):
 
     def applyHigherOrderMutators(self, tree, higherOrder):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
-
+        print("Finding mutable nodes in AST")
         # Find all mutable nodes
         nodes = self.findMutableNodes(tree)
 
         # Combine all nodes
+        print("Shuffling Mutants")
         shuffle(nodes)
         nodeGroups = list()
 
+        print("Preparing Higher-Order Mutants")
         for i in range(0, len(nodes) - higherOrder + 1, higherOrder):
             nodeGroups.append([nodes[j] for j in range(i, i + higherOrder, 1)])
 
         # Run mutation operators
 
         mutatedTreeTexts = list()
+        c = 0
+
+        print("\n")
 
         for nodeGroup in nodeGroups:
+            c += 1
+            sys.stdout.write("\rProcessing HOM " + str(c) + "/" + str(len(nodeGroups)))
+            sys.stdout.flush()
+
             mutatedTreeTexts.append(self.runHigherOrderProcedure(tree, nodeGroup))
 
         return mutatedTreeTexts
