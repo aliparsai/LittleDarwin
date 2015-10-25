@@ -129,14 +129,10 @@ class JavaMutate(object):
             [node.start.line for node in originalNodes.itervalues()]) + "\n*/ \n\n" + (
                           " ".join(tree.getText().rsplit("<EOF>", 1)))  # create compilable, readable code
 
+        for nodeIndex in originalNodes.keys():
+            self.javaParseObject.setNode(tree, nodeIndex, originalNodes[nodeIndex])
 
-
-
-
-
-
-
-
+        return mutatedText
 
     def applyHigherOrderMutators(self, tree, higherOrder):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
