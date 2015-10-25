@@ -73,10 +73,70 @@ class JavaMutate(object):
 
     def findMutableNodes(self, tree):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
-        pass
+
+        mutableNodes = list()
+        mutableNodes.extend(self.arithmeticOperatorReplacementBinary(tree, "return_nodes"))
+        mutableNodes.extend(self.arithmeticOperatorReplacementShortcut(tree, "return_nodes"))
+        mutableNodes.extend(self.arithmeticOperatorReplacementUnary(tree, "return_nodes"))
+        mutableNodes.extend(self.assignmentOperatorReplacementShortcut(tree, "return_nodes"))
+        mutableNodes.extend(self.conditionalOperatorDeletion(tree, "return_nodes"))
+        mutableNodes.extend(self.conditionalOperatorReplacement(tree, "return_nodes"))
+        mutableNodes.extend(self.logicalOperatorReplacement(tree, "return_nodes"))
+        mutableNodes.extend(self.relationalOperatorReplacement(tree, "return_nodes"))
+        mutableNodes.extend(self.shiftOperatorReplacement(tree, "return_nodes"))
+
+        return mutableNodes
 
     def runHigherOrderProcedure(self, tree, nodeGroup):
-        pass
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+        assert isinstance(nodeGroup, list)
+        steps = len(nodeGroup)
+        assert steps >= 1
+
+        # Store original nodes here
+        originalNodes = dict()
+
+        for node in nodeGroup:
+            originalNodes[node] = copy.deepcopy(self.javaParseObject.getNode(tree, node))
+
+        while steps >= 1:
+            steps -= 1
+
+            node = nodeGroup.pop()
+
+            if node[1] == "ArithmeticOperatorReplacementBinary":
+                tree = self.arithmeticOperatorReplacementBinary(tree, "return_tree", node[0])
+            elif node[1] == "ArithmeticOperatorReplacementShortcut":
+                tree = self.arithmeticOperatorReplacementShortcut(tree, "return_tree", node[0])
+            elif node[1] == "ArithmeticOperatorReplacementUnary":
+                tree = self.arithmeticOperatorReplacementUnary(tree, "return_tree", node[0])
+            elif node[1] == "AssignmentOperatorReplacementShortcut":
+                tree = self.assignmentOperatorReplacementShortcut(tree, "return_tree", node[0])
+            elif node[1] == "ConditionalOperatorDeletion":
+                tree = self.conditionalOperatorDeletion(tree, "return_tree", node[0])
+            elif node[1] == "ConditionalOperatorReplacement":
+                tree = self.conditionalOperatorReplacement(tree, "return_tree", node[0])
+            elif node[1] == "LogicalOperatorReplacement":
+                tree = self.logicalOperatorReplacement(tree, "return_tree", node[0])
+            elif node[1] == "RelationalOperatorReplacement":
+                tree = self.relationalOperatorReplacement(tree, "return_tree", node[0])
+            elif node[1] == "ShiftOperatorReplacement":
+                tree = self.shiftOperatorReplacement(tree, "return_tree", node[0])
+
+        assert len(nodeGroup) == 0
+
+        mutatedText = "/* LittleDarwin generated higher order mutant\n ----> line number in original file: " + str(
+            [node.start.line for node in originalNodes.itervalues()]) + "\n*/ \n\n" + (
+                          " ".join(tree.getText().rsplit("<EOF>", 1)))  # create compilable, readable code
+
+
+
+
+
+
+
+
+
 
     def applyHigherOrderMutators(self, tree, higherOrder):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
@@ -583,17 +643,17 @@ class JavaMutate(object):
 
             return tree
 
-    def arithmeticOperatorInsertionUnary(self, tree):
-        pass
-
-    def arithmeticOperatorInsertionShortcut(self, tree):
-        pass
-
-    def arithmeticOperatorDeletionUnary(self, tree):
-        pass
-
-    def arithmeticOperatorDeletionShortcut(self, tree):
-        pass
+    # def arithmeticOperatorInsertionUnary(self, tree):
+    #     pass
+    #
+    # def arithmeticOperatorInsertionShortcut(self, tree):
+    #     pass
+    #
+    # def arithmeticOperatorDeletionUnary(self, tree):
+    #     pass
+    #
+    # def arithmeticOperatorDeletionShortcut(self, tree):
+    #     pass
 
     def relationalOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):  # covered by negateConditionals
         assert isinstance(tree, JavaParser.CompilationUnitContext)
@@ -924,8 +984,8 @@ class JavaMutate(object):
 
             return tree
 
-    def conditionalOperatorInsertion(self, tree):   # covered by negateConditionals, both generate too many mutations
-        pass
+    # def conditionalOperatorInsertion(self, tree):   # covered by negateConditionals, both generate too many mutations
+    #     pass
 
     def shiftOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
@@ -1244,11 +1304,11 @@ class JavaMutate(object):
 
 
 
-    def logicalOperatorInsertion(self, tree):
-        pass
-
-    def logicalOperatorDeletion(self, tree):
-        pass
+    # def logicalOperatorInsertion(self, tree):
+    #     pass
+    #
+    # def logicalOperatorDeletion(self, tree):
+    #     pass
 
     def assignmentOperatorReplacementShortcut(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
