@@ -94,10 +94,12 @@ class JavaMutate(object):
         assert steps >= 1
 
         # Store original nodes here
-        originalNodes = dict()
+        originalNodes = list()
 
         for node in nodeGroup:
-            originalNodes[node] = copy.deepcopy(self.javaParseObject.getNode(tree, node))
+            originalNodeAddress = self.javaParseObject.getNode(tree, node[0])
+            originalNodeContent = copy.deepcopy(originalNodeAddress)
+            originalNodes.append([node, originalNodeContent])
 
         while steps >= 1:
             steps -= 1
@@ -126,11 +128,11 @@ class JavaMutate(object):
         assert len(nodeGroup) == 0
 
         mutatedText = "/* LittleDarwin generated higher order mutant\n ----> line number in original file: " + str(
-            [node.start.line for node in originalNodes.itervalues()]) + "\n*/ \n\n" + (
+            [node[1].start.line for node in originalNodes]) + "\n*/ \n\n" + (
                           " ".join(tree.getText().rsplit("<EOF>", 1)))  # create compilable, readable code
 
-        for nodeIndex in originalNodes.keys():
-            self.javaParseObject.setNode(tree, nodeIndex, originalNodes[nodeIndex])
+        for node in originalNodes:
+            self.javaParseObject.setNode(tree, node[0], node[1])
 
         return mutatedText
 
@@ -154,15 +156,32 @@ class JavaMutate(object):
         for nodeGroup in nodeGroups:
             mutatedTreeTexts.append(self.runHigherOrderProcedure(tree, nodeGroup))
 
+        return mutatedTreeTexts
+
     def applyMutators(self, tree, higherOrder, type):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
+        mutationTypeCount = dict()
+
+        mutationTypeCount["ArithmeticOperatorReplacementBinary"] = 0
+        mutationTypeCount["ArithmeticOperatorReplacementShortcut"] = 0
+        mutationTypeCount["ArithmeticOperatorReplacementUnary"] = 0
+        mutationTypeCount["LogicalOperatorReplacement"] = 0
+        mutationTypeCount["ShiftOperatorReplacement"] = 0
+        mutationTypeCount["RelationalOperatorReplacement"] = 0
+        mutationTypeCount["ConditionalOperatorReplacement"] = 0
+        mutationTypeCount["ConditionalOperatorDeletion"] = 0
+        mutationTypeCount["AssignmentOperatorReplacementShortcut"] = 0
+        mutationTypeCount["Higher-Order"] = 0
+
         if higherOrder > 1:
-            return self.applyHigherOrderMutators(tree, higherOrder)
+            treeTexts = self.applyHigherOrderMutators(tree, higherOrder)
+            mutationTypeCount["Higher-Order"] = len(treeTexts)
+
+            return treeTexts, mutationTypeCount
 
 
         mutatedTrees = list()
-        mutationTypeCount = dict()
 
         # mutatedTrees.extend(self.arithmeticOperatorDeletionShortcut(tree))
         # mutatedTrees.extend(self.arithmeticOperatorDeletionUnary(tree))
