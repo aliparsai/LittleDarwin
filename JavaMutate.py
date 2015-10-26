@@ -142,6 +142,8 @@ class JavaMutate(object):
         print("Finding mutable nodes in AST")
         # Find all mutable nodes
         nodes = self.findMutableNodes(tree)
+        if len(nodes) == 0:
+            return list()
 
         # Combine all nodes
         print("Shuffling Mutants")
@@ -161,14 +163,14 @@ class JavaMutate(object):
         mutatedTreeTexts = list()
         c = 0
 
-        print("\n")
-
         for nodeGroup in nodeGroups:
             c += 1
             sys.stdout.write("\rProcessing HOM " + str(c) + "/" + str(len(nodeGroups)))
             sys.stdout.flush()
 
             mutatedTreeTexts.append(self.runHigherOrderProcedure(tree, nodeGroup))
+
+        print(" ")
 
         return mutatedTreeTexts
 
