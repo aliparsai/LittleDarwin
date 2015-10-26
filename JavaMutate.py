@@ -4,6 +4,7 @@ from JavaParse import JavaParse
 import copy
 from antlr4.tree.Tree import TerminalNodeImpl
 from random import shuffle
+from math import log10
 
 sys.setrecursionlimit(50000)
 
@@ -136,7 +137,7 @@ class JavaMutate(object):
 
         return mutatedText
 
-    def applyHigherOrderMutators(self, tree, higherOrder):
+    def applyHigherOrderMutators(self, tree, higherOrderDirective):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         print("Finding mutable nodes in AST")
         # Find all mutable nodes
@@ -146,6 +147,10 @@ class JavaMutate(object):
         print("Shuffling Mutants")
         shuffle(nodes)
         nodeGroups = list()
+
+        higherOrder = int(2*log10(len(nodes))) if higherOrderDirective == -1 else higherOrderDirective
+        higherOrder = 1 if higherOrder == 0 else higherOrder
+
 
         print("Preparing Higher-Order Mutants")
         for i in range(0, len(nodes) - higherOrder + 1, higherOrder):
@@ -183,7 +188,7 @@ class JavaMutate(object):
         mutationTypeCount["AssignmentOperatorReplacementShortcut"] = 0
         mutationTypeCount["Higher-Order"] = 0
 
-        if higherOrder > 1:
+        if higherOrder > 1 or higherOrder == -1:
             treeTexts = self.applyHigherOrderMutators(tree, higherOrder)
             mutationTypeCount["Higher-Order"] = len(treeTexts)
 
