@@ -125,8 +125,8 @@ class ReportGenerator(object):
             survivedMutantCount += mutationResult[1]
             totalMutantCount += mutationResult[2]
             breakdownFile.append(
-                "<tr><td><a href=\"" + os.path.relpath(os.path.join(os.path.dirname(reportPath), os.sep.join(
-                    os.path.relpath(mutationResult[0], os.path.dirname(reportPath)).split(os.sep)[4:]), "results.html"),
+                "<tr><td><a href=\"" + os.path.relpath(os.path.join(os.path.dirname(reportPath), os.sep.join([ x for x in
+                    os.path.relpath(mutationResult[0], os.path.dirname(reportPath)).split(os.sep) if x != ".."]), "results.html"),
                                                        os.path.dirname(reportPath)) + "\">" + os.path.relpath(
                     mutationResult[0], reportPath) + "</a></td> <td> " + ("%3.1f" % (100 - (
                 mutationResult[1] / float(mutationResult[
