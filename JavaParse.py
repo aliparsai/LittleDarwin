@@ -41,19 +41,34 @@ class JavaParse(object):
             print "Index: ", tree.nodeIndex, "Text: ", tree.getText()
 
 
-    def seek(self, tree, type):
+    def seek(self, myTree, type):
         seekList = list()
 
-        if isinstance(tree, type):
-            seekList.append(tree.nodeIndex)
+        if isinstance(myTree, type):
+            seekList.append(myTree.nodeIndex)
 
         try:
-            for child in tree.getChildren():
+            for child in myTree.getChildren():
                 seekList.extend(self.seek(child, type))
         except AttributeError:
             pass
 
         return seekList
+
+    def seekNode(self, myTree, nodeIndex):
+
+        if myTree.nodeIndex == nodeIndex:
+            return 0
+
+        try:
+            for child in myTree.getChildren():
+                nodeFound = self.seekNode(child, nodeIndex)
+                if nodeFound is not None:
+                    return nodeFound + 1
+        except AttributeError:
+            pass
+
+        return None
 
     def getNode(self, myTree, index):
         stack = list()
@@ -79,5 +94,19 @@ class JavaParse(object):
                 # print myTree.nodeIndex, child.nodeIndex
                 self.setNode(child, index, node)
 
+    def distance(self, myTree, node1, node2):
+        rootDistance1 = self.seekNode(myTree, node1)
+        rootDistance2 = self.seekNode(myTree, node2)
+
+        if rootDistance1 > rootDistance2:
+            distance = self.seekNode(self.getNode(myTree, node2), node1)
+
+        elif rootDistance1 < rootDistance2:
+            distance = self.seekNode(self.getNode(myTree, node1), node2)
+
+        else:
+            distance = 0 if node1 == node2 else -1
+
+        return distance
 
 
