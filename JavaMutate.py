@@ -137,6 +137,46 @@ class JavaMutate(object):
 
         return mutatedText
 
+
+    def applyHigherOrderMutatorsBasedOnDistance(self, tree, higherOrderDirective):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+        print("Finding mutable nodes in AST")
+        # Find all mutable nodes
+        nodes = self.findMutableNodes(tree)
+        if len(nodes) == 0:
+            return list()
+
+        # Combine all nodes RANDOMLY
+        print("Shuffling Mutants")
+        shuffle(nodes)
+        nodeGroups = list()
+
+        higherOrder = int(2*log10(len(nodes))) if higherOrderDirective == -1 else higherOrderDirective
+        higherOrder = 1 if higherOrder == 0 else higherOrder
+
+
+        print("Preparing Higher-Order Mutants")
+        for i in range(0, len(nodes) - higherOrder + 1, higherOrder):
+            nodeGroups.append([nodes[j] for j in range(i, i + higherOrder, 1)])
+
+        # Run mutation operators
+
+        mutatedTreeTexts = list()
+        c = 0
+
+        for nodeGroup in nodeGroups:
+            c += 1
+            sys.stdout.write("\rProcessing HOM " + str(c) + "/" + str(len(nodeGroups)))
+            sys.stdout.flush()
+
+            mutatedTreeTexts.append(self.runHigherOrderProcedure(tree, nodeGroup))
+
+        print(" ")
+
+        return mutatedTreeTexts
+
+
+
     def applyHigherOrderMutators(self, tree, higherOrderDirective):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         print("Finding mutable nodes in AST")
@@ -145,7 +185,7 @@ class JavaMutate(object):
         if len(nodes) == 0:
             return list()
 
-        # Combine all nodes
+        # Combine all nodes RANDOMLY
         print("Shuffling Mutants")
         shuffle(nodes)
         nodeGroups = list()

@@ -3,6 +3,8 @@ from antlr4.InputStream import InputStream
 from antlr4 import *
 from JavaLexer import JavaLexer
 from JavaParser import JavaParser
+import graphviz
+from antlr4.tree.Tree import TerminalNodeImpl
 
 
 class JavaParse(object):
@@ -105,8 +107,43 @@ class JavaParse(object):
             distance = self.seekNode(self.getNode(myTree, node1), node2)
 
         else:
-            distance = 0 if node1 == node2 else -1
+            distance = 0 if node1 == node2 else None
 
-        return distance
+        return distance if distance is not None else -1
 
+    def tree2DOT(self, tree):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
 
+        nodeStack = list()
+        nodes = list()
+        parent = dict()
+
+        nodeStack.append(tree)
+
+        nodes.append(type(tree).__name__ + " " + str(tree.nodeIndex))
+
+        while len(nodeStack) > 0:
+
+            tmp = nodeStack.pop()
+            if tmp.getChildCount() > 0:
+                nodeStack.extend(tmp.children)
+                for child in tmp.children:
+                    childID = type(child).__name__ + " " + str(child.nodeIndex)
+                    nodes.append(childID)
+                    parent[childID] = type(tmp).__name__ + " " + str(tmp.nodeIndex)
+
+            if isinstance(tmp, TerminalNodeImpl):
+                tokenID = "\"" + str(tmp.symbol.text) + "\" " + str(tmp.nodeIndex)
+                nodes.append(tokenID)
+                parent[tokenID] = type(tmp).__name__ + " " + str(tmp.nodeIndex)
+
+        graph = graphviz.Digraph()
+
+        for node in nodes:
+            graph.node(node)
+            try:
+                graph.edge(parent[node], node)
+            except KeyError as e:
+                pass
+
+        graph.render("img/tree")
