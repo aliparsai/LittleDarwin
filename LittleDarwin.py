@@ -247,7 +247,7 @@ def main(argv):
 
             # assigning a number to each node to be able to identify it uniquely.
             javaParse.numerify(tree)
-            javaParse.tree2DOT(tree)
+            # javaParse.tree2DOT(tree)
 
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.

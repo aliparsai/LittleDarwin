@@ -72,6 +72,36 @@ class JavaMutate(object):
         else:
             self.javaParseObject = JavaParse(self.verbose)
 
+    def returnNodeToOriginalState(self, node):
+        assert isinstance(node, TerminalNodeImpl)
+
+        try:
+            if node.symbol.oldText is not None:
+                node.symbol.text = node.symbol.oldText
+        except AttributeError as e:
+            pass
+
+
+
+    def returnTreeToOriginalState(self, tree):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        stack = list()
+        stack.append(tree)
+
+        while len(stack) > 0:
+            currentNode = stack.pop()
+
+            if isinstance(currentNode, TerminalNodeImpl):
+                self.returnNodeToOriginalState(currentNode)
+
+            if currentNode.getChildCount() > 0:
+                stack.extend(currentNode.children)
+
+
+
+
+
     def findMutableNodes(self, tree):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
@@ -95,12 +125,14 @@ class JavaMutate(object):
         assert steps >= 1
 
         # Store original nodes here
-        originalNodes = list()
+        # originalNodes = list()
 
-        for node in nodeGroup:
-            originalNodeAddress = self.javaParseObject.getNode(tree, node[0])
-            originalNodeContent = copy.deepcopy(originalNodeAddress)
-            originalNodes.append([node, originalNodeContent])
+        originalNodes = [node[0] for node in nodeGroup]
+
+        # for node in nodeGroup:
+            # originalNodeAddress = self.javaParseObject.getNode(tree, node[0])
+            # originalNodeContent = copy.deepcopy(originalNodeAddress)
+            # originalNodes.append(node)
 
         while steps >= 1:
             steps -= 1
@@ -129,11 +161,13 @@ class JavaMutate(object):
         assert len(nodeGroup) == 0
 
         mutatedText = "/* LittleDarwin generated higher order mutant\n ----> line number in original file: " + str(
-            [node[1].start.line for node in originalNodes]) + "\n*/ \n\n" + (
+            [self.javaParseObject.getNode(tree,node).start.line for node in originalNodes]) + "\n*/ \n\n" + (
                           " ".join(tree.getText().rsplit("<EOF>", 1)))  # create compilable, readable code
 
-        for node in originalNodes:
-            self.javaParseObject.setNode(tree, node[0], node[1])
+        # for node in originalNodes:
+        #     self.javaParseObject.setNode(tree, node[0], node[1])
+
+        self.returnTreeToOriginalState(tree)
 
         return mutatedText
 
@@ -474,14 +508,19 @@ class JavaMutate(object):
             originalText = node.children[1].symbol.text
 
             if originalText == u"+":
+                node.children[1].symbol.oldText = u"+"
                 node.children[1].symbol.text = u"-"
             elif originalText == u"-":
+                node.children[1].symbol.oldText = u"-"
                 node.children[1].symbol.text = u"+"
             elif originalText == u"/":
+                node.children[1].symbol.oldText = u"/"
                 node.children[1].symbol.text = u"*"
             elif originalText == u"*":
+                node.children[1].symbol.oldText = u"*"
                 node.children[1].symbol.text = u"/"
             elif originalText == u"%":
+                node.children[1].symbol.oldText = u"%"
                 node.children[1].symbol.text = u"/"
             else:
                 assert False
@@ -586,8 +625,10 @@ class JavaMutate(object):
             originalText = node.children[0].symbol.text
 
             if originalText == u"+":
+                node.children[0].symbol.oldText = u"+"
                 node.children[0].symbol.text = u"-"
             elif originalText == u"-":
+                node.children[0].symbol.oldText = u"-"
                 node.children[0].symbol.text = u"+"
             else:
                 assert False
@@ -706,8 +747,10 @@ class JavaMutate(object):
             originalText = node.children[terminalChild].symbol.text
 
             if originalText == u"++":
+                node.children[terminalChild].symbol.oldText = u"++"
                 node.children[terminalChild].symbol.text = u"--"
             elif originalText == u"--":
+                node.children[terminalChild].symbol.oldText = u"--"
                 node.children[terminalChild].symbol.text = u"++"
             else:
                 assert False
@@ -838,16 +881,22 @@ class JavaMutate(object):
             originalText = node.children[1].symbol.text
 
             if originalText == u">":
+                node.children[1].symbol.oldText = u">"
                 node.children[1].symbol.text = u"<="
             elif originalText == u"<":
+                node.children[1].symbol.oldText = u"<"
                 node.children[1].symbol.text = u">="
             elif originalText == u"<=":
+                node.children[1].symbol.oldText = u"<="
                 node.children[1].symbol.text = u">"
             elif originalText == u">=":
+                node.children[1].symbol.oldText = u">="
                 node.children[1].symbol.text = u"<"
             elif originalText == u"!=":
+                node.children[1].symbol.oldText = u"!="
                 node.children[1].symbol.text = u"=="
             elif originalText == u"==":
+                node.children[1].symbol.oldText = u"=="
                 node.children[1].symbol.text = u"!="
             else:
                 assert False
@@ -951,8 +1000,10 @@ class JavaMutate(object):
             originalText = node.children[1].symbol.text
 
             if originalText == u"&&":
+                node.children[1].symbol.oldText = u"&&"
                 node.children[1].symbol.text = u"||"
             elif originalText == u"||":
+                node.children[1].symbol.oldText = u"||"
                 node.children[1].symbol.text = u"&&"
             else:
                 assert False
@@ -1049,6 +1100,7 @@ class JavaMutate(object):
             originalText = node.children[0].symbol.text
 
             if originalText == u"!":
+                node.children[0].symbol.oldText = u"!"
                 node.children[0].symbol.text = u" "
             else:
                 assert False
@@ -1246,6 +1298,7 @@ class JavaMutate(object):
                 originalText3 = node.children[3].symbol.text
 
                 if originalText1 == u">" and originalText2 == u">" and originalText3 == u">":
+                    node.children[3].symbol.oldText = u">"
                     node.children[3].symbol.text = u" "
                 else:
                     assert False
@@ -1255,9 +1308,13 @@ class JavaMutate(object):
                 originalText2 = node.children[2].symbol.text
 
                 if originalText1 == u">" and originalText2 == u">":
+                    node.children[1].symbol.oldText = u">"
+                    node.children[2].symbol.oldText = u">"
                     node.children[1].symbol.text = u"<"
                     node.children[2].symbol.text = u"<"
                 elif originalText1 == u"<" and originalText2 == u"<":
+                    node.children[1].symbol.oldText = u"<"
+                    node.children[2].symbol.oldText = u"<"
                     node.children[1].symbol.text = u">"
                     node.children[2].symbol.text = u">"
                 else:
@@ -1363,10 +1420,13 @@ class JavaMutate(object):
             originalText = node.children[1].symbol.text
 
             if originalText == u"&":
+                node.children[1].symbol.oldText = u"&"
                 node.children[1].symbol.text = u"|"
             elif originalText == u"|":
+                node.children[1].symbol.oldText = u"|"
                 node.children[1].symbol.text = u"^"
             elif originalText == u"^":
+                node.children[1].symbol.oldText = u"^"
                 node.children[1].symbol.text = u"&"
             else:
                 assert False
@@ -1507,27 +1567,39 @@ class JavaMutate(object):
 
             originalText = node.children[1].symbol.text
 
+
             if originalText == u"+=":
+                node.children[1].symbol.oldText = u"+="
                 node.children[1].symbol.text = u"-="
             elif originalText == u"-=":
+                node.children[1].symbol.oldText = u"-="
                 node.children[1].symbol.text = u"+="
             elif originalText == u"/=":
+                node.children[1].symbol.oldText = u"/="
                 node.children[1].symbol.text = u"*="
             elif originalText == u"*=":
+                node.children[1].symbol.oldText = u"*="
                 node.children[1].symbol.text = u"/="
             elif originalText == u"%=":
+                node.children[1].symbol.oldText = u"%="
                 node.children[1].symbol.text = u"/="
             elif originalText == u"&=":
+                node.children[1].symbol.oldText = u"&="
                 node.children[1].symbol.text = u"|="
             elif originalText == u"|=":
+                node.children[1].symbol.oldText = u"|="
                 node.children[1].symbol.text = u"^="
             elif originalText == u"^=":
+                node.children[1].symbol.oldText = u"^="
                 node.children[1].symbol.text = u"&="
             elif originalText == u">>=":
+                node.children[1].symbol.oldText = u">>="
                 node.children[1].symbol.text = u">>>="
             elif originalText == u"<<=":
+                node.children[1].symbol.oldText = u"<<="
                 node.children[1].symbol.text = u">>="
             elif originalText == u">>>=":
+                node.children[1].symbol.oldText = u">>>="
                 node.children[1].symbol.text = u">>="
             else:
                 assert False
