@@ -131,9 +131,9 @@ def main(argv):
  / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /
 /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/
 
-     _                     _                 ___
-    /_|  /|/|  _/__/'     /_|   _ /   _ ' _ (_  _ _ _  _      _ /
-   (  | /   |(//(///()/) (  |/)(/((/_) /_)  /  / (///)(-((/()/ /(
+      _                     _                 ___
+     /_|  /|/|  _/__/'     /_|   _ /   _ ' _ (_  _ _ _  _      _ /
+    (  | /   |(//(///()/) (  |/)(/((/_) /_)  /  / (///)(-((/()/ /(
                                   /
 
 
@@ -154,37 +154,45 @@ def main(argv):
     optionParser = OptionParser()
 
     optionParser.add_option("-m", "--mutate", action="store_true", dest="isMutationActive", default=False,
-                            help="activate the mutation phase")
+                            help="Activate the mutation phase.")
     optionParser.add_option("-b", "--build", action="store_true", dest="isBuildActive", default=False,
-                            help="activate the build phase")
+                            help="Activate the build phase.")
     optionParser.add_option("-v", "--verbose", action="store_true", dest="isVerboseActive", default=False,
-                            help="verbose output")
+                            help="Verbose output.")
     optionParser.add_option("-p", "--path", action="store", dest="sourcePath",
-                            default=os.path.dirname(os.path.realpath(__file__)), help="path to source files")
+                            default=os.path.dirname(os.path.realpath(__file__)), help="Path to source files.")
     optionParser.add_option("-t", "--build-path", action="store", dest="buildPath",
-                            default=os.path.dirname(os.path.realpath(__file__)), help="path to build system working directory")
+                            default=os.path.dirname(os.path.realpath(__file__)), help="Path to build system working directory.")
     optionParser.add_option("-c", "--build-command", action="store", dest="buildCommand", default="mvn,test",
-                            help="command to run the build system. if it includes more than a single argument, they should be seperated by comma. for example: mvn,install")
+                            help="Command to run the build system. If it includes more than a single argument, they should be seperated by comma. For example: mvn,install")
     optionParser.add_option("--test-path", action="store", dest="testPath",
                             default="***dummy***", help="path to test project build system working directory")
     optionParser.add_option("--test-command", action="store", dest="testCommand", default="***dummy***",
-                            help="command to run the test-suite. if it includes more than a single argument, they should be seperated by comma. for example: mvn,test")
+                            help="Command to run the test-suite. If it includes more than a single argument, they should be seperated by comma. For example: mvn,test")
     optionParser.add_option("--initial-build-command", action="store", dest="initialBuildCommand",
-                            default="***dummy***", help="command to run the initial build")
+                            default="***dummy***", help="Command to run the initial build.")
     optionParser.add_option("--timeout", type="int", action="store", dest="timeout", default=60,
-                            help="timeout value for the build process")
+                            help="Timeout value for the build process.")
     optionParser.add_option("--cleanup", action="store", dest="cleanUp", default="***dummy***",
-                            help="commands to run after each build")
+                            help="Commands to run after each build.")
     optionParser.add_option("--use-alternate-database", action="store", dest="alternateDb", default="***dummy***",
-                            help="path to alternative database")
-
+                            help="Path to alternative database.")
     optionParser.add_option("--license", action="store_true", dest="isLicenseActive", default=False,
-                            help="output the license and exit")
+                            help="Output the license and exit.")
+    optionParser.add_option("--higher-order", type="int", action="store", dest="higherOrder", default=1,
+                            help="Define order of mutation. Use -1 to dynamically adjust per class.")
+
+
     (options, args) = optionParser.parse_args()
 
     if options.isLicenseActive:
         License.outputLicense()
         sys.exit(0)
+
+    if options.higherOrder <= 1 and options.higherOrder != -1:
+        higherOrder = 1
+    else:
+        higherOrder = options.higherOrder
 
     # there is an upside in not running two phases together. we may include the ability to edit some mutants later.
     if options.isBuildActive and options.isMutationActive:
@@ -239,10 +247,11 @@ def main(argv):
 
             # assigning a number to each node to be able to identify it uniquely.
             javaParse.numerify(tree)
+            # javaParse.tree2DOT(tree)
 
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.
-            mutated, mutantTypes = javaMutate.applyMutators(tree, "all")
+            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, "all")
 
             print "--> mutations found: ", len(mutated)
 

@@ -124,16 +124,17 @@ class ReportGenerator(object):
         for mutationResult in resultData:
             survivedMutantCount += mutationResult[1]
             totalMutantCount += mutationResult[2]
-            breakdownFile.append(
-                "<tr><td><a href=\"" + os.path.relpath(os.path.join(os.path.dirname(reportPath), os.sep.join([ x for x in
-                    os.path.relpath(mutationResult[0], os.path.dirname(reportPath)).split(os.sep) if x != ".."]), "results.html"),
-                                                       os.path.dirname(reportPath)) + "\">" + os.path.relpath(
-                    mutationResult[0], reportPath) + "</a></td> <td> " + ("%3.1f" % (100 - (
-                mutationResult[1] / float(mutationResult[
-                    2]) * 100))) + " </td> <td> <div class=\"coverage_bar\"><div class=\"coverage_complete\" style=\"width:" + (
-                "%d" % (100 - (mutationResult[1] / float(
-                    mutationResult[2]) * 100))) + "%\"></div><div class=\"coverage_legend\">" + str(
-                    mutationResult[2] - mutationResult[1]) + "/" + str(mutationResult[2]) + "</div></div></td></tr>")
+            breakdownFile.append("<tr><td><a href=\"" + os.path.join(os.sep.join(
+                [x for x in os.path.relpath(mutationResult[0], os.path.dirname(reportPath)).split(os.sep) if
+                 x != ".."]), "results.html") + "\">" + os.path.relpath(mutationResult[0],
+                                                                        reportPath) + "</a></td> <td> " + ("%3.1f" % (
+                100 - (mutationResult[1] / float(mutationResult[
+                                                     2]) * 100))) + " </td> <td> <div class=\"coverage_bar\"><div class=\"coverage_complete\" style=\"width:" + (
+                                     "%d" % (100 - (mutationResult[1] / float(
+                                         mutationResult[
+                                             2]) * 100))) + "%\"></div><div class=\"coverage_legend\">" + str(
+                mutationResult[2] - mutationResult[1]) + "/" + str(mutationResult[2]) + "</div></div></td></tr>")
+
 
         killedMutantCount = totalMutantCount - survivedMutantCount
 
@@ -323,3 +324,4 @@ class ReportGenerator(object):
         reportOutput.append(reportEnd)
 
         return '\n'.join(reportOutput)
+
