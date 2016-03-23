@@ -46,7 +46,7 @@ class MutationOperator(object):
             self.mutateNode(nodeIndex)
             mutatedCode.append((
                                "/* LittleDarwin generated mutant \nmutant type: " + self.type + "\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
-                                   self.mutatedNodes[nodeIndex].start.line) + "\n*/ \n\n" + (
+                                   self.mutatedNodes[nodeIndex].start.line) + "\n----> mutated nodes: " + str(nodeIndex) + "\n*/ \n\n" + (
                                " ".join(self.tree.getText().rsplit("<EOF>", 1)))))
             self.unmutateNode(nodeIndex)
 
@@ -161,7 +161,8 @@ class JavaMutate(object):
         assert len(nodeGroup) == 0
 
         mutatedText = "/* LittleDarwin generated higher order mutant\n ----> line number in original file: " + str(
-            [self.javaParseObject.getNode(tree,node).start.line for node in originalNodes]) + "\n*/ \n\n" + (
+            [self.javaParseObject.getNode(tree, node).start.line for node in
+             originalNodes]).strip("[]") + "\n----> mutated nodes: " + str(originalNodes).strip("[]") + "\n*/ \n\n" + (
                           " ".join(tree.getText().rsplit("<EOF>", 1)))  # create compilable, readable code
 
         # for node in originalNodes:
@@ -444,7 +445,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementBinary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementBinary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n"  + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText)
@@ -570,7 +571,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementUnary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementUnary\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[0].symbol.text = copy.deepcopy(originalText)
@@ -682,7 +683,7 @@ class JavaMutate(object):
                     print mutationAfter
 
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementShortcut\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: arithmeticOperatorReplacementShortcut\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[terminalChild].symbol.text = copy.deepcopy(originalText)
@@ -823,7 +824,7 @@ class JavaMutate(object):
 
                 mutatedTreesTexts.append((
                     (
-                        "/* LittleDarwin generated mutant\n mutant type: relationalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        "/* LittleDarwin generated mutant\n mutant type: relationalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1))))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText)
@@ -945,7 +946,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText)
@@ -1048,7 +1049,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorDeletion\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: conditionalOperatorDeletion\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[0].symbol.text = copy.deepcopy(originalText)
@@ -1190,7 +1191,7 @@ class JavaMutate(object):
                     print mutationAfter
 
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: shiftOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: shiftOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                     " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText1)
@@ -1366,7 +1367,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: logicalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: logicalOperatorReplacement\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText)
@@ -1505,7 +1506,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print mutationAfter
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: assignmentOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                    "/* LittleDarwin generated mutant\n mutant type: assignmentOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line)  + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                         " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
                 node.children[1].symbol.text = copy.deepcopy(originalText)
