@@ -117,7 +117,7 @@ if not os.path.isdir(secondOrderPath) or not os.path.isfile(os.path.join(secondO
 firstOrderClasses = listClasses(firstOrderPath)
 secondOrderClasses = listClasses(secondOrderPath)
 
-classes = list()
+classes = dict()
 
 for secondOrderClass in secondOrderClasses:
     assert isinstance(secondOrderClass, JavaClass)
@@ -132,8 +132,69 @@ for secondOrderClass in secondOrderClasses:
         for node in secondOrderMutant.nodes:
             firstOrderMutants.append(firstOrderClass.findMutantByNode(node).id)
         mutantPairs[secondOrderMutant.id] = firstOrderMutants
-    classes.append(mutantPairs)
+    classes[secondOrderClass.name] = mutantPairs
 
 
+# count the anomalies
 
-print (classes)
+for cname, c in classes.iteritems():
+    processedIDs1 = list()
+    processedIDs2 = list()
+
+    s2k = 0
+    k2s = 0
+    normal = 0
+    hcl = getClassByName(cname, secondOrderClasses)
+    fcl = getClassByName(cname, firstOrderClasses)
+
+    assert isinstance(c, dict)
+
+    for key, value in c.iteritems():
+        #### assertions
+
+        assert key not in processedIDs2
+        assert isinstance(value, list)
+        assert len(value) == len(set(value))
+        for k in value:
+            assert k not in processedIDs1
+
+        processedIDs2.append(key)
+        processedIDs1.extend(value)
+
+        #### counting
+        hom = hcl.findMutantByID(key)
+        assert isinstance(hom, Mutant)
+
+        foms = [fcl.findMutantByID(fid) for fid in value]
+
+        assert hom.status != 0
+        if hom.status == -1:
+            for fom in foms:
+                assert isinstance(fom, Mutant)
+                assert fom.status != 0
+                flag = False
+                if fom.status == -1:
+                    flag = True
+                    break
+            if flag:
+                normal += 1
+            else:
+                print cname, hom.id, [f.id for f in foms]
+                s2k += 1
+
+        elif hom.status == 1:
+            for fom in foms:
+                assert isinstance(fom, Mutant)
+                assert fom.status != 0
+                flag = False
+                if fom.status == -1:
+                    print cname, hom.id, [f.id for f in foms], fom.id
+                    flag = True
+                    break
+            if flag:
+                k2s += 1
+            else:
+                normal += 1
+
+    print cname, normal, k2s, s2k
+
