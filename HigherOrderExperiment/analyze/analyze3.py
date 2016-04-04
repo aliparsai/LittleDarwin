@@ -18,13 +18,27 @@ for i in range(1,61):
         
     fo = list()
     so = list()
-    
-    for i in range(0,len(inF)):
+
+    maxLength = len(inF)
+
+    if len(inF) != len(inS):
+        print "[WARN}", inputFileF, inputFileS, "not equal size.", len(inF), len(inS)
+        if len(inS) > maxLength:
+            assert False
+
+    skipped = 0
+    for i in range(0, maxLength):
         inFs = inF[i].split(',')
-        fop = (float(inFs[2])/float(inFs[3]))
+        inSs = inS[i - skipped].split(',')
+
+        if inFs[0] != inSs[0]:
+            skipped += 1
+            print inFs[0], "not found."
+            continue
+
+        fop = (float(inFs[2]) / float(inFs[3]))
+
         fo.append(fop*2 - fop**2)
-        
-        inSs = inS[i].split(',')
         so.append(float(inSs[2])/float(inSs[3]))
     
     # print (fo,so)
