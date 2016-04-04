@@ -19,7 +19,7 @@ if len(sys.argv) < 3:
 
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
-thresholdRange = int(sys.argv[2])
+thresholdRange = int(sys.argv[3])
 
 if thresholdRange <= 0:
     thresholdRange = 1
