@@ -4,7 +4,7 @@ from scipy.stats.stats import pearsonr
 
 corr = list()
 
-for i in range(1,31):
+for i in range(1,41):
     inputFileF = "fo-"+ str(3*i) + ".csv"
     inputFileS = "to-"+ str(i) + ".csv"
     
