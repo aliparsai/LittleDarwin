@@ -40,6 +40,14 @@ java.org.apache.commons.codec.net.QCodec,0,7,7
 java.org.apache.commons.codec.net.QuotedPrintableCodec,0,19,19
 java.org.apache.commons.codec.net.RFC1522Codec,0,4,4
 java.org.apache.commons.codec.net.URLCodec,0,9,9
+java.org.apache.commons.fileupload.FileUploadBase,0,23,23
+java.org.apache.commons.fileupload.MultipartStream,0,31,31
+java.org.apache.commons.fileupload.ParameterParser,0,18,18
+java.org.apache.commons.fileupload.disk.DiskFileItem,0,8,8
+java.org.apache.commons.fileupload.util.Streams,0,4,4
+java.org.apache.commons.fileupload.util.mime.Base64Decoder,0,10,10
+java.org.apache.commons.fileupload.util.mime.MimeUtility,0,12,12
+java.org.apache.commons.fileupload.util.mime.QuotedPrintableDecoder,0,6,6
 java.org.apache.commons.lang3.AnnotationUtils,0,9,9
 java.org.apache.commons.lang3.ArrayUtils,0,260,260
 java.org.apache.commons.lang3.BitField,0,5,5
@@ -96,6 +104,12 @@ java.org.apache.commons.lang3.time.FastDatePrinter,0,40,40
 java.org.apache.commons.lang3.time.FormatCache,0,5,5
 java.org.apache.commons.lang3.time.StopWatch,0,8,8
 java.com.github.kevinsawicki.http.HttpRequest,0,75,75
+jdepend.framework.ClassFileParser,0,30,30
+jdepend.framework.FileManager,0,4,4
+jdepend.framework.JavaPackage,0,5,5
+jdepend.swingui.JDepend,0,9,9
+jdepend.textui.JDepend,0,11,11
+jdepend.xmlui.JDepend,0,5,5
 java.org.jgrapht.alg.BellmanFordIterator,0,4,4
 java.org.jgrapht.alg.BlockCutpointGraph,0,5,5
 java.org.jgrapht.alg.CliqueMinimalSeparatorDecomposition,0,10,10

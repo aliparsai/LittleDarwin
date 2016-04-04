@@ -16,6 +16,9 @@ java.org.apache.commons.codec.language.Metaphone,4,90,94
 java.org.apache.commons.codec.language.Nysiis,0,59,59
 java.org.apache.commons.codec.language.bm.Rule,4,66,70
 java.org.apache.commons.codec.net.QuotedPrintableCodec,1,58,59
+java.org.apache.commons.fileupload.FileUploadBase,22,47,69
+java.org.apache.commons.fileupload.MultipartStream,14,80,94
+java.org.apache.commons.fileupload.ParameterParser,2,53,55
 java.org.apache.commons.lang3.ArrayUtils,2,780,782
 java.org.apache.commons.lang3.BooleanUtils,6,130,136
 java.org.apache.commons.lang3.ClassUtils,9,114,123

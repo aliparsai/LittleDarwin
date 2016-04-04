@@ -54,6 +54,15 @@ java.org.apache.commons.codec.net.QCodec,2,19,21
 java.org.apache.commons.codec.net.QuotedPrintableCodec,1,58,59
 java.org.apache.commons.codec.net.RFC1522Codec,1,11,12
 java.org.apache.commons.codec.net.URLCodec,0,29,29
+java.org.apache.commons.fileupload.FileUploadBase,22,47,69
+java.org.apache.commons.fileupload.MultipartStream,14,80,94
+java.org.apache.commons.fileupload.ParameterParser,2,53,55
+java.org.apache.commons.fileupload.disk.DiskFileItem,14,11,25
+java.org.apache.commons.fileupload.util.LimitedInputStream,3,3,6
+java.org.apache.commons.fileupload.util.Streams,1,11,12
+java.org.apache.commons.fileupload.util.mime.Base64Decoder,8,22,30
+java.org.apache.commons.fileupload.util.mime.MimeUtility,9,27,36
+java.org.apache.commons.fileupload.util.mime.QuotedPrintableDecoder,3,15,18
 java.org.apache.commons.lang3.AnnotationUtils,3,26,29
 java.org.apache.commons.lang3.ArrayUtils,2,780,782
 java.org.apache.commons.lang3.BitField,3,14,17

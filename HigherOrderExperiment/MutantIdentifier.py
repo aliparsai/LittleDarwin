@@ -7,8 +7,11 @@ class Mutant(object):
     def __init__(self):
         self.id = None
         self.nodes = list()
-        self.status = 0     # 0 unknown, 1 survived, -1 killed
+        self.status = 999     # 0 unknown, 1 survived, -1 killed, 999 unset
         self.path = None
+
+    def __str__(self):
+        return " ".join(str(x) for x in ["Mutant ", self.id, "| Path:", self.path, "| Status:", self.status, "| Nodes:", self.nodes])
 
 
 class JavaClass(object):
@@ -62,7 +65,7 @@ class JavaClass(object):
                             newMutant.status = -1
                         else:
                             newMutant.status = 0
-                    break
+                        break
 
 
                 self.mutants.append(newMutant)
@@ -105,12 +108,12 @@ secondOrderPath = sys.argv[2]
 
 
 if not os.path.isdir(firstOrderPath) or not os.path.isfile(os.path.join(firstOrderPath, "report.txt")):
-    print("Error: FirstOrderPath Incorrect.")
+    print("Error: FirstOrderPath Incorrect.", firstOrderPath)
     sys.exit(1)
 
 
 if not os.path.isdir(secondOrderPath) or not os.path.isfile(os.path.join(secondOrderPath, "report.txt")):
-    print("Error: SecondOrderPath Incorrect.")
+    print("Error: SecondOrderPath Incorrect.", secondOrderPath)
     sys.exit(1)
 
 
@@ -136,6 +139,8 @@ for secondOrderClass in secondOrderClasses:
 
 
 # count the anomalies
+
+writeHandle = open(sys.argv[3], "w")
 
 for cname, c in classes.iteritems():
     processedIDs1 = list()
@@ -167,34 +172,39 @@ for cname, c in classes.iteritems():
 
         foms = [fcl.findMutantByID(fid) for fid in value]
 
+        if hom.status not in [1, -1]:
+            print hom, "\n unknown status"
         assert hom.status != 0
+
+
         if hom.status == -1:
             for fom in foms:
                 assert isinstance(fom, Mutant)
                 assert fom.status != 0
-                flag = False
+                statusFlag = False
                 if fom.status == -1:
-                    flag = True
+                    statusFlag = True
                     break
-            if flag:
+            if statusFlag:
                 normal += 1
             else:
-                print cname, hom.id, [f.id for f in foms]
+                sys.stdout.write(",".join(str(x) for x in [cname, hom.id, [f.id for f in foms], "all FOMs survived, HOM killed\n"]))
                 s2k += 1
 
         elif hom.status == 1:
             for fom in foms:
                 assert isinstance(fom, Mutant)
                 assert fom.status != 0
-                flag = False
+                statusFlag = False
                 if fom.status == -1:
-                    print cname, hom.id, [f.id for f in foms], fom.id
-                    flag = True
+                    sys.stdout.write(",".join(str(x) for x in [cname, hom.id, [f.id for f in foms], fom.id, "FOM killed, HOM survived\n"]))
+                    statusFlag = True
                     break
-            if flag:
+            if statusFlag:
                 k2s += 1
             else:
                 normal += 1
 
-    print cname, normal, k2s, s2k
+    writeHandle.write(",".join(str(x) for x in [cname, normal, k2s, s2k, "\n"]))
 
+writeHandle.close()

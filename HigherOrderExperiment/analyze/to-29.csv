@@ -4,6 +4,7 @@ java.org.apache.commons.codec.binary.Base64,2,62,64
 java.org.apache.commons.codec.digest.UnixCrypt,4,57,61
 java.org.apache.commons.codec.language.DoubleMetaphone,0,133,133
 java.org.apache.commons.codec.language.Metaphone,0,31,31
+java.org.apache.commons.fileupload.MultipartStream,0,31,31
 java.org.apache.commons.lang3.ArrayUtils,0,260,260
 java.org.apache.commons.lang3.BooleanUtils,0,45,45
 java.org.apache.commons.lang3.ClassUtils,0,41,41
@@ -20,6 +21,7 @@ java.org.apache.commons.lang3.time.DateUtils,0,47,47
 java.org.apache.commons.lang3.time.DurationFormatUtils,0,33,33
 java.org.apache.commons.lang3.time.FastDatePrinter,0,40,40
 java.com.github.kevinsawicki.http.HttpRequest,0,75,75
+jdepend.framework.ClassFileParser,0,30,30
 java.org.jgrapht.alg.KuhnMunkresMinimalWeightBipartitePerfectMatching,1,40,41
 java.org.joda.time.DateTimeZone,0,48,48
 java.org.joda.time.Partial,0,29,29

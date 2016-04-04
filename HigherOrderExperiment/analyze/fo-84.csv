@@ -5,6 +5,7 @@ java.org.apache.commons.codec.binary.Base64,57,135,192
 java.org.apache.commons.codec.digest.UnixCrypt,72,113,185
 java.org.apache.commons.codec.language.DoubleMetaphone,50,351,401
 java.org.apache.commons.codec.language.Metaphone,4,90,94
+java.org.apache.commons.fileupload.MultipartStream,14,80,94
 java.org.apache.commons.lang3.ArrayUtils,2,780,782
 java.org.apache.commons.lang3.BooleanUtils,6,130,136
 java.org.apache.commons.lang3.ClassUtils,9,114,123

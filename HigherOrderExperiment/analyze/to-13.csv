@@ -18,6 +18,9 @@ java.org.apache.commons.codec.language.Metaphone,0,31,31
 java.org.apache.commons.codec.language.Nysiis,0,19,19
 java.org.apache.commons.codec.language.bm.Rule,0,23,23
 java.org.apache.commons.codec.net.QuotedPrintableCodec,0,19,19
+java.org.apache.commons.fileupload.FileUploadBase,0,23,23
+java.org.apache.commons.fileupload.MultipartStream,0,31,31
+java.org.apache.commons.fileupload.ParameterParser,0,18,18
 java.org.apache.commons.lang3.ArrayUtils,0,260,260
 java.org.apache.commons.lang3.BooleanUtils,0,45,45
 java.org.apache.commons.lang3.CharRange,0,14,14
@@ -49,6 +52,7 @@ java.org.apache.commons.lang3.time.DurationFormatUtils,0,33,33
 java.org.apache.commons.lang3.time.FastDateParser,0,19,19
 java.org.apache.commons.lang3.time.FastDatePrinter,0,40,40
 java.com.github.kevinsawicki.http.HttpRequest,0,75,75
+jdepend.framework.ClassFileParser,0,30,30
 java.org.jgrapht.alg.KuhnMunkresMinimalWeightBipartitePerfectMatching,1,40,41
 java.org.jgrapht.experimental.alg.color.GreedyColoring,0,16,16
 java.org.jgrapht.experimental.dag.DirectedAcyclicGraph,5,18,23
