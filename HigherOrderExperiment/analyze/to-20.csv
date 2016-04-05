@@ -66,6 +66,6 @@ java.org.jsoup.parser.TokenQueue,1,22,23
 java.org.jsoup.select.Evaluator,0,20,20
 java.com.grahamedgecombe.jterminal.vt100.Vt100TerminalModel,3,28,31
 java.net.hydromatic.linq4j.expressions.BlockBuilder,0,21,21
-java.net.hydromatic.linq4j.expressions.Expressions,0,22,22
+java.net.hydromatic.linq4j.expressions.Expressions,1,21,22
 java.net.hydromatic.linq4j.expressions.OptimizeVisitor,0,23,23
 java.sun.pitest.CodeCoverageStore,38,7,45
