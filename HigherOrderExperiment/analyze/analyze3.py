@@ -41,9 +41,11 @@ for i in range(1,41):
 
 
         fop = (float(inFs[2])/float(inFs[3]))
-
-        fo.append( fop*3 - 3*(fop**2) + fop**3)
-        so.append(float(inSs[2])/float(inSs[3]))
+	# print fop
+	sop = (float(inSs[2])/float(inSs[3]))
+ 
+        fo.append( fop )
+        so.append( 1 - (1- sop)**0.333333 )
     
     # print (fo,so)
     

@@ -1,0 +1,8 @@
+java.joptsimple.ParserRules,1,0,0,
+java.joptsimple.ArgumentAcceptingOptionSpec,1,0,0,
+java.joptsimple.BuiltinHelpFormatter,3,0,0,
+java.joptsimple.OptionParser,3,0,0,
+java.joptsimple.OptionSpecTokenizer,2,0,0,
+java.joptsimple.OptionSet,2,0,0,
+java.joptsimple.util.KeyValuePair,1,0,0,
+java.joptsimple.internal.AbbreviationMap,3,0,0,

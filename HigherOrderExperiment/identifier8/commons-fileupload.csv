@@ -1,0 +1,8 @@
+java.org.apache.commons.fileupload.FileUploadBase,8,0,0,
+java.org.apache.commons.fileupload.util.Streams,1,0,0,
+java.org.apache.commons.fileupload.ParameterParser,6,0,0,
+java.org.apache.commons.fileupload.util.mime.Base64Decoder,3,0,0,
+java.org.apache.commons.fileupload.MultipartStream,11,0,0,
+java.org.apache.commons.fileupload.disk.DiskFileItem,3,0,0,
+java.org.apache.commons.fileupload.util.mime.QuotedPrintableDecoder,2,0,0,
+java.org.apache.commons.fileupload.util.mime.MimeUtility,4,0,0,

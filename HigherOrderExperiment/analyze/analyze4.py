@@ -4,9 +4,9 @@ from scipy.stats.stats import pearsonr
 
 corr = list()
 
-for i in range(1,16):
-    inputFileF = "fo-"+ str(8*i) + ".csv"
-    inputFileS = "8o-"+ str(i) + ".csv"
+for i in range(1,31):
+    inputFileF = "fo-"+ str(4*i) + ".csv"
+    inputFileS = "4o-"+ str(i) + ".csv"
     
 
 
@@ -45,12 +45,12 @@ for i in range(1,16):
 	sop = (float(inSs[2])/float(inSs[3]))
  
         fo.append( fop )
-        so.append( 1 - (1- sop)**0.125 )
+        so.append( 1 - (1- sop)**0.25 )
     
     # print (fo,so)
     
     r,p = pearsonr(fo, so)
     corr.append(str(r**2)+"\n")
 
-with open("corr8.csv", 'w') as corrF:
+with open("corr4.csv", 'w') as corrF:
     corrF.writelines(corr)
