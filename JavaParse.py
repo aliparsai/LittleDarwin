@@ -3,8 +3,14 @@ from antlr4.InputStream import InputStream
 from antlr4 import *
 from JavaLexer import JavaLexer
 from JavaParser import JavaParser
-import graphviz
 from antlr4.tree.Tree import TerminalNodeImpl
+
+try:
+    import graphviz
+    noGraphviz = False
+
+except ImportError as e:
+    noGraphviz = True
 
 
 class JavaParse(object):
@@ -12,7 +18,6 @@ class JavaParse(object):
         self.verbose = verbose
 
     # antlr-based parser
-
 
     def parse(self, file_content):
         inputS = InputStream.InputStream(file_content)
@@ -22,7 +27,6 @@ class JavaParse(object):
         tree = parser.compilationUnit()
         # tree.getText()
         return tree
-
 
     def numerify(self, tree):
         numerifyCounter = 1
@@ -41,7 +45,6 @@ class JavaParse(object):
                 self.toString(child)
         except AttributeError:
             print "Index: ", tree.nodeIndex, "Text: ", tree.getText()
-
 
     def seek(self, myTree, type):
         seekList = list()
@@ -112,6 +115,9 @@ class JavaParse(object):
         return distance if distance is not None else -1
 
     def tree2DOT(self, tree):
+        if noGraphviz:
+            return
+
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         nodeStack = list()
