@@ -221,29 +221,29 @@ def main(argv):
 
 
         # getting the list of files.
-        javaRead.list_files(os.path.abspath(options.sourcePath))
+        javaRead.listFiles(os.path.abspath(options.sourcePath))
         fileCounter = 0
-        fileCount = len(javaRead.file_list)
+        fileCount = len(javaRead.fileList)
 
         # creating a database for generated mutants. the format of this database is different on different platforms,
         # so it cannot be simply copied from a platform to another.
-        databasePath = os.path.join(javaRead.target_dir, "mutationdatabase")
+        databasePath = os.path.join(javaRead.targetDirectory, "mutationdatabase")
 
-        print "source dir: ", javaRead.source_dir
-        print "target dir: ", javaRead.target_dir
+        print "source dir: ", javaRead.sourceDirectory
+        print "target dir: ", javaRead.targetDirectory
         print "creating mutation database: ", databasePath
 
         mutationDatabase = shelve.open(databasePath, "c")
         mutantTypeDatabase = dict()
 
         # go through each file, parse it, calculate all mutations, and generate files accordingly.
-        for srcFile in javaRead.file_list:
+        for srcFile in javaRead.fileList:
             fileCounter += 1
             print "(" + str(fileCounter) + "/" + str(fileCount) + ") source file: ", srcFile
             targetList = list()
 
             # parsing the source file into a tree.
-            tree = javaParse.parse(javaRead.get_file_content(srcFile))
+            tree = javaParse.parse(javaRead.getFileContent(srcFile))
 
             # assigning a number to each node to be able to identify it uniquely.
             javaParse.numerify(tree)
@@ -264,11 +264,11 @@ def main(argv):
 
             # for each mutant, generate the file, and add it to the list.
             for mutatedFile in mutated:
-                targetList.append(javaRead.generate_new_file(srcFile, mutatedFile))
+                targetList.append(javaRead.generateNewFile(srcFile, mutatedFile))
 
             # if the list is not empty (some mutants were found), put the data in the database.
             if len(targetList) != 0:
-                mutationDatabase[os.path.relpath(srcFile, javaRead.source_dir)] = targetList
+                mutationDatabase[os.path.relpath(srcFile, javaRead.sourceDirectory)] = targetList
 
         mutationDatabase.close()
 

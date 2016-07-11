@@ -1,42 +1,41 @@
 import fnmatch
+import io
 import os
 import shutil
 import unicodedata
-import io
-
 
 
 class JavaRead(object):
     def __init__(self, verbose=False):
         self.verbose = False
-        self.source_dir = None
-        self.target_dir = None
-        self.file_list = list()
+        self.sourceDirectory = None
+        self.targetDirectory = None
+        self.fileList = list()
 
-
-    def list_files(self, target_path=None, desired_type="*.java"):
-        #print target_path, desired_type
-        self.source_dir = target_path
-        self.target_dir = os.path.abspath(os.path.join(target_path, os.path.pardir, "mutated"))
+    def listFiles(self, target_path=None, desired_type="*.java"):
+        # print target_path, desired_type
+        self.sourceDirectory = target_path
+        self.targetDirectory = os.path.abspath(os.path.join(target_path, os.path.pardir, "mutated"))
 
         for root, dirnames, filenames in os.walk(target_path):
             for filename in fnmatch.filter(filenames, desired_type):
-                self.file_list.append(os.path.join(root, filename))
+                self.fileList.append(os.path.join(root, filename))
 
-        if not os.path.exists(self.target_dir):
-            os.makedirs(self.target_dir)
+        if not os.path.exists(self.targetDirectory):
+            os.makedirs(self.targetDirectory)
 
-    def get_file_content(self, file_path=None):
-        with io.open(file_path, mode='r', errors='replace') as content_file:
-            file_data = content_file.read()
+    def getFileContent(self, filePath=None):
+        with io.open(filePath, mode='r', errors='replace') as contentFile:
+            file_data = contentFile.read()
         normalizedData = unicodedata.normalize('NFKD', file_data).encode('ascii', 'replace')
         return normalizedData
 
-    def generate_new_file(self, original_file=None, file_data=None):
+    def generateNewFile(self, original_file=None, file_data=None):
         original_file_root, original_file_name = os.path.split(original_file)
 
         target_dir = \
-            os.path.join(self.target_dir, os.path.relpath(original_file_root, self.source_dir), original_file_name)
+            os.path.join(self.targetDirectory, os.path.relpath(original_file_root, self.sourceDirectory),
+                         original_file_name)
 
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
@@ -53,10 +52,4 @@ class JavaRead(object):
 
         if self.verbose:
             print "--> generated file: ", target_file
-        return os.path.relpath(target_file, self.target_dir)
-
-
-
-
-
-
+        return os.path.relpath(target_file, self.targetDirectory)
