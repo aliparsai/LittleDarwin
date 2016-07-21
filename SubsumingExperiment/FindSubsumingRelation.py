@@ -60,9 +60,12 @@ testSets = killedMutantsByTests(failedTestResult)
 
 subsumes = dict()
 subsumedby = dict()
+redundant = dict()
+
 for key in failedTestResult.keys():
     subsumedby[key] = set()
     subsumes[key] = set()
+    redundant[key] = set()
 
 for key1 in failedTestResult.keys():
     for key2 in failedTestResult.keys():
@@ -79,16 +82,18 @@ for key1 in failedTestResult.keys():
             subsumes[key1].add(key2)
             subsumedby[key2].add(key1)
 
-        # if mutant1 == mutant2:
-        #     print key1, key2
-#
+        if mutant1 == mutant2:
+            redundant[key1].add(key2)
+            redundant[key2].add(key1)
+
 for key in sorted(failedTestResult.keys()):
     numberOfSubsumed = len(subsumedby[key])
     numberOfSubsumes = len(subsumes[key])
+    numberOfRedundant = len(redundant[key])
 
     # if numberOfSubsumed == 0:
     #     print key
 
-    print key, numberOfSubsumed, numberOfSubsumes
+    print key, numberOfSubsumed, numberOfSubsumes, numberOfRedundant
 
 
