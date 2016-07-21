@@ -5,6 +5,17 @@ public class ExampleProgram {
         int a = 1;
         int b = 2;
 
+        String x = "Hello!";
+        String y = "Hi!";
+
+        String z;
+
+        z = x + y;
+        z = "Hi" + y;
+        z =  'a' + y;
+
+
+
         if (a==1) a += 1;
 
         else {
