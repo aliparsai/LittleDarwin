@@ -24,10 +24,16 @@ class CloverXMLReportParser(object):
     def findCoverageForLine(self, fileElement, lineNumber):
         assert isinstance(fileElement, xml.etree.ElementTree.Element)
         assert isinstance(lineNumber, int)
+
+        latest = 0
         for lineElement in fileElement.iter("line"):
             assert isinstance(lineElement, xml.etree.ElementTree.Element)
-            if int(lineElement.get("num")) == lineNumber:
-                return int(lineElement.get("count"))
+            if int(lineElement.get("num")) <= lineNumber:
+                if lineElement.get("count") is not None:
+                    latest = int(lineElement.get("count"))
+            else:
+                break
+        return latest
 
     def findCoverage(self, filePath, lineNumber):
         return self.findCoverageForLine(self.findMatchingFile(filePath), lineNumber)

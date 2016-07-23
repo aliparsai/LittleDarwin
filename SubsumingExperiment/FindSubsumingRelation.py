@@ -1,7 +1,5 @@
 import fnmatch
 import os
-import sys
-import shelve
 
 from RetrieveLineCoverageFromCloverXML import CloverXMLReportParser
 
@@ -20,7 +18,6 @@ class Mutant(object):
         self.subsumes = set()
         # self.redundant = set()
 
-
     def getCoverageInfo(self, cloverXMLReportParserInstance):
         assert isinstance(cloverXMLReportParserInstance, CloverXMLReportParser)
         assert self.lineNumber >= 0
@@ -30,7 +27,11 @@ class Mutant(object):
         return ".txt".join(self.path.rsplit('.java', 1))
 
     def __str__(self):
-        return " ".join(str(x) for x in ["Mutant ", self.id, "| Path:", self.path, "| Subsuming:", self.subsuming, "| Covered:", self.covered])
+        return " ".join(str(x) for x in ["Mutant ", self.id, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
+                                         self.isSubsuming,  "| Redundant:", self.isRedundant, "| Covered:", self.covered])
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class MutantSet(object):
@@ -45,7 +46,7 @@ class MutantSet(object):
         self.cloverXMLReportParserInstance = CloverXMLReportParser(coverageReportPath)
 
     def retrieveMutants(self):
-        for root, dirnames, filenames in os.walk(os.path.join(self.globalPath, self.path)):
+        for root, dirnames, filenames in os.walk(self.globalPath):
             for filename in fnmatch.filter(filenames, "*.java"):
                 if str(filename) == "original.java":
                     continue
@@ -101,21 +102,21 @@ class MutantSet(object):
                 if mutant1 is mutant2 or len(mutant1.failedTests) == 0 or len(mutant2.failedTests) == 0:
                     continue
 
-            if mutant1.failedTests < mutant2.failedTests:
-                mutant1.subsumes.add(mutant2)
-                mutant2.subsumedby.add(mutant1)
+                if mutant1.failedTests < mutant2.failedTests:
+                    mutant1.subsumes.add(mutant2)
+                    mutant2.subsumedby.add(mutant1)
 
-            if mutant1.failedTests == mutant2.failedTests:
-                if self.redundancyClusters.has_key(frozenset(mutant1.failedTests)):
-                    assert isinstance(self.redundancyClusters[frozenset(mutant1.failedTests)], set)
-                    self.redundancyClusters[frozenset(mutant1.failedTests)].add(mutant1)
-                    self.redundancyClusters[frozenset(mutant1.failedTests)].add(mutant2)
+                if mutant1.failedTests == mutant2.failedTests:
+                    if self.redundancyClusters.has_key(frozenset(mutant1.failedTests)):
+                        assert isinstance(self.redundancyClusters[frozenset(mutant1.failedTests)], set)
+                        self.redundancyClusters[frozenset(mutant1.failedTests)].add(mutant1)
+                        self.redundancyClusters[frozenset(mutant1.failedTests)].add(mutant2)
 
-                else:
-                    self.redundancyClusters[frozenset(mutant1.failedTests)] = {mutant1, mutant2}
+                    else:
+                        self.redundancyClusters[frozenset(mutant1.failedTests)] = {mutant1, mutant2}
 
-                mutant1.isRedundant = True
-                mutant2.isRedundant = True
+                    mutant1.isRedundant = True
+                    mutant2.isRedundant = True
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
@@ -128,9 +129,9 @@ class MutantSet(object):
             if not len(mutant.failedTests) == 0 and not mutant.isRedundant:
                 self.filteredMutants.append(mutant)
 
-        checkedCUs = set()
-        for cluster in self.redundancyClusters.items():
+        for cluster in self.redundancyClusters.values():
             assert isinstance(cluster, set)
+            checkedCUs = set()
             for mutant in cluster:
                 assert isinstance(mutant, Mutant)
                 if mutant.cuPath not in checkedCUs:
@@ -139,6 +140,9 @@ class MutantSet(object):
                     self.filteredMutants.append(mutant)
 
 
+mutantSet = MutantSet("Cases/codec-3.3.0/src/mutated/", "clover.xml")
+mutantSet.retrieveMutants()
+mutantSet.assignStatus()
+mutantSet.filterMutants()
 
-
-
+print "\n".join([str(x) for x in mutantSet.filteredMutants])
