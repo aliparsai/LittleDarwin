@@ -26,7 +26,6 @@ class JavaClass(object):
             if nodeID in mutant.nodes:
                 return mutant
 
-
     def findMutantByID(self, ID):
         for mutant in self.mutants:
             if ID == mutant.id:
@@ -66,7 +65,6 @@ class JavaClass(object):
                         else:
                             newMutant.status = 0
                         break
-
 
                 self.mutants.append(newMutant)
 
