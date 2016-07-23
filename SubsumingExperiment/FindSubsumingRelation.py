@@ -7,6 +7,7 @@ from RetrieveLineCoverageFromCloverXML import CloverXMLReportParser
 class Mutant(object):
     def __init__(self):
         self.id = None
+        self.type = None
         self.isSubsuming = False
         self.isRedundant = False
         self.path = None
@@ -27,7 +28,7 @@ class Mutant(object):
         return ".txt".join(self.path.rsplit('.java', 1))
 
     def outputForWeka(self):
-        return ",".join(str(x) for x in [self.isSubsuming, self.isRedundant, self.covered])
+        return ",".join(str(x) for x in [self.isSubsuming, self.isRedundant, self.type, self.covered])
 
     def __str__(self):
         return " ".join(str(x) for x in ["Mutant ", self.id, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
@@ -55,8 +56,9 @@ class MutantSet(object):
         lines.append("% (c) 2016 Ali Parsai --- www.parsai.net    %")
         lines.append("\n\n\n")
         lines.append("@relation \'subsuming\'")
-        lines.append("@attribute \'isSubsuming\' { \'True\', \'False\' }")
-        lines.append("@attribute \'isRedundant\' { \'True\', \'False\' }")
+        lines.append("@attribute \'IsSubsuming\' { \'True\', \'False\' }")
+        lines.append("@attribute \'IsRedundant\' { \'True\', \'False\' }")
+        lines.append("@attribute \'MutantType\' { \'arithmeticOperatorReplacementBinary\', \'arithmeticOperatorReplacementShortcut\', \'arithmeticOperatorReplacementUnary\', \'logicalOperatorReplacement\', \'shiftOperatorReplacement\', \'relationalOperatorReplacement\', \'conditionalOperatorReplacement\', \'conditionalOperatorDeletion\', \'assignmentOperatorReplacementShortcut\' }")
         lines.append("@attribute \'TimesCovered\' numeric")
         # lines.append("@attribute \'NumberOfFailedTests\' numeric")
         lines.append("\n\n@data\n")
@@ -87,6 +89,16 @@ class MutantSet(object):
 
                 assert mutantLine is not None
                 newMutant.lineNumber = int(mutantLine.rsplit(":", 1)[1])
+
+                mutantLine = None
+                for line in mutantContent:
+                    if "mutant type: " in line:
+                        mutantLine = line
+                        break
+
+                assert mutantLine is not None
+                newMutant.type = str(mutantLine.rsplit(": ", 1)[1]).strip()
+
                 newMutant.getCoverageInfo(self.cloverXMLReportParserInstance)
 
                 self.mutants.append(newMutant)
