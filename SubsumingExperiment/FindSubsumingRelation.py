@@ -1,5 +1,6 @@
 import fnmatch
 import os
+import sys
 
 from RetrieveLineCoverageFromCloverXML import CloverXMLReportParser
 
@@ -173,7 +174,7 @@ class MutantSet(object):
                     self.filteredMutants.append(mutant)
 
 
-mutantSet = MutantSet("Cases/codec-3.3.0/src/mutated/", "clover.xml")
+mutantSet = MutantSet(sys.argv[1], sys.argv[2])
 mutantSet.retrieveMutants()
 mutantSet.assignStatus()
 mutantSet.filterMutants()
