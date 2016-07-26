@@ -35,9 +35,12 @@ class CloverDBParser(object):
         return self.getResults(filePath, lineNumber)[1:]
 
     def findCoverage(self, filePath, lineNumber):
+        assert isinstance(filePath, str)
+        filePathCorrected = "".join(filePath.split('java/', 1))
+
         try:
-            result = int(self.getResults(filePath, lineNumber)[0])
-        except ValueError:
+            result = int(self.getResults(filePathCorrected, lineNumber)[0])
+        except:
             result = -1
 
         return result

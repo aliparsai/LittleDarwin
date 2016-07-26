@@ -25,7 +25,7 @@ class CloverXMLReportParser(object):
         assert isinstance(fileElement, xml.etree.ElementTree.Element)
         assert isinstance(lineNumber, int)
 
-        latest = 0
+        latest = -1
         for lineElement in fileElement.iter("line"):
             assert isinstance(lineElement, xml.etree.ElementTree.Element)
             if int(lineElement.get("num")) <= lineNumber:
