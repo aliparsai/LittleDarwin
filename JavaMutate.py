@@ -769,7 +769,7 @@ class JavaMutate(object):
     # def arithmeticOperatorDeletionShortcut(self, tree):
     #     pass
 
-    def relationalOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):  # covered by negateConditionals
+    def relationalOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):  # executionCount by negateConditionals
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -927,7 +927,7 @@ class JavaMutate(object):
                     continue
 
                 if not (node.children[1].symbol.text == u"&&" or node.children[1].symbol.text == u"||"):
-                    continue  # not a conditional operator (non-lazy ones covered in logical operators)
+                    continue  # not a conditional operator (non-lazy ones executionCount in logical operators)
 
                 mutationBefore = "----> before: " + node.getText()
                 if self.verbose:
@@ -974,7 +974,7 @@ class JavaMutate(object):
                     continue
 
                 if not (node.children[1].symbol.text == u"&&" or node.children[1].symbol.text == u"||"):
-                    continue  # not a conditional operator (non-lazy ones covered in logical operators)
+                    continue  # not a conditional operator (non-lazy ones executionCount in logical operators)
 
                 nodeList.append([expressionIndex, "ConditionalOperatorReplacement"])
 
@@ -1010,7 +1010,7 @@ class JavaMutate(object):
 
             return tree
 
-    def conditionalOperatorDeletion(self, tree, mode="return_text", nodeIndex=None):  # covered by negateConditionals
+    def conditionalOperatorDeletion(self, tree, mode="return_text", nodeIndex=None):  # executionCount by negateConditionals
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1107,7 +1107,7 @@ class JavaMutate(object):
 
             return tree
 
-    # def conditionalOperatorInsertion(self, tree):   # covered by negateConditionals, both generate too many mutations
+    # def conditionalOperatorInsertion(self, tree):   # executionCount by negateConditionals, both generate too many mutations
     #     pass
 
     def shiftOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):

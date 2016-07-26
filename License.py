@@ -1,5 +1,6 @@
 #!/bin/python
 
+
 def outputLicense():
     print """
                     GNU GENERAL PUBLIC LICENSE

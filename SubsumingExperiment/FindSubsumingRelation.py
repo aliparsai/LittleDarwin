@@ -11,33 +11,39 @@ class Mutant(object):
         self.id = None
         self.type = None
         self.isSubsuming = False
+        self.isProbablySubsuming = False
         self.isRedundant = False
+        self.isProbablyRedundant = False
         self.path = None
         self.cuPath = None
-        self.covered = -1
-        self.failingTestsCount = -1
+        self.executionCount = -1
+        self.coveringTestsCount = -1
         self.lineNumber = -1
         self.failedTests = set()
+        self.coveringTests = set()
         self.subsumedby = set()
         self.subsumes = set()
+        self.probablySubsumes = set()
+        self.probablySubsumedby = set()
         # self.redundant = set()
 
     def getCoverageInfo(self, cloverXMLReportParserInstance, cloverDBParserInstance):
         assert isinstance(cloverXMLReportParserInstance, CloverXMLReportParser)
         assert isinstance(cloverDBParserInstance, CloverDBParser)
         assert self.lineNumber >= 0
-        self.covered = int(cloverXMLReportParserInstance.findCoverage(self.cuPath, self.lineNumber))
-        self.failingTestsCount = int(cloverDBParserInstance.findCoverage(self.cuPath, self.lineNumber))
+        self.executionCount = int(cloverXMLReportParserInstance.findCoverage(self.cuPath, self.lineNumber))
+        self.coveringTestsCount = int(cloverDBParserInstance.findCoverage(self.cuPath, self.lineNumber))
+        self.coveringTests = set(cloverDBParserInstance.findCoveringTests(self.cuPath, self.lineNumber))
 
     def getBuildResultFilePath(self):
         return ".txt".join(self.path.rsplit('.java', 1))
 
     def outputForWeka(self):
-        return ",".join(str(x) for x in [self.isSubsuming, self.isRedundant, self.type, self.covered, self.failingTestsCount])
+        return ",".join(str(x) for x in [self.isSubsuming, self.isRedundant, self.type, self.executionCount, self.coveringTestsCount])
 
     def __str__(self):
         return " ".join(str(x) for x in ["Mutant ", self.id, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
-                                         self.isSubsuming,  "| Redundant:", self.isRedundant, "| Covered:", self.covered])
+                                         self.isSubsuming,  "| Redundant:", self.isRedundant, "| Covered:", self.executionCount])
 
     def __repr__(self):
         return self.__str__()
@@ -51,6 +57,8 @@ class MutantSet(object):
         self.mutants = list()
         self.filteredMutants = list()
         self.redundancyClusters = dict()
+        self.redundancyClustersFromCoverage = dict()
+
         assert os.path.exists(coverageReportPath)
         assert os.path.exists(coverageDBPath)
 
@@ -164,6 +172,35 @@ class MutantSet(object):
             if len(mutant.subsumedby) == 0:
                 mutant.isSubsuming = True
 
+    def predictStatus(self):
+        for mutant1 in self.mutants:
+            for mutant2 in self.mutants:
+                assert isinstance(mutant1, Mutant)
+                assert isinstance(mutant2, Mutant)
+                if mutant1 is mutant2 or len(mutant1.coveringTests) == 0 or len(mutant2.coveringTests) == 0:
+                    continue
+
+                if mutant1.coveringTests < mutant2.coveringTests:
+                    mutant1.probablySubsumes.add(mutant2)
+                    mutant2.probablySubsumedby.add(mutant1)
+
+                if mutant1.coveringTests == mutant2.coveringTests:
+                    if self.redundancyClustersFromCoverage.has_key(frozenset(mutant1.coveringTests)):
+                        assert isinstance(self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)], set)
+                        self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)].add(mutant1)
+                        self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)].add(mutant2)
+
+                    else:
+                        self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)] = {mutant1, mutant2}
+
+                    mutant1.isProbablyRedundant = True
+                    mutant2.isProbablyRedundant = True
+
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            if len(mutant.probablySubsumedby) == 0:
+                mutant.isProbablySubsuming = True
+
     def filterMutants(self):
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
@@ -184,8 +221,9 @@ class MutantSet(object):
 mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 mutantSet.retrieveMutants()
 mutantSet.assignStatus()
-mutantSet.filterMutants()
+mutantSet.predictStatus()
 
+# mutantSet.filterMutants()
 # print "\n".join([str(x) for x in mutantSet.filteredMutants])
 
 if len(sys.argv) == 6 and sys.argv[5] == "skip":
@@ -193,4 +231,53 @@ if len(sys.argv) == 6 and sys.argv[5] == "skip":
 else:
     skipHeaders = False
 
-print mutantSet.outputForWeka(skipHeaders)
+# print mutantSet.outputForWeka(skipHeaders)
+
+truePositiveSubsuming = 0
+trueNegativeSubsuming = 0
+falsePositiveSubsuming = 0
+falseNegativeSubsuming = 0
+
+
+truePositiveRedundant = 0
+trueNegativeRedundant = 0
+falsePositiveRedundant = 0
+falseNegativeRedundant = 0
+
+
+for mutant in mutantSet.mutants:
+    assert isinstance(mutant, Mutant)
+    if mutant.isProbablySubsuming and mutant.isSubsuming:
+        truePositiveSubsuming += 1
+    elif mutant.isProbablySubsuming and not mutant.isSubsuming:
+        falsePositiveSubsuming += 1
+    elif not mutant.isProbablySubsuming and mutant.isSubsuming:
+        falseNegativeSubsuming += 1
+    elif not mutant.isProbablySubsuming and not mutant.isSubsuming:
+        trueNegativeSubsuming += 1
+
+    if mutant.isProbablyRedundant and mutant.isRedundant:
+        truePositiveRedundant += 1
+    elif mutant.isProbablyRedundant and not mutant.isRedundant:
+        falsePositiveRedundant += 1
+    elif not mutant.isProbablyRedundant and mutant.isRedundant:
+        falseNegativeRedundant += 1
+    elif not mutant.isProbablyRedundant and not mutant.isRedundant:
+        trueNegativeRedundant += 1
+
+assert len(mutantSet.mutants) == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
+assert len(mutantSet.mutants) == truePositiveRedundant + falsePositiveRedundant + trueNegativeRedundant + falseNegativeRedundant
+
+
+print "Subsuming Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
+print "----------------------------\nPrecision: ", truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming), "\nRecall: ", truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming), "\n****************************"
+
+
+print "Redundant Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveRedundant, " FP:", falsePositiveRedundant, "\nFN:", falseNegativeRedundant, "TN:", trueNegativeRedundant
+print "----------------------------\nPrecision: ", truePositiveRedundant / float(truePositiveRedundant + falsePositiveRedundant), "\nRecall: ", truePositiveRedundant / float(truePositiveRedundant + falseNegativeRedundant), "\n****************************"
+
+# for mutant in mutantSet.mutants:
+#     assert isinstance(mutant, Mutant)
+#     print "*****************************"
+#     print mutant.failedTests, mutant.coveringTests
+#     print "*****************************"

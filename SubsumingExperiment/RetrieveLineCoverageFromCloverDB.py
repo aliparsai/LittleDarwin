@@ -28,18 +28,17 @@ class CloverDBParser(object):
         assert os.path.exists(self.cloverDB)
         assert os.path.exists(self.javaCloverDBHandler)
         assert isinstance(lineNumber, int)
-        result = self.jarWrapper([self.javaCloverDBHandler, self.cloverDB, filePath, lineNumber])
+        assert isinstance(filePath, str)
+        filePathCorrected = "".join(filePath.split('java/', 1))
+        result = self.jarWrapper([self.javaCloverDBHandler, self.cloverDB, filePathCorrected, lineNumber])
         return result
 
-    def findTestCases(self, filePath, lineNumber):
+    def findCoveringTests(self, filePath, lineNumber):
         return self.getResults(filePath, lineNumber)[1:]
 
     def findCoverage(self, filePath, lineNumber):
-        assert isinstance(filePath, str)
-        filePathCorrected = "".join(filePath.split('java/', 1))
-
         try:
-            result = int(self.getResults(filePathCorrected, lineNumber)[0])
+            result = int(self.getResults(filePath, lineNumber)[0])
         except:
             result = -1
 
