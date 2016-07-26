@@ -265,16 +265,24 @@ for mutant in mutantSet.mutants:
     elif not mutant.isProbablyRedundant and not mutant.isRedundant:
         trueNegativeRedundant += 1
 
-assert len(mutantSet.mutants) == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
-assert len(mutantSet.mutants) == truePositiveRedundant + falsePositiveRedundant + trueNegativeRedundant + falseNegativeRedundant
+totalMutants = len(mutantSet.mutants)
+assert totalMutants == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
+assert totalMutants == truePositiveRedundant + falsePositiveRedundant + trueNegativeRedundant + falseNegativeRedundant
 
+precisionSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming)
+recallSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming)
+accuracySubsuming = 100 * (truePositiveSubsuming + trueNegativeSubsuming) / float(totalMutants)
+
+precisionRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falsePositiveRedundant)
+recallRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falseNegativeRedundant)
+accuracyRedundant = 100 * (truePositiveRedundant + trueNegativeRedundant) / float(totalMutants)
 
 print "Subsuming Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
-print "----------------------------\nPrecision: ", truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming), "\nRecall: ", truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming), "\n****************************"
+print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming,  "\n****************************"
 
 
 print "Redundant Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveRedundant, " FP:", falsePositiveRedundant, "\nFN:", falseNegativeRedundant, "TN:", trueNegativeRedundant
-print "----------------------------\nPrecision: ", truePositiveRedundant / float(truePositiveRedundant + falsePositiveRedundant), "\nRecall: ", truePositiveRedundant / float(truePositiveRedundant + falseNegativeRedundant), "\n****************************"
+print "----------------------------\nPrecision: %.2f" % precisionRedundant, "\nRecall: %.2f" % recallRedundant, "\nAccuracy: %.2f" % accuracyRedundant, "\n****************************"
 
 # for mutant in mutantSet.mutants:
 #     assert isinstance(mutant, Mutant)
