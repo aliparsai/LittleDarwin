@@ -25,6 +25,8 @@ class Mutant(object):
         self.subsumes = set()
         self.probablySubsumes = set()
         self.probablySubsumedby = set()
+        self.mutuallySubsuming = set()
+        self.probablyMutuallySubsuming = set()
         # self.redundant = set()
 
     def getCoverageInfo(self, cloverXMLReportParserInstance, cloverDBParserInstance):
@@ -151,11 +153,13 @@ class MutantSet(object):
                 if mutant1 is mutant2 or len(mutant1.failedTests) == 0 or len(mutant2.failedTests) == 0:
                     continue
 
-                if mutant1.failedTests < mutant2.failedTests:
+                if mutant1.failedTests <= mutant2.failedTests:
                     mutant1.subsumes.add(mutant2)
                     mutant2.subsumedby.add(mutant1)
 
                 if mutant1.failedTests == mutant2.failedTests:
+                    mutant1.mutuallySubsuming.add(mutant2)
+                    mutant2.mutuallySubsuming.add(mutant1)
                     if self.redundancyClusters.has_key(frozenset(mutant1.failedTests)):
                         assert isinstance(self.redundancyClusters[frozenset(mutant1.failedTests)], set)
                         self.redundancyClusters[frozenset(mutant1.failedTests)].add(mutant1)
@@ -169,10 +173,25 @@ class MutantSet(object):
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
-            if len(mutant.subsumedby) == 0:
+            if len(mutant.subsumedby - mutant.mutuallySubsuming) == 0:
                 mutant.isSubsuming = True
 
-    def predictStatus(self):
+    def similarityFunction(self, testSet1, testSet2):
+        assert isinstance(testSet1, set)
+        assert isinstance(testSet2, set)
+
+        intersection = testSet1 & testSet2
+        testSet1Remainder = testSet1 - intersection
+        testSet2Remainder = testSet2 - intersection
+
+        if len(testSet1Remainder) > len(testSet2Remainder):
+            return 0.0
+
+        score = len(intersection) / float(len(testSet1))
+        # print score
+        return score
+
+    def predictStatus(self, threshold=1.0):
         for mutant1 in self.mutants:
             for mutant2 in self.mutants:
                 assert isinstance(mutant1, Mutant)
@@ -180,11 +199,13 @@ class MutantSet(object):
                 if mutant1 is mutant2 or len(mutant1.coveringTests) == 0 or len(mutant2.coveringTests) == 0:
                     continue
 
-                if mutant1.coveringTests < mutant2.coveringTests:
+                if self.similarityFunction(mutant1.coveringTests, mutant2.coveringTests) >= threshold:
                     mutant1.probablySubsumes.add(mutant2)
                     mutant2.probablySubsumedby.add(mutant1)
 
                 if mutant1.coveringTests == mutant2.coveringTests:
+                    mutant1.probablyMutuallySubsuming.add(mutant2)
+                    mutant2.probablyMutuallySubsuming.add(mutant1)
                     if self.redundancyClustersFromCoverage.has_key(frozenset(mutant1.coveringTests)):
                         assert isinstance(self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)], set)
                         self.redundancyClustersFromCoverage[frozenset(mutant1.coveringTests)].add(mutant1)
@@ -198,7 +219,7 @@ class MutantSet(object):
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
-            if len(mutant.probablySubsumedby) == 0:
+            if len(mutant.probablySubsumedby - mutant.probablyMutuallySubsuming) == 0:
                 mutant.isProbablySubsuming = True
 
     def filterMutants(self):
@@ -217,72 +238,87 @@ class MutantSet(object):
                     assert mutant not in self.filteredMutants
                     self.filteredMutants.append(mutant)
 
+    def resetPredictions(self):
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            mutant.isProbablyRedundant = False
+            mutant.isProbablySubsuming = False
+
+def printResults(mutantSet):
+    assert isinstance(mutantSet, MutantSet)
+
+    truePositiveSubsuming = 0
+    trueNegativeSubsuming = 0
+    falsePositiveSubsuming = 0
+    falseNegativeSubsuming = 0
+
+    truePositiveRedundant = 0
+    trueNegativeRedundant = 0
+    falsePositiveRedundant = 0
+    falseNegativeRedundant = 0
+
+    for mutant in mutantSet.mutants:
+        assert isinstance(mutant, Mutant)
+        if mutant.isProbablySubsuming and mutant.isSubsuming:
+            truePositiveSubsuming += 1
+        elif mutant.isProbablySubsuming and not mutant.isSubsuming:
+            falsePositiveSubsuming += 1
+        elif not mutant.isProbablySubsuming and mutant.isSubsuming:
+            falseNegativeSubsuming += 1
+        elif not mutant.isProbablySubsuming and not mutant.isSubsuming:
+            trueNegativeSubsuming += 1
+
+        if mutant.isProbablyRedundant and mutant.isRedundant:
+            truePositiveRedundant += 1
+        elif mutant.isProbablyRedundant and not mutant.isRedundant:
+            falsePositiveRedundant += 1
+        elif not mutant.isProbablyRedundant and mutant.isRedundant:
+            falseNegativeRedundant += 1
+        elif not mutant.isProbablyRedundant and not mutant.isRedundant:
+            trueNegativeRedundant += 1
+
+    totalMutants = len(mutantSet.mutants)
+    assert totalMutants == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
+    assert totalMutants == truePositiveRedundant + falsePositiveRedundant + trueNegativeRedundant + falseNegativeRedundant
+
+    precisionSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming)
+    recallSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming)
+    accuracySubsuming = 100 * (truePositiveSubsuming + trueNegativeSubsuming) / float(totalMutants)
+
+    # precisionRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falsePositiveRedundant)
+    # recallRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falseNegativeRedundant)
+    # accuracyRedundant = 100 * (truePositiveRedundant + trueNegativeRedundant) / float(totalMutants)
+
+    print "Subsuming Prediction:", len(
+        mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
+    print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming, "\n****************************"
+    #
+    # print "Redundant Prediction:", len(
+    #     mutantSet.mutants), "\nTP:", truePositiveRedundant, " FP:", falsePositiveRedundant, "\nFN:", falseNegativeRedundant, "TN:", trueNegativeRedundant
+    # print "----------------------------\nPrecision: %.2f" % precisionRedundant, "\nRecall: %.2f" % recallRedundant, "\nAccuracy: %.2f" % accuracyRedundant, "\n****************************"
+
 
 mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 mutantSet.retrieveMutants()
 mutantSet.assignStatus()
-mutantSet.predictStatus()
+
 
 # mutantSet.filterMutants()
 # print "\n".join([str(x) for x in mutantSet.filteredMutants])
+# print mutantSet.outputForWeka(skipHeaders)
+
+for t in range(1, 11):
+    tf = float(t) / 10.0
+    print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
+    mutantSet.predictStatus(tf)
+    printResults(mutantSet)
+    mutantSet.resetPredictions()
 
 if len(sys.argv) == 6 and sys.argv[5] == "skip":
     skipHeaders = True
 else:
     skipHeaders = False
 
-# print mutantSet.outputForWeka(skipHeaders)
-
-truePositiveSubsuming = 0
-trueNegativeSubsuming = 0
-falsePositiveSubsuming = 0
-falseNegativeSubsuming = 0
-
-
-truePositiveRedundant = 0
-trueNegativeRedundant = 0
-falsePositiveRedundant = 0
-falseNegativeRedundant = 0
-
-
-for mutant in mutantSet.mutants:
-    assert isinstance(mutant, Mutant)
-    if mutant.isProbablySubsuming and mutant.isSubsuming:
-        truePositiveSubsuming += 1
-    elif mutant.isProbablySubsuming and not mutant.isSubsuming:
-        falsePositiveSubsuming += 1
-    elif not mutant.isProbablySubsuming and mutant.isSubsuming:
-        falseNegativeSubsuming += 1
-    elif not mutant.isProbablySubsuming and not mutant.isSubsuming:
-        trueNegativeSubsuming += 1
-
-    if mutant.isProbablyRedundant and mutant.isRedundant:
-        truePositiveRedundant += 1
-    elif mutant.isProbablyRedundant and not mutant.isRedundant:
-        falsePositiveRedundant += 1
-    elif not mutant.isProbablyRedundant and mutant.isRedundant:
-        falseNegativeRedundant += 1
-    elif not mutant.isProbablyRedundant and not mutant.isRedundant:
-        trueNegativeRedundant += 1
-
-totalMutants = len(mutantSet.mutants)
-assert totalMutants == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
-assert totalMutants == truePositiveRedundant + falsePositiveRedundant + trueNegativeRedundant + falseNegativeRedundant
-
-precisionSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming)
-recallSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming)
-accuracySubsuming = 100 * (truePositiveSubsuming + trueNegativeSubsuming) / float(totalMutants)
-
-precisionRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falsePositiveRedundant)
-recallRedundant = 100 * truePositiveRedundant / float(truePositiveRedundant + falseNegativeRedundant)
-accuracyRedundant = 100 * (truePositiveRedundant + trueNegativeRedundant) / float(totalMutants)
-
-print "Subsuming Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
-print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming,  "\n****************************"
-
-
-print "Redundant Prediction:", len(mutantSet.mutants), "\nTP:", truePositiveRedundant, " FP:", falsePositiveRedundant, "\nFN:", falseNegativeRedundant, "TN:", trueNegativeRedundant
-print "----------------------------\nPrecision: %.2f" % precisionRedundant, "\nRecall: %.2f" % recallRedundant, "\nAccuracy: %.2f" % accuracyRedundant, "\n****************************"
 
 # for mutant in mutantSet.mutants:
 #     assert isinstance(mutant, Mutant)

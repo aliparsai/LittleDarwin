@@ -1,4 +1,3 @@
-
 python ~/Study/LittleDarwin/HigherOrderExperiment/MutantIdentifier.py ~/Study/LittleDarwin/Cases/FirstOrder/JSqlParser-jsqlparser-0.9.4/src/mutated/ ~/Study/LittleDarwin/Cases/SecondOrder/JSqlParser-jsqlparser-0.9.4/src/mutated/ ~/Study/LittleDarwin/HigherOrderExperiment/identifier/jsqlparser.csv
 python ~/Study/LittleDarwin/HigherOrderExperiment/MutantIdentifier.py ~/Study/LittleDarwin/Cases/FirstOrder/commons-fileupload-FILEUPLOAD_1_3_1/src/mutated/ ~/Study/LittleDarwin/Cases/SecondOrder/commons-fileupload-FILEUPLOAD_1_3_1/src/mutated/ ~/Study/LittleDarwin/HigherOrderExperiment/identifier/commons-fileupload.csv
 python ~/Study/LittleDarwin/HigherOrderExperiment/MutantIdentifier.py ~/Study/LittleDarwin/Cases/FirstOrder/jdepend-2.9.1/mutated/ ~/Study/LittleDarwin/Cases/SecondOrder/jdepend-2.9.1/mutated/ ~/Study/LittleDarwin/HigherOrderExperiment/identifier/jdepend.csv
