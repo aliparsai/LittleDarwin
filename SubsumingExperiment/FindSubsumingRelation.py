@@ -4,6 +4,7 @@ import sys
 
 from RetrieveLineCoverageFromCloverXML import CloverXMLReportParser
 from RetrieveLineCoverageFromCloverDB import CloverDBParser
+from SubsumptionGraph import MutantSubsumptionGraph
 
 
 class Mutant(object):
@@ -243,6 +244,12 @@ class MutantSet(object):
             assert isinstance(mutant, Mutant)
             mutant.isProbablyRedundant = False
             mutant.isProbablySubsuming = False
+
+    def createMutantSubsumptionGraph(self):
+        self.mutantSubsumptionGraph = MutantSubsumptionGraph()
+        for mutant in self.mutants:
+            self.mutantSubsumptionGraph.addMutant(mutant)
+
 
 def printResults(mutantSet):
     assert isinstance(mutantSet, MutantSet)
