@@ -126,7 +126,7 @@ class ManualMutation(object):
             self.sourceFiles.append(tmpSourceFileObj)
             sys.stdout.write(str(len(self.sourceFiles)) + " source files found.   \r")
 
-        print("\n")
+        sys.stdout.write("\n")
 
         mutantFilePaths = self.listFiles(self.mutantsPath)
         for mutantFilePath in mutantFilePaths:
