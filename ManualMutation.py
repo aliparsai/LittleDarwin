@@ -1,10 +1,12 @@
 import re
 import os
+import shutil
 import unicodedata
 import fnmatch
 import shelve
 import sys
 from Levenshtein import _levenshtein
+
 
 class CodeFile(object):
     def __init__(self, path = None, fullPath = None):
@@ -166,20 +168,64 @@ class ManualMutation(object):
         #         if sourceFile.distanceFrom[mutantFile] < max(150, 0.3 * meanValue):
         #             sourceFile.associatedMutantFiles.append(mutantFile)
 
+    def createSingleMutant(self, sourceFile, mutantFile):
+        mutantDir = os.path.join(self.targetPath, sourceFile.path)
+
+        if not os.path.exists(mutantDir):
+            os.makedirs(mutantDir)
+
+        if not os.path.isfile(os.path.join(mutantDir, "original.java")):
+            shutil.copyfile(sourceFile.fullPath, os.path.join(mutantDir, "original.java"))
+
+        counter = 1
+        while os.path.isfile(os.path.join(mutantDir, str(counter) + ".java")):
+            counter += 1
+
+        generatedMutantFile = os.path.abspath(os.path.join(mutantDir, str(counter) + ".java"))
+        shutil.copyfile(mutantFile.fullPath, generatedMutantFile)
+
+        return os.path.relpath(generatedMutantFile, self.targetPath)
+
+
     def createMutationStructure(self):
-        self.databasePath = os.path.join(self.targetPath, "manualmutationdatabase")
-        self.databaseHandle = shelve.open(self.databasePath, "c")
+        markUsed = dict()
+
+        for mutantFile in self.mutantFiles:
+            markUsed[mutantFile] = False
 
         if not os.path.exists(self.targetPath):
             os.makedirs(self.targetPath)
 
+        self.databasePath = os.path.join(self.targetPath, "manualmutationdatabase")
+        self.databaseHandle = shelve.open(self.databasePath, "c")
+
+        for sourceFile in self.sourceFiles:
+            assert isinstance(sourceFile, SourceFile)
+            generatedMutantFiles = list()
+            for mutantFile in sourceFile.associatedMutantFiles:
+                generatedMutantFile = self.createSingleMutant(sourceFile, mutantFile)
+                generatedMutantFiles.append(generatedMutantFile)
+                markUsed[mutantFile] = True
+
+            if len(generatedMutantFiles) > 0:
+                self.databaseHandle[sourceFile.path] = generatedMutantFiles
+
+        print("\nMutants generated: ", markUsed.values().count(True))
+        print("Mutants missed: ", markUsed.values().count(False))
+
+        self.databaseHandle.close()
 
 
+if __name__ == "__main__":
+    srcPath = sys.argv[1]
+    mutPath = sys.argv[2]
 
+    assert os.path.isdir(srcPath)
+    assert os.path.isdir(mutPath)
 
+    mm = ManualMutation(srcPath, mutPath)
 
-
-
-
-
+    mm.initialize()
+    mm.groupMutants()
+    mm.createMutationStructure()
 
