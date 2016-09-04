@@ -13,6 +13,13 @@ except ImportError as e:
     noGraphviz = True
 
 
+class JavaListen(JavaListener):
+    def __init__(self):
+        JavaListener.__init__(self)
+
+
+
+
 class JavaParse(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
