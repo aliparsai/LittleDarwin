@@ -1,5 +1,6 @@
 import re
 import os
+import io
 import shutil
 import unicodedata
 import fnmatch
@@ -65,12 +66,11 @@ class CodeFile(object):
 
     def readContents(self):
         assert os.path.exists(self.fullPath)
-        with open(self.fullPath, mode='r', errors='replace') as contentFile:
+        with io.open(self.fullPath, mode='r', errors='replace') as contentFile:
             fileData = contentFile.read()
-        self.contents = unicodedata.normalize('NFKD', fileData).encode('ascii', 'replace')
+        self.contents = str(unicodedata.normalize('NFKD', fileData).encode('ascii', 'replace'))
 
     def __sub__(self, other):
-        assert isinstance(other, type(self))
         if self.strippedContents is None:
             self.strippedContents = self.stripJavaCode(self.contents)
 
@@ -85,7 +85,7 @@ class CodeFile(object):
 
 class MutantFile(CodeFile):
     def __init__(self, path, fullPath):
-        CodeFile.__init__(path, fullPath)
+        CodeFile.__init__(self, path, fullPath)
 
     def calculateDistance(self, sourceFile):
         assert isinstance(sourceFile, SourceFile)
@@ -93,7 +93,7 @@ class MutantFile(CodeFile):
 
 class SourceFile(CodeFile):
     def __init__(self, path, fullPath):
-        CodeFile.__init__(path, fullPath)
+        CodeFile.__init__(self, path, fullPath)
         self.associatedMutantFiles = list()
 
 class ManualMutation(object):
@@ -125,6 +125,8 @@ class ManualMutation(object):
             tmpSourceFileObj.readContents()
             self.sourceFiles.append(tmpSourceFileObj)
             sys.stdout.write(str(len(self.sourceFiles)) + " source files found.   \r")
+
+        print("\n")
 
         mutantFilePaths = self.listFiles(self.mutantsPath)
         for mutantFilePath in mutantFilePaths:
@@ -210,8 +212,8 @@ class ManualMutation(object):
             if len(generatedMutantFiles) > 0:
                 self.databaseHandle[sourceFile.path] = generatedMutantFiles
 
-        print("\nMutants generated: ", markUsed.values().count(True))
-        print("Mutants missed: ", markUsed.values().count(False))
+        print "\nMutants generated: ", markUsed.values().count(True)
+        print "Mutants missed: ", markUsed.values().count(False)
 
         self.databaseHandle.close()
 
