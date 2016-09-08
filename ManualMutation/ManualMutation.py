@@ -77,7 +77,7 @@ class CodeFile(object):
         if other.strippedContents is None:
             other.strippedContents = other.stripJavaCode(other.contents)
 
-        if abs(len(self.strippedContents) - len(other.strippedContents)) > max(0.1 * (len(self.strippedContents) + len(other.strippedContents)), 50):
+        if abs(len(self.strippedContents) - len(other.strippedContents)) > max(0.05 * (len(self.strippedContents) + len(other.strippedContents)), 50):
             return 99999
 
         return _levenshtein.distance(self.strippedContents, other.strippedContents)
