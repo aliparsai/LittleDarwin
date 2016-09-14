@@ -34,7 +34,7 @@ class SearchAndReplaceMutation(ManualMutation):
                 tmpList.append(tokens[j])
 
                 if i == j:
-                    tmpList.append(replacement + "\* <- mutated from \"" + searchTerm + "\" *\ ")
+                    tmpList.append(replacement + " /* <- mutated from \'" + searchTerm + "\' */ ")
                 elif i != j and j != len(tokens) - 1:
                     tmpList.append(searchTerm)
 
@@ -75,7 +75,6 @@ if __name__ == "__main__":
     mm.initialize()
     mm.mutateAllSourceFiles(search, replace)
     mm.createMutationStructure()
-    print len(mm.mutantFiles), "mutants generated."
 
     for tmpfile in mm.tmpFilePaths:
         os.remove(tmpfile)
