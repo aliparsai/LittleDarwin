@@ -1,11 +1,14 @@
 from FindSubsumingRelation import Mutant, MutantSet
 import itertools
 
+
 class MutantSubsumptionGraphNode(object):
     newID = itertools.count().next
-    def __init__(self):
+
+    def __init__(self, predicted=False):
         self.id = MutantSubsumptionGraphNode.newID()
         self.mutants = set()
+        self.predicted = predicted
 
     def __eq__(self, other):
         assert isinstance(other, MutantSubsumptionGraphNode)
@@ -15,9 +18,14 @@ class MutantSubsumptionGraphNode(object):
 
     def addMutant(self, mutant):
         assert isinstance(mutant, Mutant)
-        if self.mutants <= (mutant.mutuallySubsuming | {mutant}):
-            self.mutants.add(mutant)
-            return 1
+        if not self.predicted:
+            if self.mutants <= (mutant.mutuallySubsuming | {mutant}):
+                self.mutants.add(mutant)
+                return 1
+        else:
+            if self.mutants <= (mutant.probablyMutuallySubsuming | {mutant}):
+                self.mutants.add(mutant)
+                return 1
         return 0
 
     def checkSubsuming(self, node):
@@ -31,17 +39,23 @@ class MutantSubsumptionGraphNode(object):
         assert isinstance(me, Mutant)
         assert isinstance(him, Mutant)
 
-        if me.failedTests < him.failedTests:
-            return True
+        if not self.predicted:
+            if me.failedTests < him.failedTests:
+                return True
+        else:
+            if me.coveringTests < him.coveringTests:
+                return True
         return False
 
 
 class MutantSubsumptionGraphEdge(object):
     newID = itertools.count().next
-    def __init__(self, subsuming=None, subsumed=None):
+
+    def __init__(self, subsuming=None, subsumed=None, predicted=False):
         self.id = MutantSubsumptionGraphEdge.newID()
         self.mutantSubsuming = subsuming
         self.mutantSubsumed = subsumed
+        self.predicted = predicted
 
     def __eq__(self, other):
         assert isinstance(other, MutantSubsumptionGraphEdge)
@@ -51,9 +65,10 @@ class MutantSubsumptionGraphEdge(object):
 
 
 class MutantSubsumptionGraph(object):
-    def __init__(self):
+    def __init__(self, predicted=False):
         self.nodes = list()
         self.edges = list()
+        self.predicted = predicted
 
     def __sub__(self, other):
         tp, fp, fn = self.calculateConfusionMatrix(other)
@@ -109,7 +124,7 @@ class MutantSubsumptionGraph(object):
 
         assert addCounter <= 1
         if addCounter == 0:
-            newNode = MutantSubsumptionGraphNode()
+            newNode = MutantSubsumptionGraphNode(self.predicted)
             newNode.addMutant(mutant)
             self.nodes.append(newNode)
 
@@ -123,7 +138,7 @@ class MutantSubsumptionGraph(object):
                     continue
 
                 if node1.checkSubsuming(node2):
-                    newEdge = MutantSubsumptionGraphEdge(node1, node2)
+                    newEdge = MutantSubsumptionGraphEdge(node1, node2, self.predicted)
                     exists = False
 
                     for edge in self.edges:
@@ -134,9 +149,6 @@ class MutantSubsumptionGraph(object):
                     if not exists:
                         self.edges.append(newEdge)
 
-    def addMutants(self, mutants):
-        for mutant in mutants:
-            self.addMutant(mutant)
 
 
 

@@ -247,8 +247,11 @@ class MutantSet(object):
 
     def createMutantSubsumptionGraph(self):
         self.mutantSubsumptionGraph = MutantSubsumptionGraph()
+        self.predictedMutantSubsumptionGraph = MutantSubsumptionGraph(predicted=True)
+
         for mutant in self.mutants:
             self.mutantSubsumptionGraph.addMutant(mutant)
+            self.predictedMutantSubsumptionGraph.addMutant(mutant)
 
 
 def printResults(mutantSet):
@@ -299,6 +302,10 @@ def printResults(mutantSet):
     print "Subsuming Prediction:", len(
         mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
     print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming, "\n****************************"
+
+    print "Graph Distance:"
+    print mutantSet.mutantSubsumptionGraph.calculateConfusionMatrix(mutantSet.predictedMutantSubsumptionGraph)
+
     #
     # print "Redundant Prediction:", len(
     #     mutantSet.mutants), "\nTP:", truePositiveRedundant, " FP:", falsePositiveRedundant, "\nFN:", falseNegativeRedundant, "TN:", trueNegativeRedundant
@@ -309,17 +316,23 @@ mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 mutantSet.retrieveMutants()
 mutantSet.assignStatus()
 
+print "||||||||||||||||||  t=", 1.0, "  ||||||||||||||||||||||"
+mutantSet.predictStatus(1.0)
+mutantSet.createMutantSubsumptionGraph()
+printResults(mutantSet)
+mutantSet.resetPredictions()
+
 
 # mutantSet.filterMutants()
 # print "\n".join([str(x) for x in mutantSet.filteredMutants])
 # print mutantSet.outputForWeka(skipHeaders)
 
-for t in range(1, 11):
-    tf = float(t) / 10.0
-    print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
-    mutantSet.predictStatus(tf)
-    printResults(mutantSet)
-    mutantSet.resetPredictions()
+# for t in range(1, 11):
+#     tf = float(t) / 10.0
+#     print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
+#     mutantSet.predictStatus(tf)
+#     printResults(mutantSet)
+#     mutantSet.resetPredictions()
 
 if len(sys.argv) == 6 and sys.argv[5] == "skip":
     skipHeaders = True
