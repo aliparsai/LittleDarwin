@@ -464,8 +464,8 @@ def printResults(mutantSet):
         mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
     print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming, "\n****************************"
 
-    print "Graph Distance:"
-    print mutantSet.mutantSubsumptionGraph.calculateConfusionMatrix(mutantSet.predictedMutantSubsumptionGraph)
+    # print "Graph Distance:"
+    # print mutantSet.mutantSubsumptionGraph.calculateConfusionMatrix(mutantSet.predictedMutantSubsumptionGraph)
 
     #
     # print "Redundant Prediction:", len(
@@ -479,8 +479,8 @@ mutantSet.assignStatus()
 
 # print "||||||||||||||||||  t=", 1.0, "  ||||||||||||||||||||||"
 mutantSet.predictStatus(1.0)
-print "\n"
-createMutantSubsumptionGraph(mutantSet)
+# print "\n"
+# createMutantSubsumptionGraph(mutantSet)
 printResults(mutantSet)
 mutantSet.resetPredictions()
 
