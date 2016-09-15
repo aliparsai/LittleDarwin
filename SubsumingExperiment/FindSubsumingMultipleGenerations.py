@@ -36,15 +36,14 @@ def printResultsMultiple(mutantSet1, mutantSet2):
         elif not mutant.isProbablySubsuming and not mutantMap[mutant].isSubsuming:
             trueNegativeSubsuming += 1
 
-    totalMutants = len(mutantSet.mutants)
+    totalMutants = len(mutantSet1.mutants)
     assert totalMutants == truePositiveSubsuming + falsePositiveSubsuming + trueNegativeSubsuming + falseNegativeSubsuming
 
     precisionSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falsePositiveSubsuming)
     recallSubsuming = 100 * truePositiveSubsuming / float(truePositiveSubsuming + falseNegativeSubsuming)
     accuracySubsuming = 100 * (truePositiveSubsuming + trueNegativeSubsuming) / float(totalMutants)
 
-    print "Subsuming Prediction:", len(
-        mutantSet.mutants), "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
+    print "Subsuming Prediction:", totalMutants, "\nTP:", truePositiveSubsuming, " FP:", falsePositiveSubsuming, "\nFN:", falseNegativeSubsuming, "TN:", trueNegativeSubsuming
     print "----------------------------\nPrecision: %.2f" % precisionSubsuming, "\nRecall: %.2f" % recallSubsuming, "\nAccuracy: %.2f" % accuracySubsuming, "\n****************************"
 
 
