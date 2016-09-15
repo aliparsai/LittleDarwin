@@ -473,33 +473,35 @@ def printResults(mutantSet):
     # print "----------------------------\nPrecision: %.2f" % precisionRedundant, "\nRecall: %.2f" % recallRedundant, "\nAccuracy: %.2f" % accuracyRedundant, "\n****************************"
 
 
-mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
-mutantSet.retrieveMutants()
-mutantSet.assignStatus()
 
-# print "||||||||||||||||||  t=", 1.0, "  ||||||||||||||||||||||"
-mutantSet.predictStatus(1.0)
-# print "\n"
-# createMutantSubsumptionGraph(mutantSet)
-printResults(mutantSet)
-mutantSet.resetPredictions()
+if __name__ == "__main__":
+    mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    mutantSet.retrieveMutants()
+    mutantSet.assignStatus()
+
+#   print "||||||||||||||||||  t=", 1.0, "  ||||||||||||||||||||||"
+    mutantSet.predictStatus(1.0)
+#   print "\n"
+#   createMutantSubsumptionGraph(mutantSet)
+    printResults(mutantSet)
+    mutantSet.resetPredictions()
 
 
-# mutantSet.filterMutants()
-# print "\n".join([str(x) for x in mutantSet.filteredMutants])
-# print mutantSet.outputForWeka(skipHeaders)
+#   mutantSet.filterMutants()
+#   print "\n".join([str(x) for x in mutantSet.filteredMutants])
+#   print mutantSet.outputForWeka(skipHeaders)
 
-# for t in range(1, 11):
-#     tf = float(t) / 10.0
-#     print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
-#     mutantSet.predictStatus(tf)
-#     printResults(mutantSet)
-#     mutantSet.resetPredictions()
+#   for t in range(1, 11):
+#       tf = float(t) / 10.0
+#       print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
+#       mutantSet.predictStatus(tf)
+#       printResults(mutantSet)
+#       mutantSet.resetPredictions()
 
-if len(sys.argv) == 6 and sys.argv[5] == "skip":
-    skipHeaders = True
-else:
-    skipHeaders = False
+    if len(sys.argv) == 6 and sys.argv[5] == "skip":
+        skipHeaders = True
+    else:
+        skipHeaders = False
 
 
 # for mutant in mutantSet.mutants:
