@@ -8,7 +8,7 @@ def mapCorrespondingMutants(mutantSet1, mutantSet2):
     mutantMap = dict()
 
     for mutant1 in mutantSet1.mutants:
-        for mutant2 in mutantSet1.mutants:
+        for mutant2 in mutantSet2.mutants:
             if mutant1.path == mutant2.path:
                 mutantMap[mutant1] = mutant2
 
@@ -57,4 +57,9 @@ mutantSetNew.retrieveMutants()
 mutantSetNew.assignStatus()
 mutantSetNew.predictStatus(1.0)
 
+print "Weak:\n-------------------------------"
+printResults(mutantSetOld)
+print "Strong:\n-------------------------------"
+printResults(mutantSetNew)
+print "Weak on Strong:\n-------------------------------"
 printResultsMultiple(mutantSetOld, mutantSetNew)
