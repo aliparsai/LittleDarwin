@@ -1,9 +1,12 @@
 import os
 from subprocess import PIPE, Popen
 from py4j.java_gateway import JavaGateway
-
+import atexit
 
 class CloverDBParser(object):
+    serverStatus = False
+    serverProcess = None
+
     def __init__(self, dbFile=None, jarFile=None):
         self.cloverDB = dbFile
         self.javaCloverDBHandler = jarFile
@@ -28,10 +31,23 @@ class CloverDBParser(object):
         returnResults.remove('')
         return returnResults
 
+    def jarWrapperNonBlocking(self, args):
+        assert isinstance(args, list)
+        stringArgs = ['java', '-jar']
+        stringArgs.extend([str(x) for x in args])
+        process = Popen(stringArgs)
+        return process
+
     def getResultsFromServer(self, filePath, lineNumber):
         assert os.path.exists(self.cloverDB)
         assert isinstance(lineNumber, int)
         assert isinstance(filePath, str)
+
+        if not CloverDBParser.serverStatus:
+            CloverDBParser.serverProcess = self.jarWrapperNonBlocking([self.javaCloverDBHandler, "--server"])
+            CloverDBParser.serverStatus = True
+
+
         filePathCorrected = "".join(filePath.split('java/', 1))
 
         if self.server is None:
@@ -66,4 +82,8 @@ class CloverDBParser(object):
         return result, set(rawResult[1:])
 
 
+def termination():
+    if CloverDBParser.serverProcess is not None:
+        CloverDBParser.serverProcess.terminate()
 
+atexit.register(termination)

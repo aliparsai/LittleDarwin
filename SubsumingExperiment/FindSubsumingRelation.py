@@ -77,7 +77,6 @@ class Mutant(object):
         return self.__str__()
 
 
-
 class MutantSet(object):
     def __init__(self, globalPath, coverageReportPath, coverageDBPath, javaHandler):
         self.globalPath = globalPath
@@ -177,7 +176,6 @@ class MutantSet(object):
 
 
     def retrieveFailedTestResults(self):
-
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
             record = False
