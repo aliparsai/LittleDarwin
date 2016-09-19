@@ -55,14 +55,13 @@ class Mutant(object):
 
         return ",".join(values)
 
-
-    def getCoverageInfo(self, cloverXMLReportParserInstance, cloverDBParserInstance):
+    def getCoverageInfo(self, cloverXMLReportParserInstance, cloverDBParserInstance, clientMode=False):
         assert isinstance(cloverXMLReportParserInstance, CloverXMLReportParser)
         assert isinstance(cloverDBParserInstance, CloverDBParser)
         assert self.lineNumber >= 0
         self.executionCount = int(cloverXMLReportParserInstance.findCoverage(self.cuPath, self.lineNumber))
-        self.coveringTestsCount = int(cloverDBParserInstance.findCoverage(self.cuPath, self.lineNumber))
-        self.coveringTests = set(cloverDBParserInstance.findCoveringTests(self.cuPath, self.lineNumber))
+        self.coveringTestsCount, self.coveringTests = cloverDBParserInstance.findCoverage(self.cuPath, self.lineNumber, clientMode)
+
 
     def getBuildResultFilePath(self):
         return ".txt".join(self.path.rsplit('.java', 1))
@@ -169,11 +168,12 @@ class MutantSet(object):
                 assert mutantLine is not None
                 newMutant.type = str(mutantLine.rsplit(": ", 1)[1]).strip()
 
-                newMutant.getCoverageInfo(self.cloverXMLReportParserInstance, self.cloverDBParserInstance)
+                newMutant.getCoverageInfo(self.cloverXMLReportParserInstance, self.cloverDBParserInstance, True)
 
                 self.mutants.append(newMutant)
                 counter += 1
                 sys.stdout.write(str(counter)+"       \r")
+                sys.stdout.flush()
 
 
     def retrieveFailedTestResults(self):

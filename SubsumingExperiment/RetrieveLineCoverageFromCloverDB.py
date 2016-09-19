@@ -1,11 +1,15 @@
 import os
 from subprocess import PIPE, Popen
+from py4j.java_gateway import JavaGateway
 
 
 class CloverDBParser(object):
     def __init__(self, dbFile=None, jarFile=None):
         self.cloverDB = dbFile
         self.javaCloverDBHandler = jarFile
+        self.server = None
+        self.opened = False
+        self.gateway = JavaGateway()
 
     def jarWrapper(self, args):
         assert isinstance(args, list)
@@ -24,6 +28,21 @@ class CloverDBParser(object):
         returnResults.remove('')
         return returnResults
 
+    def getResultsFromServer(self, filePath, lineNumber):
+        assert os.path.exists(self.cloverDB)
+        assert isinstance(lineNumber, int)
+        assert isinstance(filePath, str)
+        filePathCorrected = "".join(filePath.split('java/', 1))
+
+        if self.server is None:
+            self.server = self.gateway.entry_point.getInstance()
+
+        if not self.opened:
+            self.server.openDB(os.path.abspath(self.cloverDB))
+            self.opened = True
+
+        return self.server.retrieveResults(filePathCorrected, lineNumber)
+
     def getResults(self, filePath, lineNumber):
         assert os.path.exists(self.cloverDB)
         assert os.path.exists(self.javaCloverDBHandler)
@@ -33,15 +52,18 @@ class CloverDBParser(object):
         result = self.jarWrapper([self.javaCloverDBHandler, self.cloverDB, filePathCorrected, lineNumber])
         return result
 
-    def findCoveringTests(self, filePath, lineNumber):
-        return self.getResults(filePath, lineNumber)[1:]
+    def findCoverage(self, filePath, lineNumber, clientMode=False):
+        if not clientMode:
+            rawResult = self.getResults(filePath, lineNumber)
+        else:
+            rawResult = self.getResultsFromServer(filePath, lineNumber)
 
-    def findCoverage(self, filePath, lineNumber):
         try:
-            result = int(self.getResults(filePath, lineNumber)[0])
+            result = int(rawResult[0])
         except:
             result = -1
 
-        return result
+        return result, set(rawResult[1:])
+
 
 
