@@ -63,3 +63,12 @@ print "Strong:\n-------------------------------"
 printResults(mutantSetNew)
 print "Weak on Strong:\n-------------------------------"
 printResultsMultiple(mutantSetOld, mutantSetNew)
+
+csvOld = open("old.csv", "w")
+csvNew = open("new.csv", "w")
+
+mutantSetOld.toCSV(csvOld, True)
+mutantSetNew.toCSV(csvNew, True)
+
+csvOld.close()
+csvNew.close()

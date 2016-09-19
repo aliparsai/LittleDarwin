@@ -29,6 +29,33 @@ class Mutant(object):
         self.probablyMutuallySubsuming = set()
         # self.redundant = set()
 
+    def toCSV(self, short=True):
+        appStr = lambda l, q: l.append(str(q)) if " " not in str(q) else l.append("\"" + str(q) + "\"")
+
+        values = list()
+        appStr(values, self.id)
+        appStr(values, self.type)
+        appStr(values, self.path)
+        appStr(values, self.cuPath)
+        appStr(values, self.lineNumber)
+        appStr(values, self.isSubsuming)
+        appStr(values, self.isProbablySubsuming)
+        appStr(values, len(self.failedTests))
+        if not short:
+            appStr(values, self.failedTests)
+        appStr(values, len(self.coveringTests))
+        if not short:
+            appStr(values, self.coveringTests)
+        appStr(values, ";".join([str(x.id) for x in self.subsumes]))
+        appStr(values, ";".join([str(x.id) for x in self.subsumedby]))
+        appStr(values, ";".join([str(x.id) for x in self.probablySubsumes]))
+        appStr(values, ";".join([str(x.id) for x in self.probablySubsumedby]))
+        appStr(values, ";".join([str(x.id) for x in self.mutuallySubsuming]))
+        appStr(values, ";".join([str(x.id) for x in self.probablyMutuallySubsuming]))
+
+        return ",".join(values)
+
+
     def getCoverageInfo(self, cloverXMLReportParserInstance, cloverDBParserInstance):
         assert isinstance(cloverXMLReportParserInstance, CloverXMLReportParser)
         assert isinstance(cloverDBParserInstance, CloverDBParser)
@@ -51,6 +78,7 @@ class Mutant(object):
         return self.__str__()
 
 
+
 class MutantSet(object):
     def __init__(self, globalPath, coverageReportPath, coverageDBPath, javaHandler):
         self.globalPath = globalPath
@@ -66,6 +94,29 @@ class MutantSet(object):
 
         self.cloverXMLReportParserInstance = CloverXMLReportParser(coverageReportPath)
         self.cloverDBParserInstance = CloverDBParser(coverageDBPath, javaHandler)
+
+    def toCSV(self, fileHandle=sys.stdout, short=True):
+        assert isinstance(fileHandle, file)
+
+        numMutants = len(self.mutants)
+
+        mutantIndex = 0
+        fileHandle.write("MutantSet\r\nField,Value\r\nGlobalPath,"+str(self.globalPath)+"\r\nCoverageReportPath,")
+        fileHandle.write(str(self.coverageReportPath)+"\r\nCoverageDBPath,"+str(self.coverageDBPath))
+        fileHandle.write("\r\nNumberOfMutants,"+str(numMutants)+"\r\n\r\nMutants\r\n")
+
+        for mutant in self.mutants:
+            assert isinstance(mutant,Mutant)
+            mutantIndex += 1
+            mutant.id = mutantIndex
+
+        if short:
+            fileHandle.write("\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"isProbablySubsuming\",\"Number of Failed Tests\",\"Number of Covering Tests\",\"Subsumes\",\"SubsumedBy\",\"ProbablySubsumes\",\"ProbablySubsumedBy\",\"MutuallySubsuming\",\"ProbablyMutuallySubsuming\"\r\n")
+        else:
+            fileHandle.write("\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"isProbablySubsuming\",\"Number of Failed Tests\",\"Failed Tests\",\"Number of Covering Tests\",\"Covering Tests\",\"Subsumes\",\"SubsumedBy\",\"ProbablySubsumes\",\"ProbablySubsumedBy\",\"MutuallySubsuming\",\"ProbablyMutuallySubsuming\"\r\n")
+
+        for mutant in self.mutants:
+            fileHandle.write(mutant.toCSV(short)+"\r\n")
 
     def outputForWeka(self, skipHeader=False):
         lines = list()
@@ -177,7 +228,7 @@ class MutantSet(object):
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
-            if len(mutant.subsumedby - mutant.mutuallySubsuming) == 0:
+            if len(mutant.subsumedby - mutant.mutuallySubsuming) == 0 and len(mutant.failedTests) > 0:
                 mutant.isSubsuming = True
 
     def similarityFunction(self, testSet1, testSet2):
@@ -223,7 +274,7 @@ class MutantSet(object):
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
-            if len(mutant.probablySubsumedby - mutant.probablyMutuallySubsuming) == 0:
+            if len(mutant.probablySubsumedby - mutant.probablyMutuallySubsuming) == 0 and len(mutant.coveringTests) > 0:
                 mutant.isProbablySubsuming = True
 
     def filterMutants(self):
