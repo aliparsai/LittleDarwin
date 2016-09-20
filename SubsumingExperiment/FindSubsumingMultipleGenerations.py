@@ -64,11 +64,20 @@ printResults(mutantSetNew)
 print "Weak on Strong:\n-------------------------------"
 printResultsMultiple(mutantSetOld, mutantSetNew)
 
-csvOld = open("old.csv", "w")
-csvNew = open("new.csv", "w")
+freeFile = 0
+
+while os.path.exists("weak-{0:05d}.csv".format(freeFile)) or os.path.exists("strong-{0:05d}.csv".format(freeFile)):
+    freeFile += 1
+
+csvOld = open("weak-{0:05d}.csv".format(freeFile), "w")
+csvNew = open("strong-{0:05d}.csv".format(freeFile), "w")
 
 mutantSetOld.toCSV(csvOld, True)
 mutantSetNew.toCSV(csvNew, True)
 
 csvOld.close()
 csvNew.close()
+
+del mutantSetOld
+del mutantSetNew
+

@@ -93,6 +93,11 @@ class MutantSet(object):
         self.cloverXMLReportParserInstance = CloverXMLReportParser(coverageReportPath)
         self.cloverDBParserInstance = CloverDBParser(coverageDBPath, javaHandler)
 
+    def __del__(self):
+        self.cloverDBParserInstance.gateway.close()
+        del self.cloverDBParserInstance
+        del self.cloverXMLReportParserInstance
+
     def toCSV(self, fileHandle=sys.stdout, short=True):
         assert isinstance(fileHandle, file)
 

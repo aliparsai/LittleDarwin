@@ -35,7 +35,13 @@ class CloverDBParser(object):
         assert isinstance(args, list)
         stringArgs = ['java', '-jar']
         stringArgs.extend([str(x) for x in args])
-        process = Popen(stringArgs)
+        process = Popen(stringArgs, stdout=PIPE)
+        line = ""
+        while "Server Started" not in line:
+            line = process.stdout.readline()
+            if line != "":
+                print line
+
         return process
 
     def getResultsFromServer(self, filePath, lineNumber):
