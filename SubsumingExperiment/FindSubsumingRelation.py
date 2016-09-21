@@ -529,37 +529,25 @@ def printResults(mutantSet):
 
 
 if __name__ == "__main__":
+
     mutantSet = MutantSet(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+
     mutantSet.retrieveMutants()
     mutantSet.assignStatus()
-
-#   print "||||||||||||||||||  t=", 1.0, "  ||||||||||||||||||||||"
     mutantSet.predictStatus(1.0)
-#   print "\n"
-#   createMutantSubsumptionGraph(mutantSet)
+
     printResults(mutantSet)
-    mutantSet.resetPredictions()
+    print "Strong:\n-------------------------------"
 
+    freeFile = 0
 
-#   mutantSet.filterMutants()
-#   print "\n".join([str(x) for x in mutantSet.filteredMutants])
-#   print mutantSet.outputForWeka(skipHeaders)
+    while os.path.exists("single-{0:05d}.csv".format(freeFile)):
+        freeFile += 1
 
-#   for t in range(1, 11):
-#       tf = float(t) / 10.0
-#       print "||||||||||||||||||  t=", tf, "  ||||||||||||||||||||||"
-#       mutantSet.predictStatus(tf)
-#       printResults(mutantSet)
-#       mutantSet.resetPredictions()
+    csvFile = open("single-{0:05d}.csv".format(freeFile), "w")
 
-    if len(sys.argv) == 6 and sys.argv[5] == "skip":
-        skipHeaders = True
-    else:
-        skipHeaders = False
+    mutantSet.toCSV(csvFile, True)
 
+    csvFile.close()
 
-# for mutant in mutantSet.mutants:
-#     assert isinstance(mutant, Mutant)
-#     print "*****************************"
-#     print mutant.failedTests, mutant.coveringTests
-#     print "*****************************"
+    del mutantSet
