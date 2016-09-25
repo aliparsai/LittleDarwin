@@ -1,7 +1,10 @@
 import os
 from subprocess import PIPE, Popen
+
+import time
 from py4j.java_gateway import JavaGateway
 import atexit
+
 
 class CloverDBParser(object):
     serverStatus = False
@@ -89,6 +92,7 @@ class CloverDBParser(object):
 
 
 def termination():
+    time.sleep(3)
     if CloverDBParser.serverProcess is not None:
         CloverDBParser.serverProcess.terminate()
 
