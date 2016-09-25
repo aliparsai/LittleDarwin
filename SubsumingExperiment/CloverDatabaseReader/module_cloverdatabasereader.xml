@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_cloverdatabasereader" default="compile.module.cloverdatabasereader">
+  <dirname property="module.cloverdatabasereader.basedir" file="${ant.file.module_cloverdatabasereader}"/>
+  
+  <property name="module.jdk.home.cloverdatabasereader" value="${jdk.home.1.8}"/>
+  <property name="module.jdk.bin.cloverdatabasereader" value="${jdk.bin.1.8}"/>
+  <property name="module.jdk.classpath.cloverdatabasereader" value="jdk.classpath.1.8"/>
+  
+  <property name="compiler.args.cloverdatabasereader" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="cloverdatabasereader.output.dir" value="${module.cloverdatabasereader.basedir}/bin"/>
+  <property name="cloverdatabasereader.testoutput.dir" value="${module.cloverdatabasereader.basedir}/bin"/>
+  
+  <path id="cloverdatabasereader.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="cloverdatabasereader.module.production.classpath">
+    <path refid="${module.jdk.classpath.cloverdatabasereader}"/>
+    <pathelement location="${basedir}/clover-4.0.0.jar"/>
+  </path>
+  
+  <path id="cloverdatabasereader.runtime.production.module.classpath">
+    <pathelement location="${cloverdatabasereader.output.dir}"/>
+    <pathelement location="${basedir}/clover-4.0.0.jar"/>
+  </path>
+  
+  <path id="cloverdatabasereader.module.classpath">
+    <pathelement location="${cloverdatabasereader.output.dir}"/>
+    <path refid="${module.jdk.classpath.cloverdatabasereader}"/>
+    <pathelement location="${basedir}/clover-4.0.0.jar"/>
+  </path>
+  
+  <path id="cloverdatabasereader.runtime.module.classpath">
+    <pathelement location="${cloverdatabasereader.output.dir}"/>
+    <pathelement location="${basedir}/clover-4.0.0.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.cloverdatabasereader">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.cloverdatabasereader">
+    <patternset refid="excluded.from.module.cloverdatabasereader"/>
+  </patternset>
+  
+  <path id="cloverdatabasereader.module.sourcepath">
+    <dirset dir="${module.cloverdatabasereader.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.cloverdatabasereader" depends="compile.module.cloverdatabasereader.production,compile.module.cloverdatabasereader.tests" description="Compile module CloverDatabaseReader"/>
+  
+  <target name="compile.module.cloverdatabasereader.production" depends="register.custom.compilers" description="Compile module CloverDatabaseReader; production classes">
+    <mkdir dir="${cloverdatabasereader.output.dir}"/>
+    <javac2 destdir="${cloverdatabasereader.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.cloverdatabasereader}/javac">
+      <compilerarg line="${compiler.args.cloverdatabasereader}"/>
+      <bootclasspath refid="cloverdatabasereader.module.bootclasspath"/>
+      <classpath refid="cloverdatabasereader.module.production.classpath"/>
+      <src refid="cloverdatabasereader.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.cloverdatabasereader"/>
+    </javac2>
+    
+    <copy todir="${cloverdatabasereader.output.dir}">
+      <fileset dir="${module.cloverdatabasereader.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.cloverdatabasereader.tests" depends="register.custom.compilers,compile.module.cloverdatabasereader.production" description="compile module CloverDatabaseReader; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.cloverdatabasereader" description="cleanup module">
+    <delete dir="${cloverdatabasereader.output.dir}"/>
+    <delete dir="${cloverdatabasereader.testoutput.dir}"/>
+  </target>
+</project>

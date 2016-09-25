@@ -1,6 +1,0 @@
-java.org.scribe.utils.Preconditions,2,0,0,
-java.org.scribe.model.ParameterList,2,0,0,
-java.org.scribe.model.Request,2,0,0,
-java.org.scribe.model.Response,1,0,0,
-java.org.scribe.model.Parameter,1,0,0,
-java.org.scribe.extractors.HeaderExtractorImpl,1,0,0,

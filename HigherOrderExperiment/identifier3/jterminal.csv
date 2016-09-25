@@ -1,5 +1,0 @@
-java.com.grahamedgecombe.jterminal.JTerminal,7,0,0,
-java.com.grahamedgecombe.jterminal.vt100.Vt100TerminalModel,30,1,0,
-java.com.grahamedgecombe.jterminal.AbstractTerminalModel,6,0,0,
-java.com.grahamedgecombe.jterminal.vt100.AnsiControlSequence,1,0,0,
-java.com.grahamedgecombe.jterminal.vt100.AnsiControlSequenceParser,6,0,0,
