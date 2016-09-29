@@ -3,6 +3,8 @@ import os
 import sys
 import itertools
 
+import time
+
 from RetrieveLineCoverageFromCloverXML import CloverXMLReportParser
 from RetrieveLineCoverageFromCloverDB import CloverDBParser
 
@@ -551,3 +553,6 @@ if __name__ == "__main__":
     csvFile.close()
 
     del mutantSet
+    time.sleep(2)
+
+

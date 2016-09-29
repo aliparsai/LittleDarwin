@@ -81,3 +81,4 @@ csvNew.close()
 del mutantSetOld
 del mutantSetNew
 
+time.sleep(2)
