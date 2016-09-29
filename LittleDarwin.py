@@ -181,7 +181,8 @@ def main(argv):
                             help="Output the license and exit.")
     optionParser.add_option("--higher-order", type="int", action="store", dest="higherOrder", default=1,
                             help="Define order of mutation. Use -1 to dynamically adjust per class.")
-
+    optionParser.add_option("--null-check", action="store_true", dest="isNullCheck", default=False,
+                            help="Use null check mutation operators.")
 
     (options, args) = optionParser.parse_args()
 
@@ -251,7 +252,7 @@ def main(argv):
 
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.
-            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, "all")
+            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, "all" if not options.isNullCheck else "null-check")
 
             print "--> mutations found: ", len(mutated)
 

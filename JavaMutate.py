@@ -263,7 +263,9 @@ class JavaMutate(object):
         mutationTypeCount["ConditionalOperatorReplacement"] = 0
         mutationTypeCount["ConditionalOperatorDeletion"] = 0
         mutationTypeCount["AssignmentOperatorReplacementShortcut"] = 0
+        mutationTypeCount["NullifyInputVariable"] = 0
         mutationTypeCount["Higher-Order"] = 0
+
 
         if higherOrder > 1 or higherOrder == -1:
             treeTexts = self.applyHigherOrderMutators(tree, higherOrder)
@@ -326,10 +328,15 @@ class JavaMutate(object):
             mutationTypeCount["AssignmentOperatorReplacementShortcut"] = len(
                 resultAssignmentOperatorReplacementShortcut)
 
-        elif type == "object-oriented" or type == "all":
+        if type == "object-oriented" or type == "all":
             pass
 
-        return (mutatedTrees, mutationTypeCount)
+        if type == "null-check" or type == "all":
+            resultNullifyInputVariable = self.nullifyInputVariable(tree)
+            mutatedTrees.extend(resultNullifyInputVariable)
+            mutationTypeCount["NullifyInputVariable"] = len(resultNullifyInputVariable)
+
+        return mutatedTrees, mutationTypeCount
 
     # def negateConditionalsMutator(self, tree, mode="return_text"):
     #     assert isinstance(tree, JavaParser.CompilationUnitContext)
@@ -386,6 +393,62 @@ class JavaMutate(object):
                 return_nodes
                 return_tree
     """
+
+    def nullifyInputVariable(self, tree, mode="return_text", nodeIndex=None):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        if mode == "return_text":
+
+            mutatedTreesTexts = list()
+            methodDeclarationList = self.javaParseObject.seek(tree, JavaParser.MethodDeclarationContext)
+
+            while len(methodDeclarationList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                methodDeclarationIndex = methodDeclarationList.pop()
+
+                methodDeclaration = self.javaParseObject.getNode(tree, methodDeclarationIndex)
+                assert isinstance(methodDeclaration, JavaParser.MethodDeclarationContext)
+
+                try:
+                    variableIDList = self.javaParseObject.seek(methodDeclaration.formalParameters(), JavaParser.VariableDeclaratorIdContext)
+
+                    if len(variableIDList) == 0:
+                        continue  # no variables in this declaration
+
+                except Exception, e:
+                    continue
+
+                node = methodDeclaration.methodBody().block().getChild(0, TerminalNodeImpl)
+
+                mutationBefore = "----> before: " + node.getText()
+
+                if self.verbose:
+                    print mutationBefore
+
+                originalText = copy.deepcopy(node.symbol.text)
+
+                for var in variableIDList:
+                    node.symbol.text = u'{ ' + self.javaParseObject.getNode(methodDeclaration, var).getText() + u' = null; '
+
+                    mutationAfter = "----> after: " + node.getText()
+
+                    if self.verbose:
+                        print mutationAfter
+                    mutatedTreesTexts.append((
+                        "/* LittleDarwin generated mutant\n mutant type: nullifyInputVariable\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.parentCtx.start.line) + "\n----> mutated nodes: " + str(var) + "\n*/ \n\n"  + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
+
+                    node.symbol.text = copy.deepcopy(originalText)
+
+            return mutatedTreesTexts
+
+
+        elif mode == "return_nodes":
+            pass
+
+        elif mode == "return_tree":
+            pass
+
 
     def arithmeticOperatorReplacementBinary(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)

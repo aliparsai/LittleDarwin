@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 public class ExampleProgram {
 
@@ -28,4 +30,17 @@ public class ExampleProgram {
         a = 4;
 
    }
+
+   public int exampleMethod2(int var1, String var2, ArrayList var3)
+    {
+        var1 = 25;
+
+        var2 = "Hey!";
+
+        var3 = null;
+
+        return 1;
+    }
+
+
 }
