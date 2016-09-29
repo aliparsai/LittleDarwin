@@ -37,7 +37,17 @@ public class ExampleProgram {
 
         var2 = "Hey!";
 
-        var3 = null;
+        if (var1 == null)
+            {
+            var2 = "Hoy!";
+            }
+
+
+
+        if (var3 != null)
+            {
+            var2 = "Hey";
+            }
 
         return 1;
     }

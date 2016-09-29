@@ -264,6 +264,7 @@ class JavaMutate(object):
         mutationTypeCount["ConditionalOperatorDeletion"] = 0
         mutationTypeCount["AssignmentOperatorReplacementShortcut"] = 0
         mutationTypeCount["NullifyInputVariable"] = 0
+        mutationTypeCount["RemoveNullCheck"] = 0
         mutationTypeCount["Higher-Order"] = 0
 
 
@@ -336,51 +337,64 @@ class JavaMutate(object):
             mutatedTrees.extend(resultNullifyInputVariable)
             mutationTypeCount["NullifyInputVariable"] = len(resultNullifyInputVariable)
 
+            resultRemoveNullCheck = self.removeNullCheck(tree)
+            mutatedTrees.extend(resultRemoveNullCheck)
+            mutationTypeCount["RemoveNullCheck"] = len(resultRemoveNullCheck)
+
         return mutatedTrees, mutationTypeCount
 
-    # def negateConditionalsMutator(self, tree, mode="return_text"):
-    #     assert isinstance(tree, JavaParser.CompilationUnitContext)
-    #
-    #
-    #     if mode == "return_text":
-    #
-    #
-    #         mutatedTreesTexts = list()
-    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
-    #
-    #         while len(expressionList) > 0:
-    #             # tmpTree = copy.deepcopy(tree)
-    #             expressionIndex = expressionList.pop()
-    #
-    #             node = self.javaParseObject.getNode(tree, expressionIndex)
-    #             assert isinstance(node, JavaParser.ParExpressionContext)
-    #             assert isinstance(node.children[0], TerminalNodeImpl)
-    #             assert isinstance(node.children[2], TerminalNodeImpl)
-    #             mutationBefore = "----> before: " + node.getText()
-    #             if self.verbose:
-    #                 print mutationBefore
-    #             originalText0 = copy.deepcopy(node.children[0].symbol.text)
-    #             node.children[0].symbol.text = u"(!("
-    #             originalText2 = copy.deepcopy(node.children[2].symbol.text)
-    #             node.children[2].symbol.text = u"))"
-    #             mutationAfter = "----> after: " + node.getText()
-    #             if self.verbose:
-    #                 print mutationAfter
-    #             mutatedTreesTexts.append((
-    #                 "/* LittleDarwin generated mutant\n mutant type: negateConditionalsMutator\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
-    #                     " ".join(tree.getText().rsplit("<EOF>", 1)))))
-    #             # mutatedTreesTexts.append(tree.getText())
-    #             node.children[0].symbol.text = copy.deepcopy(originalText0)
-    #             node.children[2].symbol.text = copy.deepcopy(originalText2)
-    #
-    #         return mutatedTreesTexts
-    #
-    #     elif mode == "return_nodes":
-    #         nodeList = list()
-    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
-    #
-    #         for exp in expressionList:
-    #             nodeList.append([exp, "negateConditionalsMutator"])
+    def removeNullCheck(self, tree, mode="return_text", nodeIndex=None):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        if mode == "return_text":
+
+            mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.ParExpressionContext)
+                assert isinstance(node.children[0], TerminalNodeImpl)
+                assert isinstance(node.children[2], TerminalNodeImpl)
+
+                if u'null' not in node.getText():
+                    continue
+
+                if u'==' in node.getText():
+                    replacementText = u'false'
+                elif u'!=' in node.getText():
+                    replacementText = u'true'
+                else:
+                    continue
+
+                mutationBefore = "----> before: " + node.getText()
+                if self.verbose:
+                    print mutationBefore
+                originalText0 = copy.deepcopy(node.children[0].symbol.text)
+                node.children[0].symbol.text = u"(" + replacementText + u" /* "
+                originalText2 = copy.deepcopy(node.children[2].symbol.text)
+                node.children[2].symbol.text = u" */ )"
+                mutationAfter = "----> after: " + node.getText().split(u'/*')[0]
+                if self.verbose:
+                    print mutationAfter
+                mutatedTreesTexts.append((
+                    "/* LittleDarwin generated mutant\n mutant type: removeNullCheck\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n*/ \n\n" + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))
+                # mutatedTreesTexts.append(tree.getText())
+                node.children[0].symbol.text = copy.deepcopy(originalText0)
+                node.children[2].symbol.text = copy.deepcopy(originalText2)
+
+            return mutatedTreesTexts
+
+        # elif mode == "return_nodes":
+        #     nodeList = list()
+        #     expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+        #
+        #     for exp in expressionList:
+        #         nodeList.append([exp, "negateConditionalsMutator"])
 
 
 
