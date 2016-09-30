@@ -28,6 +28,7 @@ public class ExampleProgram {
         }
 
         a = 4;
+        return;
 
    }
 
