@@ -484,7 +484,7 @@ class JavaMutate(object):
                 node = self.javaParseObject.getNode(tree, expressionIndex)
                 assert isinstance(node, TerminalNodeImpl)
 
-                if u'return' not in node.getText():
+                if u'return' != node.symbol.text:
                     continue
 
                 if not isinstance(node.getParent().getChild(1), JavaParser.ExpressionContext):
