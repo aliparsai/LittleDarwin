@@ -54,4 +54,17 @@ public class ExampleProgram {
     }
 
 
+
+   public ArrayList exampleMethod3(int var1, String var2, ArrayList var3)
+    {
+        var1 = 25;
+
+        var2 = "Hey!";
+
+        return var3;
+    }
+
+
+
+
 }

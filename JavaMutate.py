@@ -490,6 +490,19 @@ class JavaMutate(object):
                 if not isinstance(node.getParent().getChild(1), JavaParser.ExpressionContext):
                     continue
 
+                parentMethod = self.javaParseObject.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+                if parentMethod is None:
+                    continue
+
+                assert isinstance(parentMethod, JavaParser.MethodDeclarationContext)
+
+                parentType = parentMethod.getChild(0, JavaParser.JTypeContext)
+                if not isinstance(parentType, JavaParser.JTypeContext):
+                    continue
+
+                if parentType.getChild(0, JavaParser.PrimitiveTypeContext) is not None:
+                    continue  # primitive typed method
+
                 mutationBefore = "----> before: " + node.getParent().getText()
                 if self.verbose:
                     print mutationBefore
@@ -552,7 +565,13 @@ class JavaMutate(object):
                 originalText = copy.deepcopy(node.symbol.text)
 
                 for var in variableIDList:
-                    node.symbol.text = u'{ ' + self.javaParseObject.getNode(methodDeclaration, var).getText() + u' = null; '
+                    typeNode = self.javaParseObject.getNode(methodDeclaration, var)
+                    assert isinstance(typeNode, JavaParser.VariableDeclaratorIdContext)
+
+                    if typeNode.parentCtx.getChild(0, JavaParser.JTypeContext).getChild(0, JavaParser.PrimitiveTypeContext) is not None:
+                        continue  # primitive typed method
+
+                    node.symbol.text = u'{ ' + typeNode.getText() + u' = null; '
 
                     mutationAfter = "----> after: " + node.getText()
 
@@ -572,10 +591,6 @@ class JavaMutate(object):
 
         elif mode == "return_tree":
             pass
-
-
-
-
 
     def arithmeticOperatorReplacementBinary(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)

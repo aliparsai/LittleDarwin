@@ -67,6 +67,17 @@ class JavaParse(object):
 
         return seekList
 
+    def seekFirstMatchingParent(self, node, type):
+        try:
+            parent = node.parentCtx
+        except:
+            return None
+
+        if isinstance(parent, type):
+            return parent
+
+        return self.seekFirstMatchingParent(parent, type)
+
     def seekNode(self, myTree, nodeIndex):
 
         if myTree.nodeIndex == nodeIndex:
