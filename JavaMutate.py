@@ -429,10 +429,10 @@ class JavaMutate(object):
                     if len(variableIDList) == 0:
                         continue  # no variables in this declaration
 
+                    node = methodDeclaration.methodBody().block().getChild(0, TerminalNodeImpl) # can fail on methods with no body
+
                 except Exception, e:
                     continue
-
-                node = methodDeclaration.methodBody().block().getChild(0, TerminalNodeImpl)
 
                 mutationBefore = "----> before: " + node.getText()
 
