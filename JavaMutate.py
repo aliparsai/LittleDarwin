@@ -337,13 +337,14 @@ class JavaMutate(object):
             mutatedTrees.extend(resultNullifyInputVariable)
             mutationTypeCount["NullifyInputVariable"] = len(resultNullifyInputVariable)
 
-            resultRemoveNullCheck = self.removeNullCheck(tree)
-            mutatedTrees.extend(resultRemoveNullCheck)
-            mutationTypeCount["RemoveNullCheck"] = len(resultRemoveNullCheck)
-
             resultNullifyReturnValue = self.nullifyReturnValue(tree)
             mutatedTrees.extend(resultNullifyReturnValue)
             mutationTypeCount["NullifyReturnValue"] = len(resultNullifyReturnValue)
+
+        if type == "null-check":
+            resultRemoveNullCheck = self.removeNullCheck(tree)
+            mutatedTrees.extend(resultRemoveNullCheck)
+            mutationTypeCount["RemoveNullCheck"] = len(resultRemoveNullCheck)
 
         return mutatedTrees, mutationTypeCount
 
@@ -361,48 +362,105 @@ class JavaMutate(object):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
-
             mutatedTreesTexts = list()
-            expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+            expressionList = self.javaParseObject.seek(tree, JavaParser.ExpressionContext)
 
             while len(expressionList) > 0:
                 # tmpTree = copy.deepcopy(tree)
                 expressionIndex = expressionList.pop()
 
                 node = self.javaParseObject.getNode(tree, expressionIndex)
-                assert isinstance(node, JavaParser.ParExpressionContext)
-                assert isinstance(node.children[0], TerminalNodeImpl)
-                assert isinstance(node.children[2], TerminalNodeImpl)
+                assert isinstance(node, JavaParser.ExpressionContext)
 
-                if u'null' not in node.getText():
+                try:
+                    if not (isinstance(node.children[0], JavaParser.ExpressionContext) and isinstance(node.children[1],
+                                                                                                  TerminalNodeImpl) and isinstance(
+                            node.children[2], JavaParser.ExpressionContext)):
+                        continue  # not a binary expression
+                except Exception, e:
                     continue
 
-                if u'==' in node.getText():
-                    replacementText = u'false'
-                elif u'!=' in node.getText():
-                    replacementText = u'true'
-                else:
-                    continue
+                if not (node.children[1].symbol.text == u"!=" or node.children[1].symbol.text == u"=="):
+                    continue  # not a relational operator
+
+                if not u'null' in node.getText():
+                    continue  # not a null check
+
+
 
                 mutationBefore = "----> before: " + node.getText()
                 if self.verbose:
                     print mutationBefore
-                originalText0 = copy.deepcopy(node.children[0].symbol.text)
-                node.children[0].symbol.text = u"(" + replacementText + u" /* "
-                originalText2 = copy.deepcopy(node.children[2].symbol.text)
-                node.children[2].symbol.text = u" */ )"
-                mutationAfter = "----> after: " + node.getText().split(u'/*')[0]
+
+                originalText = copy.deepcopy(node.children[1].symbol.text)
+
+                if originalText == u"==":
+                    node.children[1].symbol.text = u"!="
+                elif originalText == u"!=":
+                    node.children[1].symbol.text = u"=="
+                else:
+                    assert False
+
+                mutationAfter = "----> after: " + node.getText()
+
                 if self.verbose:
                     print mutationAfter
+
                 mutatedTreesTexts.append((
-                    "/* LittleDarwin generated mutant\n mutant type: removeNullCheck\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
-                        node.start.line) + "\n*/ \n\n" + (
-                        " ".join(tree.getText().rsplit("<EOF>", 1)))))
-                # mutatedTreesTexts.append(tree.getText())
-                node.children[0].symbol.text = copy.deepcopy(originalText0)
-                node.children[2].symbol.text = copy.deepcopy(originalText2)
+                    (
+                        "/* LittleDarwin generated mutant\n mutant type: removeNullCheck\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
+                            " ".join(tree.getText().rsplit("<EOF>", 1))))))  # create compilable, readable code
+
+                node.children[1].symbol.text = copy.deepcopy(originalText)
 
             return mutatedTreesTexts
+
+    # def removeNullCheck(self, tree, mode="return_text", nodeIndex=None):
+    #     assert isinstance(tree, JavaParser.CompilationUnitContext)
+    #
+    #     if mode == "return_text":
+    #
+    #         mutatedTreesTexts = list()
+    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
+    #
+    #         while len(expressionList) > 0:
+    #             # tmpTree = copy.deepcopy(tree)
+    #             expressionIndex = expressionList.pop()
+    #
+    #             node = self.javaParseObject.getNode(tree, expressionIndex)
+    #             assert isinstance(node, JavaParser.ParExpressionContext)
+    #             assert isinstance(node.children[0], TerminalNodeImpl)
+    #             assert isinstance(node.children[2], TerminalNodeImpl)
+    #
+    #             if u'null' not in node.getText():
+    #                 continue
+    #
+    #             if u'==' in node.getText():
+    #                 replacementText = u'false'
+    #             elif u'!=' in node.getText():
+    #                 replacementText = u'true'
+    #             else:
+    #                 continue
+    #
+    #             mutationBefore = "----> before: " + node.getText()
+    #             if self.verbose:
+    #                 print mutationBefore
+    #             originalText0 = copy.deepcopy(node.children[0].symbol.text)
+    #             node.children[0].symbol.text = u"(" + replacementText + u" /* "
+    #             originalText2 = copy.deepcopy(node.children[2].symbol.text)
+    #             node.children[2].symbol.text = u" */ )"
+    #             mutationAfter = "----> after: " + node.getText().split(u'/*')[0]
+    #             if self.verbose:
+    #                 print mutationAfter
+    #             mutatedTreesTexts.append((
+    #                 "/* LittleDarwin generated mutant\n mutant type: removeNullCheck\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+    #                     node.start.line) + "\n*/ \n\n" + (
+    #                     " ".join(tree.getText().rsplit("<EOF>", 1)))))
+    #             # mutatedTreesTexts.append(tree.getText())
+    #             node.children[0].symbol.text = copy.deepcopy(originalText0)
+    #             node.children[2].symbol.text = copy.deepcopy(originalText2)
+    #
+    #         return mutatedTreesTexts
 
             # elif mode == "return_nodes":
             #     nodeList = list()
