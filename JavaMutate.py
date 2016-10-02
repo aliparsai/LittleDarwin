@@ -267,6 +267,7 @@ class JavaMutate(object):
         mutationTypeCount["RemoveNullCheck"] = 0
         mutationTypeCount["NullifyReturnValue"] = 0
         mutationTypeCount["Higher-Order"] = 0
+        mutationTypeCount["NullifyObjectInitialization"] = 0
 
         if higherOrder > 1 or higherOrder == -1:
             treeTexts = self.applyHigherOrderMutators(tree, higherOrder)
@@ -340,6 +341,11 @@ class JavaMutate(object):
             resultNullifyReturnValue = self.nullifyReturnValue(tree)
             mutatedTrees.extend(resultNullifyReturnValue)
             mutationTypeCount["NullifyReturnValue"] = len(resultNullifyReturnValue)
+
+            resultNullifyObjectInitialization = self.nullifyObjectInitialization(tree)
+            mutatedTrees.extend(resultNullifyObjectInitialization)
+            mutationTypeCount["NullifyObjectInitialization"] = len(resultNullifyObjectInitialization)
+
 
         if type == "null-check":
             resultRemoveNullCheck = self.removeNullCheck(tree)
@@ -415,6 +421,8 @@ class JavaMutate(object):
 
             return mutatedTreesTexts
 
+
+
     # def removeNullCheck(self, tree, mode="return_text", nodeIndex=None):
     #     assert isinstance(tree, JavaParser.CompilationUnitContext)
     #
@@ -468,6 +476,57 @@ class JavaMutate(object):
             #
             #     for exp in expressionList:
             #         nodeList.append([exp, "negateConditionalsMutator"])
+
+    def nullifyObjectInitialization(self, tree, mode="return_text", nodeIndex=None):
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+
+        if mode == "return_text":
+
+            mutatedTreesTexts = list()
+            expressionList = self.javaParseObject.seek(tree, JavaParser.CreatorContext)
+
+            while len(expressionList) > 0:
+                # tmpTree = copy.deepcopy(tree)
+                expressionIndex = expressionList.pop()
+
+                node = self.javaParseObject.getNode(tree, expressionIndex)
+                assert isinstance(node, JavaParser.CreatorContext)
+                try:
+                    newStatement = node.parentCtx.getChild(0, TerminalNodeImpl)
+                    argumentsStatement = node.children[-1].children[-1]
+
+                    if newStatement.symbol.text != u'new':
+                        continue
+
+                    if not isinstance(argumentsStatement, JavaParser.ArgumentsContext):
+                        continue
+
+                    if argumentsStatement.children[-1].symbol.text != u')':
+                        continue
+
+                except:
+                    continue
+
+                mutationBefore = "----> before: " + node.parentCtx.getText()
+                if self.verbose:
+                    print mutationBefore
+                originalText0 = copy.deepcopy(newStatement.symbol.text)
+                newStatement.symbol.text = u" null /* "
+                originalText2 = copy.deepcopy(argumentsStatement.children[-1].symbol.text)
+                argumentsStatement.children[-1].symbol.text = u" ) */ "
+                mutationAfter = "----> after: " + node.parentCtx.getText().split(u'/*')[0]
+
+                if self.verbose:
+                    print mutationAfter
+                mutatedTreesTexts.append((
+                    "/* LittleDarwin generated mutant\n mutant type: nullifyObjectInitialization\n " + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        node.parentCtx.start.line) + "\n*/ \n\n" + (
+                        " ".join(tree.getText().rsplit("<EOF>", 1)))))
+                # mutatedTreesTexts.append(tree.getText())
+                newStatement.symbol.text = copy.deepcopy(originalText0)
+                argumentsStatement.children[-1].symbol.text = copy.deepcopy(originalText2)
+
+            return mutatedTreesTexts
 
     def nullifyReturnValue(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)

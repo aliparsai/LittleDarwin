@@ -9,12 +9,14 @@ public class ExampleProgram {
 
         String x = "Hello!";
         String y = "Hi!";
+        ArrayList<String> array = new ArrayList<String>();
 
         String z;
 
         z = x + y;
         z = "Hi" + y;
         z =  'a' + y;
+        z = 'a' == y;
 
 
 

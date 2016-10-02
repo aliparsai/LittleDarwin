@@ -275,7 +275,8 @@ def main(argv):
 
         print "total mutations found: ", totalMutantCount
         for mutantType in mutantTypeDatabase.keys():
-            print "-->", mutantType, ":", mutantTypeDatabase[mutantType]
+            if mutantTypeDatabase[mutantType] > 0:
+                print "-->", mutantType, ":", mutantTypeDatabase[mutantType]
 
 
     #*****************************************************************************************************************
