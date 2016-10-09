@@ -333,7 +333,7 @@ class JavaMutate(object):
         if type == "object-oriented" or type == "all":
             pass
 
-        if type == "null-check" or type == "all":
+        if type == "null-check":  # or type == "all":
             resultNullifyInputVariable = self.nullifyInputVariable(tree)
             mutatedTrees.extend(resultNullifyInputVariable)
             mutationTypeCount["NullifyInputVariable"] = len(resultNullifyInputVariable)
@@ -347,7 +347,7 @@ class JavaMutate(object):
             mutationTypeCount["NullifyObjectInitialization"] = len(resultNullifyObjectInitialization)
 
 
-        if type == "null-check":
+        # if type == "null-check":
             resultRemoveNullCheck = self.removeNullCheck(tree)
             mutatedTrees.extend(resultRemoveNullCheck)
             mutationTypeCount["RemoveNullCheck"] = len(resultRemoveNullCheck)
