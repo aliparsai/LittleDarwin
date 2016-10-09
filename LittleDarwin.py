@@ -41,6 +41,10 @@ import signal
 import time
 import subprocess
 
+# workaround for stupid ATNDeserializer error
+subprocess.call(['find', '.', '-iname', '*.pyc', '-delete'], stdout=sys.stdout, stderr=sys.stderr)
+
+
 # try:
 #     import subprocess32 as subprocess
 #     timeoutSupport = True
