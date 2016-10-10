@@ -189,7 +189,7 @@ def main(argv):
                             help="Use null check mutation operators.")
 
     optionParser.add_option("--all", action="store_true", dest="isAll", default=False,
-                            help="Use null check mutation operators.")
+                            help="Use all mutation operators.")
 
     (options, args) = optionParser.parse_args()
 
