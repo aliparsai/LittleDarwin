@@ -188,6 +188,9 @@ def main(argv):
     optionParser.add_option("--null-check", action="store_true", dest="isNullCheck", default=False,
                             help="Use null check mutation operators.")
 
+    optionParser.add_option("--all", action="store_true", dest="isAll", default=False,
+                            help="Use null check mutation operators.")
+
     (options, args) = optionParser.parse_args()
 
     if options.isLicenseActive:
@@ -254,9 +257,16 @@ def main(argv):
             javaParse.numerify(tree)
             # javaParse.tree2DOT(tree)
 
+            if options.isAll:
+                enabledMutators = "all"
+            elif options.isNullCheck:
+                enabledMutators = "null-check"
+            else:
+                enabledMutators = "classical"
+
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.
-            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, "all" if not options.isNullCheck else "null-check")
+            mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, enabledMutators)
 
             print "--> mutations found: ", len(mutated)
 
