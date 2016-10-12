@@ -18,13 +18,14 @@ class Mutant(object):
 
 class JavaClass(object):
     def __init__(self, name, path, globalPath):
-        self.name = None
-        self.path = None
-        self.globalPath = None
+        self.name = name
+        self.path = path
+        self.globalPath = globalPath
         self.mutants = list()
         self.types = set()
         self.survived = 0
         self.killed = 0
+
         self.retrieveMutants()
         self.getAllTypes()
         self.getMutantStats()
@@ -57,11 +58,10 @@ class JavaClass(object):
 
     def getAllTypes(self):
         for mutant in self.mutants:
-            self.types.add(mutant)
+            self.types.add(mutant.type)
 
     def getMutantStatsByType(self):
         stats = dict()
-
         for t in self.types:
             stats[t] = 0, 0, 0
 
@@ -136,7 +136,7 @@ class JavaClass(object):
 
 class JavaProject(object):
     def __init__(self, searchPath):
-        self.searchPath = searchPath
+        self.searchPath = os.path.abspath(searchPath)
         self.classList = list()
         self.listClasses()
 
@@ -158,32 +158,32 @@ class JavaProject(object):
         return None
 
     def getStatsByType(self):
-        total = dict()
+        totalStats = dict()
 
         for c in self.classList:
             assert isinstance(c,JavaClass)
             stats = c.getMutantStatsByType()
             for k in stats.keys():
-                if k not in total:
-                    total[k] = 0, 0, 0
+                if k not in totalStats:
+                    totalStats[k] = 0, 0, 0
 
                 survived, killed, total = stats[k]
-                totalSurvived, totalKilled, totalTotal = total[k]
+                totalSurvived, totalKilled, totalTotal = totalStats[k]
 
-                total[k] = totalSurvived + survived, totalKilled + killed, totalTotal + total
+                totalStats[k] = totalSurvived + survived, totalKilled + killed, totalTotal + total
 
-        return total
+        return totalStats
 
 
     def getStatsByClass(self):
-        total = dict()
+        totalStats = dict()
 
         for c in self.classList:
             assert isinstance(c, JavaClass)
 
-            total[c.name] = c.survived, c.killed, len(c.mutants)
+            totalStats[c.name] = c.survived, c.killed, len(c.mutants)
 
-        return total
+        return totalStats
 
 
 if __name__ == "__main__":
@@ -227,7 +227,7 @@ if __name__ == "__main__":
         for k in totalStats.keys():
             survived, killed, total = totalStats[k]
             line = [k, str(survived), str(killed), str(total)]
-            typeReportHandle.write(','.join(line))
+            typeReportHandle.write(','.join(line) + os.linesep)
 
     classNameList = set([c.name for c in normalProj.classList])
 
@@ -235,10 +235,22 @@ if __name__ == "__main__":
     for name in classNameList:
         nullClass = nullProj.getClassByName(name)
         normalClass = normalProj.getClassByName(name)
+        assert not ((nullClass is None) and (normalClass is None))
 
-        lines.append(','.join([name, str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants)), str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants))]))
+        line = [name]
+        if normalClass is not None:
+            line.extend([str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants))])
+        else:
+            line.extend(["0", "0", "0"])
+
+        if nullClass is not None:
+            line.extend([str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants))])
+        else:
+            line.extend(["0", "0", "0"])
+
+        lines.append(','.join(line) + os.linesep)
 
     with open(coverageReport, "w") as coverageReportHandle:
-        coverageReportHandle.write("Class Name,NormalSurvived,NormalKilled,NormalTotal,NullSurvived,NullKilled,NullTotal")
+        coverageReportHandle.write("Class Name,NormalSurvived,NormalKilled,NormalTotal,NullSurvived,NullKilled,NullTotal" + os.linesep)
         coverageReportHandle.writelines(lines)
 
