@@ -8,6 +8,7 @@ class Mutant(object):
         self.id = None
         self.node = None
         self.lineNumber = None
+        self.type = None
         self.status = 999     # 0 unknown, 1 survived, -1 killed, 999 unset
         self.path = None
 
@@ -16,11 +17,17 @@ class Mutant(object):
 
 
 class JavaClass(object):
-    def __init__(self):
+    def __init__(self, name, path, globalPath):
         self.name = None
         self.path = None
         self.globalPath = None
         self.mutants = list()
+        self.types = set()
+        self.survived = 0
+        self.killed = 0
+        self.retrieveMutants()
+        self.getAllTypes()
+        self.getMutantStats()
 
     def findMutantByNode(self, nodeID):
         for mutant in self.mutants:
@@ -32,13 +39,51 @@ class JavaClass(object):
             if ID == mutant.id:
                 return mutant
 
-    def findMutantByLN(self, ln):
+    def findMutantsByLN(self, ln):
         result = list()
         for mutant in self.mutants:
             if ln == mutant.lineNumber:
                 result.append(mutant)
 
         return result
+
+    def findMutantsByType(self, t):
+        result = list()
+        for mutant in self.mutants:
+            if t == mutant.type:
+                result.append(mutant)
+
+        return result
+
+    def getAllTypes(self):
+        for mutant in self.mutants:
+            self.types.add(mutant)
+
+    def getMutantStatsByType(self):
+        stats = dict()
+
+        for t in self.types:
+            stats[t] = 0, 0, 0
+
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            survived, killed, total = stats[mutant.type]
+            total += 1
+            survived += 1 if mutant.status == 1 else 0
+            killed += 1 if mutant.status == -1 else 0
+            stats[mutant.type] = survived, killed, total
+            assert survived + killed == total
+
+        return stats
+
+    def getMutantStats(self):
+        total = 0
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            total += 1
+            self.survived += 1 if mutant.status == 1 else 0
+            self.killed += 1 if mutant.status == -1 else 0
+            assert self.survived + self.killed == total
 
     def retrieveMutants(self):
         for root, dirnames, filenames in os.walk(os.path.join(self.globalPath, self.path)):
@@ -54,6 +99,7 @@ class JavaClass(object):
 
                 gotLine = False
                 gotNode = False
+                gotType = False
 
                 for line in mutantContent:
                     if not gotLine and "----> line number in original file:" in line:
@@ -64,7 +110,11 @@ class JavaClass(object):
                         newMutant.node = int(line.split(":", 1)[1].strip())
                         gotNode = True
 
-                    if gotNode and gotLine:
+                    if not gotType and "mutant type:" in line:
+                        newMutant.type = str(line.split("type:", 1)[1].strip())
+                        gotType = True
+
+                    if gotNode and gotLine and gotType:
                         break
 
                 with open(os.path.join(self.globalPath, "report.txt")) as reportHandle:
@@ -84,141 +134,111 @@ class JavaClass(object):
 
                 self.mutants.append(newMutant)
 
+class JavaProject(object):
+    def __init__(self, searchPath):
+        self.searchPath = searchPath
+        self.classList = list()
+        self.listClasses()
 
-def listClasses(searchPath):
-    classList = list()
-    for root, dirnames, filenames in os.walk(searchPath):
-        for dirname in fnmatch.filter(dirnames, "*.java"):
-            newClass = JavaClass()
-            newClass.path = os.path.relpath(os.path.join(root, dirname), searchPath)
-            newClass.name = newClass.path.replace('/', '.').rsplit(".java", 1)[0]
-            newClass.globalPath = searchPath
-            newClass.retrieveMutants()
+    def listClasses(self):
+        for root, dirnames, filenames in os.walk(self.searchPath):
+            for dirname in fnmatch.filter(dirnames, "*.java"):
+                path = os.path.relpath(os.path.join(root, dirname), self.searchPath)
+                name = path.replace('/', '.').rsplit(".java", 1)[0]
+                globalPath = self.searchPath
 
-            classList.append(newClass)
+                newClass = JavaClass(name, path, globalPath)
+                self.classList.append(newClass)
 
-    return classList
+    def getClassByName(self, className):
+        for c in self.classList:
+            assert isinstance(c, JavaClass)
+            if c.name == className:
+                return c
+        return None
 
-def getClassByName(className, classList):
-    for c in classList:
-        assert isinstance(c, JavaClass)
-        if c.name == className:
-            return c
+    def getStatsByType(self):
+        total = dict()
 
-if len(sys.argv) < 4:
-    print("""
+        for c in self.classList:
+            assert isinstance(c,JavaClass)
+            stats = c.getMutantStatsByType()
+            for k in stats.keys():
+                if k not in total:
+                    total[k] = 0, 0, 0
+
+                survived, killed, total = stats[k]
+                totalSurvived, totalKilled, totalTotal = total[k]
+
+                total[k] = totalSurvived + survived, totalKilled + killed, totalTotal + total
+
+        return total
+
+
+    def getStatsByClass(self):
+        total = dict()
+
+        for c in self.classList:
+            assert isinstance(c, JavaClass)
+
+            total[c.name] = c.survived, c.killed, len(c.mutants)
+
+        return total
+
+
+if __name__ == "__main__":
+
+
+    if len(sys.argv) < 4:
+        print("""
     MutantIdentifier by Ali Parsai
 
-    Usage: {} [FirstOrderPath] [SecondOrderPath] [ReportFile]
+    Usage: {} [NormalPath] [NullPath] [ProjectName]
 
 
-    """.format(os.path.basename(sys.argv[0])))
+        """.format(os.path.basename(sys.argv[0])))
 
-    sys.exit(0)
+        sys.exit(0)
 
+    normalPath = sys.argv[1]
+    nullPath = sys.argv[2]
+    projectName = sys.argv[3]
 
-firstOrderPath = sys.argv[1]
-secondOrderPath = sys.argv[2]
+    if not os.path.isdir(normalPath) or not os.path.isfile(os.path.join(normalPath, "report.txt")):
+        print("Error: NormalPath Incorrect.", normalPath)
+        sys.exit(1)
 
+    if not os.path.isdir(nullPath) or not os.path.isfile(os.path.join(nullPath, "report.txt")):
+        print("Error: NullPath Incorrect.", nullPath)
+        sys.exit(1)
 
-if not os.path.isdir(firstOrderPath) or not os.path.isfile(os.path.join(firstOrderPath, "report.txt")):
-    print("Error: FirstOrderPath Incorrect.", firstOrderPath)
-    sys.exit(1)
+    normalProj = JavaProject(normalPath)
+    nullProj = JavaProject(nullPath)
 
+    totalStats = normalProj.getStatsByType()
+    totalStats.update(nullProj.getStatsByType())
 
-if not os.path.isdir(secondOrderPath) or not os.path.isfile(os.path.join(secondOrderPath, "report.txt")):
-    print("Error: SecondOrderPath Incorrect.", secondOrderPath)
-    sys.exit(1)
+    typeReport = projectName + "-TypeReport.csv"
+    coverageReport = projectName + "-CoverageReport.csv"
 
+    with open(typeReport, "w") as typeReportHandle:
+        typeReportHandle.write("Mutation Operator,Survived,Killed,Total")
 
-firstOrderClasses = listClasses(firstOrderPath)
-secondOrderClasses = listClasses(secondOrderPath)
+        for k in totalStats.keys():
+            survived, killed, total = totalStats[k]
+            line = [k, str(survived), str(killed), str(total)]
+            typeReportHandle.write(','.join(line))
 
-classes = dict()
+    classNameList = set([c.name for c in normalProj.classList])
 
-for secondOrderClass in secondOrderClasses:
-    assert isinstance(secondOrderClass, JavaClass)
-    firstOrderClass = getClassByName(secondOrderClass.name, firstOrderClasses)
-    if firstOrderClass is None:
-        continue
-    mutantPairs = dict()
-    for secondOrderMutant in secondOrderClass.mutants:
-        assert isinstance(secondOrderMutant, Mutant)
-        # assert len(firstOrderMutant.nodes == 1)
-        firstOrderMutants = list()
-        for node in secondOrderMutant.nodes:
-            firstOrderMutants.append(firstOrderClass.findMutantByNode(node).id)
-        mutantPairs[secondOrderMutant.id] = firstOrderMutants
-    classes[secondOrderClass.name] = mutantPairs
+    lines = list()
+    for name in classNameList:
+        nullClass = nullProj.getClassByName(name)
+        normalClass = normalProj.getClassByName(name)
 
+        lines.append(','.join([name, str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants)), str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants))]))
 
-# count the anomalies
+    with open(coverageReport, "w") as coverageReportHandle:
+        coverageReportHandle.write("Class Name,NormalSurvived,NormalKilled,NormalTotal,NullSurvived,NullKilled,NullTotal")
+        coverageReportHandle.writelines(lines)
 
-writeHandle = open(sys.argv[3], "w")
-
-for cname, c in classes.iteritems():
-    processedIDs1 = list()
-    processedIDs2 = list()
-
-    s2k = 0
-    k2s = 0
-    normal = 0
-    hcl = getClassByName(cname, secondOrderClasses)
-    fcl = getClassByName(cname, firstOrderClasses)
-
-    assert isinstance(c, dict)
-
-    for key, value in c.iteritems():
-        #### assertions
-
-        assert key not in processedIDs2
-        assert isinstance(value, list)
-        assert len(value) == len(set(value))
-        for k in value:
-            assert k not in processedIDs1
-
-        processedIDs2.append(key)
-        processedIDs1.extend(value)
-
-        #### counting
-        hom = hcl.findMutantByID(key)
-        assert isinstance(hom, Mutant)
-
-        foms = [fcl.findMutantByID(fid) for fid in value]
-
-        if hom.status not in [1, -1]:
-            print hom, "\n unknown status"
-        assert hom.status != 0
-
-
-        if hom.status == -1:
-            for fom in foms:
-                assert isinstance(fom, Mutant)
-                assert fom.status != 0
-                statusFlag = False
-                if fom.status == -1:
-                    statusFlag = True
-                    break
-            if statusFlag:
-                normal += 1
-            else:
-                sys.stdout.write(",".join(str(x) for x in [cname, hom.id, [f.id for f in foms], "all FOMs survived, HOM killed\n"]))
-                s2k += 1
-
-        elif hom.status == 1:
-            for fom in foms:
-                assert isinstance(fom, Mutant)
-                assert fom.status != 0
-                statusFlag = False
-                if fom.status == -1:
-                    sys.stdout.write(",".join(str(x) for x in [cname, hom.id, [f.id for f in foms], fom.id, "FOM killed, HOM survived\n"]))
-                    statusFlag = True
-                    break
-            if statusFlag:
-                k2s += 1
-            else:
-                normal += 1
-
-    writeHandle.write(",".join(str(x) for x in [cname, normal, k2s, s2k, "\n"]))
-
-writeHandle.close()
