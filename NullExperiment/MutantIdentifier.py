@@ -222,9 +222,9 @@ if __name__ == "__main__":
     coverageReport = projectName + "-CoverageReport.csv"
 
     with open(typeReport, "w") as typeReportHandle:
-        typeReportHandle.write("Mutation Operator,Survived,Killed,Total")
+        typeReportHandle.write("Mutation Operator,Survived,Killed,Total" + os.linesep)
 
-        for k in totalStats.keys():
+        for k in sorted(totalStats.keys()):
             survived, killed, total = totalStats[k]
             line = [k, str(survived), str(killed), str(total)]
             typeReportHandle.write(','.join(line) + os.linesep)
@@ -232,7 +232,7 @@ if __name__ == "__main__":
     classNameList = set([c.name for c in normalProj.classList])
 
     lines = list()
-    for name in classNameList:
+    for name in sorted(classNameList):
         nullClass = nullProj.getClassByName(name)
         normalClass = normalProj.getClassByName(name)
         assert not ((nullClass is None) and (normalClass is None))
