@@ -9,11 +9,13 @@ class Mutant(object):
         self.node = None
         self.lineNumber = None
         self.type = None
-        self.status = 999     # 0 unknown, 1 survived, -1 killed, 999 unset
+        self.status = 999  # 0 unknown, 1 survived, -1 killed, 999 unset
         self.path = None
 
     def __str__(self):
-        return " ".join(str(x) for x in ["Mutant ", self.id, "| Path:", self.path, "| Status:", self.status, "| Node:", self.node, "| Line:", self.lineNumber])
+        return " ".join(str(x) for x in
+                        ["Mutant ", self.id, "| Path:", self.path, "| Status:", self.status, "| Node:", self.node,
+                         "| Line:", self.lineNumber])
 
 
 class JavaClass(object):
@@ -134,6 +136,7 @@ class JavaClass(object):
 
                 self.mutants.append(newMutant)
 
+
 class JavaProject(object):
     def __init__(self, searchPath):
         self.searchPath = os.path.abspath(searchPath)
@@ -161,7 +164,7 @@ class JavaProject(object):
         totalStats = dict()
 
         for c in self.classList:
-            assert isinstance(c,JavaClass)
+            assert isinstance(c, JavaClass)
             stats = c.getMutantStatsByType()
             for k in stats.keys():
                 if k not in totalStats:
@@ -173,7 +176,6 @@ class JavaProject(object):
                 totalStats[k] = totalSurvived + survived, totalKilled + killed, totalTotal + total
 
         return totalStats
-
 
     def getStatsByClass(self):
         totalStats = dict()
@@ -187,7 +189,6 @@ class JavaProject(object):
 
 
 if __name__ == "__main__":
-
 
     if len(sys.argv) < 4:
         print("""
@@ -219,6 +220,7 @@ if __name__ == "__main__":
     totalStats.update(nullProj.getStatsByType())
 
     typeReport = projectName + "-TypeReport.csv"
+    typeGeneralReport = projectName + "-TypeGeneralReport.csv"
     coverageReport = projectName + "-CoverageReport.csv"
 
     with open(typeReport, "w") as typeReportHandle:
@@ -228,6 +230,32 @@ if __name__ == "__main__":
             survived, killed, total = totalStats[k]
             line = [k, str(survived), str(killed), str(total)]
             typeReportHandle.write(','.join(line) + os.linesep)
+
+    with open(typeGeneralReport, "w") as typeGeneralReportHandle:
+        typeGeneralReportHandle.write("Type of Mutation Operator,Survived,Killed,Total" + os.linesep)
+        traditionalS = 0
+        traditionalK = 0
+        traditionalT = 0
+
+        nulltypeS = 0
+        nulltypeK = 0
+        nulltypeT = 0
+
+        for k in sorted(totalStats.keys()):
+            survived, killed, total = totalStats[k]
+            if "null" not in str.lower(k):
+                traditionalS += survived
+                traditionalK += killed
+                traditionalT += total
+            else:
+                nulltypeS += survived
+                nulltypeK += killed
+                nulltypeT += total
+
+        line1 = ["Traditional", str(traditionalS), str(traditionalK), str(traditionalT)]
+        line2 = ["NullType", str(nulltypeS), str(nulltypeK), str(nulltypeT)]
+        typeGeneralReportHandle.write(','.join(line1) + os.linesep)
+        typeGeneralReportHandle.write(','.join(line2) + os.linesep)
 
     classNameList = set([c.name for c in normalProj.classList])
 
@@ -239,18 +267,20 @@ if __name__ == "__main__":
 
         line = [name]
         if normalClass is not None:
-            line.extend([str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants))])
+            line.extend([str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants)),
+                         str(normalClass.killed * 100.0 / len(normalClass.mutants))])
         else:
-            line.extend(["0", "0", "0"])
+            line.extend(["0", "0", "0", "NA"])
 
         if nullClass is not None:
-            line.extend([str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants))])
+            line.extend([str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants)),
+                         str(nullClass.killed * 100.0 / len(nullClass.mutants))])
         else:
-            line.extend(["0", "0", "0"])
+            line.extend(["0", "0", "0", "NA"])
 
         lines.append(','.join(line) + os.linesep)
 
     with open(coverageReport, "w") as coverageReportHandle:
-        coverageReportHandle.write("Class Name,NormalSurvived,NormalKilled,NormalTotal,NullSurvived,NullKilled,NullTotal" + os.linesep)
+        coverageReportHandle.write(
+            "Class Name,NormalSurvived,NormalKilled,NormalTotal,NormalCoverage,NullSurvived,NullKilled,NullTotal,NullCoverage" + os.linesep)
         coverageReportHandle.writelines(lines)
-
