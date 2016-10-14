@@ -267,20 +267,29 @@ if __name__ == "__main__":
 
         line = [name]
         if normalClass is not None:
+            normalCoverage = normalClass.killed * 100.0 / len(normalClass.mutants)
             line.extend([str(normalClass.survived), str(normalClass.killed), str(len(normalClass.mutants)),
-                         str(normalClass.killed * 100.0 / len(normalClass.mutants))])
+                         str(normalCoverage)])
         else:
+            normalCoverage = None
             line.extend(["0", "0", "0", "NA"])
 
         if nullClass is not None:
+            nullCoverage = nullClass.killed * 100.0 / len(nullClass.mutants)
             line.extend([str(nullClass.survived), str(nullClass.killed), str(len(nullClass.mutants)),
-                         str(nullClass.killed * 100.0 / len(nullClass.mutants))])
+                         str(nullCoverage)])
         else:
+            nullCoverage = None
             line.extend(["0", "0", "0", "NA"])
+
+        if (normalCoverage is not None) and (nullCoverage is not None):
+            line.append(str(normalCoverage - nullCoverage))
+        else:
+            line.append("NA")
 
         lines.append(','.join(line) + os.linesep)
 
     with open(coverageReport, "w") as coverageReportHandle:
         coverageReportHandle.write(
-            "Class Name,NormalSurvived,NormalKilled,NormalTotal,NormalCoverage,NullSurvived,NullKilled,NullTotal,NullCoverage" + os.linesep)
+            "Class Name,NormalSurvived,NormalKilled,NormalTotal,NormalCoverage,NullSurvived,NullKilled,NullTotal,NullCoverage,Difference" + os.linesep)
         coverageReportHandle.writelines(lines)
