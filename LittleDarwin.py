@@ -42,7 +42,7 @@ import time
 import subprocess
 
 # workaround for stupid ATNDeserializer error
-subprocess.call(['find', '.', '-iname', '*.pyc', '-delete'], stdout=sys.stdout, stderr=sys.stderr)
+#subprocess.call(['find', '.', '-iname', '*.pyc', '-delete'], stdout=sys.stdout, stderr=sys.stderr)
 
 
 # try:
