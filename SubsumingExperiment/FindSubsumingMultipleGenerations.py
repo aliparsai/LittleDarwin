@@ -1,4 +1,4 @@
-from FindSubsumingRelation import *
+from FindSubsumingRelationWithStatementCoverage import *
 
 
 def mapCorrespondingMutants(mutantSet1, mutantSet2):
