@@ -1,9 +1,7 @@
 import fnmatch
+import itertools
 import os
 import sys
-import itertools
-
-import time
 
 
 class Mutant(object):
@@ -44,7 +42,9 @@ class Mutant(object):
         return ".txt".join(self.path.rsplit('.java', 1))
 
     def __str__(self):
-        return " ".join(str(x) for x in ["Mutant ", self.id, ":", self.type, "| File:", os.path.basename(self.cuPath), "| Subsuming:", self.isSubsuming])
+        return " ".join(str(x) for x in
+                        ["Mutant ", self.id, ":", self.type, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
+                         self.isSubsuming])
 
     def __repr__(self):
         return self.__str__()
@@ -75,8 +75,8 @@ class MutantSet(object):
         numMutants = len(self.mutants)
 
         mutantIndex = 0
-        fileHandle.write("MutantSet\r\nField,Value\r\nGlobalPath,"+str(self.globalPath))
-        fileHandle.write("\r\nNumberOfMutants,"+str(numMutants)+"\r\n\r\nMutants\r\n")
+        fileHandle.write("MutantSet\r\nField,Value\r\nGlobalPath," + str(self.globalPath))
+        fileHandle.write("\r\nNumberOfMutants," + str(numMutants) + "\r\n\r\nMutants\r\n")
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
@@ -84,12 +84,14 @@ class MutantSet(object):
             mutant.id = mutantIndex
 
         if short:
-            fileHandle.write("\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"Number of Failed Tests\",\"Subsumes\",\"SubsumedBy\",\"MutuallySubsuming\"\r\n")
+            fileHandle.write(
+                "\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"Number of Failed Tests\",\"Subsumes\",\"SubsumedBy\",\"MutuallySubsuming\"\r\n")
         else:
-            fileHandle.write("\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"Number of Failed Tests\",\"Failed Tests\",\"Subsumes\",\"SubsumedBy\",\"MutuallySubsuming\"\r\n")
+            fileHandle.write(
+                "\"Mutant ID\",\"Mutant Type\",\"Mutant Path\",\"CompilationUnit Path\",\"Line Number\",\"isSubsuming\",\"Number of Failed Tests\",\"Failed Tests\",\"Subsumes\",\"SubsumedBy\",\"MutuallySubsuming\"\r\n")
 
         for mutant in self.mutants:
-            fileHandle.write(mutant.toCSV(short)+"\r\n")
+            fileHandle.write(mutant.toCSV(short) + "\r\n")
 
     def retrieveMutants(self):
         counter = 0
@@ -126,7 +128,7 @@ class MutantSet(object):
 
                 self.mutants.append(newMutant)
                 counter += 1
-                sys.stdout.write(str(counter)+"       \r")
+                sys.stdout.write(str(counter) + "       \r")
                 sys.stdout.flush()
 
     def retrieveFailedTestResults(self):
@@ -288,7 +290,17 @@ def createMutantSubsumptionGraph(mutantSet):
         sys.stdout.flush()
 
 
+def getStatsforMutantList(mList):
+    typeDict = dict()
+    for mutant in mList:
+        assert isinstance(mutant, Mutant)
+        if mutant.type in typeDict.keys():
+            typeDict[mutant.type] += 1
 
+        else:
+            typeDict[mutant.type] = 1
+
+    return typeDict
 
 
 if __name__ == "__main__":
@@ -299,10 +311,20 @@ if __name__ == "__main__":
         mSet.retrieveMutants()
         fSet += mSet
 
-
     fSet.assignStatus()
+    normalDist = getStatsforMutantList(fSet.mutants)
+    subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
+    subsumingDist = getStatsforMutantList(subsumingMutants)
 
-    print fSet.printSubsuming()
+    # print "total:", len(fSet.mutants), "| subsuming:", len(subsumingMutants)
+    print "Mutation Operator,Total Generated,Percentage,Subsuming,Percentage"
+    sortedKeys = sorted([k for k in normalDist.keys() if "null" not in str.lower(k)])
+    sortedKeys.extend(sorted([k for k in normalDist.keys() if "null" in str.lower(k)]))
 
+    # print sortedKeys
 
+    for t in sortedKeys:
+        print str(t) + "," + str(normalDist[t]) + ",{0:.2f}%".format(
+            normalDist[t] * 100.0 / len(fSet.mutants)) + (",," if t not in subsumingDist.keys() else "," + str(
+            subsumingDist[t]) + ",{0:.2f}%".format(subsumingDist[t] * 100.0 / len(subsumingMutants)))
 
