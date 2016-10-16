@@ -317,14 +317,20 @@ if __name__ == "__main__":
     subsumingDist = getStatsforMutantList(subsumingMutants)
 
     # print "total:", len(fSet.mutants), "| subsuming:", len(subsumingMutants)
-    print "Mutation Operator,Total Generated,Percentage,Subsuming,Percentage"
+    print "Mutation Operator,All,Subsuming"
     sortedKeys = sorted([k for k in normalDist.keys() if "null" not in str.lower(k)])
     sortedKeys.extend(sorted([k for k in normalDist.keys() if "null" in str.lower(k)]))
 
     # print sortedKeys
 
     for t in sortedKeys:
-        print str(t) + "," + str(normalDist[t]) + ",{0:.2f}%".format(
-            normalDist[t] * 100.0 / len(fSet.mutants)) + (",0,0%" if t not in subsumingDist.keys() else "," + str(
-            subsumingDist[t]) + ",{0:.2f}%".format(subsumingDist[t] * 100.0 / len(subsumingMutants)))
+#       print str(t) + "," + str(normalDist[t]) + ",{0:.2f}%".format(
+#           normalDist[t] * 100.0 / len(fSet.mutants)) + (",0,0%" if t not in subsumingDist.keys() else "," + str(
+#           subsumingDist[t]) + ",{0:.2f}%".format(subsumingDist[t] * 100.0 / len(subsumingMutants)))
+
+        print str(t) + "," + str(normalDist[t]) + (",0" if t not in subsumingDist.keys() else "," + str(
+            subsumingDist[t]))
+
+    print ",,"
+    print "Total," + str(len(fSet.mutants)) + "," + str(len(subsumingMutants))
 
