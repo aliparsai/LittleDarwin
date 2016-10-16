@@ -325,6 +325,6 @@ if __name__ == "__main__":
 
     for t in sortedKeys:
         print str(t) + "," + str(normalDist[t]) + ",{0:.2f}%".format(
-            normalDist[t] * 100.0 / len(fSet.mutants)) + (",," if t not in subsumingDist.keys() else "," + str(
+            normalDist[t] * 100.0 / len(fSet.mutants)) + (",0,0%" if t not in subsumingDist.keys() else "," + str(
             subsumingDist[t]) + ",{0:.2f}%".format(subsumingDist[t] * 100.0 / len(subsumingMutants)))
 
