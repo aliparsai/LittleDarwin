@@ -128,8 +128,8 @@ class MutantSet(object):
 
                 self.mutants.append(newMutant)
                 counter += 1
-                sys.stdout.write(str(counter) + "       \r")
-                sys.stdout.flush()
+                # sys.stdout.write(str(counter) + "       \r")
+                # sys.stdout.flush()
 
     def retrieveFailedTestResults(self):
         for mutant in self.mutants:
@@ -282,12 +282,12 @@ def createMutantSubsumptionGraph(mutantSet):
 
     for mutant in mutantSet.mutants:
         counter += 1
-        sys.stdout.write(str(counter) + "/" + str(total) + "N")
+        # sys.stdout.write(str(counter) + "/" + str(total) + "N")
         mutantSet.mutantSubsumptionGraph.addMutant(mutant)
-        sys.stdout.write("P")
+        # sys.stdout.write("P")
         mutantSet.predictedMutantSubsumptionGraph.addMutant(mutant)
-        sys.stdout.write("        \r")
-        sys.stdout.flush()
+        # sys.stdout.write("        \r")
+        # sys.stdout.flush()
 
 
 def getStatsforMutantList(mList):
