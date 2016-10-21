@@ -65,6 +65,78 @@ class MutantSet(object):
         tmpMSet.mutants.extend(other.mutants)
         return tmpMSet
 
+    def printSubsumingTests(self):
+        testList = set()
+        minT = 10000000
+        maxT = -10000000
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            if mutant.isSubsuming is False:
+                continue
+
+            testList.add(list(mutant.failedTests)[0])
+            if maxT < len(mutant.failedTests):
+                maxT = len(mutant.failedTests)
+
+            if minT > len(mutant.failedTests):
+                minT = len(mutant.failedTests)
+
+        print minT, maxT
+        return sorted(list(testList))
+
+#########################################
+#          Selection Algorithm          #
+#########################################
+
+    def minimalTestSelection(self):
+        def maxFinder(testSet):
+            maxK = None
+            maxKSize = -1000000
+            for k in testSet.keys():
+                if len(testSet[k]) > maxKSize:
+                    maxK = k
+                    maxKSize = len(testSet[k])
+            return maxK
+
+        testKillsMutants = dict()
+
+        # create mutant sets for each test
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            if mutant.isSubsuming is False:
+                continue
+
+            for test in mutant.failedTests:
+                if test in testKillsMutants.keys():
+                    testKillsMutants[test].add(mutant)
+                else:
+                    testKillsMutants[test] = {mutant}
+
+        # selection algorithm
+        selectedTests = list()
+        while len(testKillsMutants) > 0:
+            # find the test that kills most mutants
+            effectiveTest = maxFinder(testKillsMutants)
+            # add it to selected tests and remove it from the test set
+            selectedTests.append(effectiveTest)
+            effectiveMutantSet = testKillsMutants.pop(effectiveTest)
+
+            for key in testKillsMutants.keys():
+                testKillsMutants[key] -= effectiveMutantSet
+                if len(testKillsMutants[key]) == 0:
+                    testKillsMutants.pop(key)
+
+        return sorted(selectedTests)
+
+
+
+
+
+
+
+
+
+
     def printSubsuming(self):
         lines = [str(m) for m in self.mutants if m.isSubsuming is True]
         return "\n".join(lines)
@@ -312,25 +384,28 @@ if __name__ == "__main__":
         fSet += mSet
 
     fSet.assignStatus()
-    normalDist = getStatsforMutantList(fSet.mutants)
-    subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
-    subsumingDist = getStatsforMutantList(subsumingMutants)
 
-    # print "total:", len(fSet.mutants), "| subsuming:", len(subsumingMutants)
-    print "Mutation Operator,All,Subsuming"
-    sortedKeys = sorted([k for k in normalDist.keys() if "null" not in str.lower(k)])
-    sortedKeys.extend(sorted([k for k in normalDist.keys() if "null" in str.lower(k)]))
+    minimalSet = fSet.minimalTestSelection()
 
-    # print sortedKeys
+    print len(fSet.printSubsumingTests()), len(minimalSet)
 
-    for t in sortedKeys:
-#       print str(t) + "," + str(normalDist[t]) + ",{0:.2f}%".format(
-#           normalDist[t] * 100.0 / len(fSet.mutants)) + (",0,0%" if t not in subsumingDist.keys() else "," + str(
-#           subsumingDist[t]) + ",{0:.2f}%".format(subsumingDist[t] * 100.0 / len(subsumingMutants)))
+    print os.linesep.join(minimalSet)
 
-        print str(t) + "," + str(normalDist[t]) + (",0" if t not in subsumingDist.keys() else "," + str(
-            subsumingDist[t]))
-
-    print ",,"
-    print "Total," + str(len(fSet.mutants)) + "," + str(len(subsumingMutants))
+    # normalDist = getStatsforMutantList(fSet.mutants)
+    # subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
+    # subsumingDist = getStatsforMutantList(subsumingMutants)
+    #
+    # # print "total:", len(fSet.mutants), "| subsuming:", len(subsumingMutants)
+    # print "Mutation Operator,All,Subsuming"
+    # sortedKeys = sorted([k for k in normalDist.keys() if "null" not in str.lower(k)])
+    # sortedKeys.extend(sorted([k for k in normalDist.keys() if "null" in str.lower(k)]))
+    #
+    # # print sortedKeys
+    #
+    # for t in sortedKeys:
+    #     print str(t) + "," + str(normalDist[t]) + (",0" if t not in subsumingDist.keys() else "," + str(
+    #         subsumingDist[t]))
+    #
+    # print ",,"
+    # print "Total," + str(len(fSet.mutants)) + "," + str(len(subsumingMutants))
 
