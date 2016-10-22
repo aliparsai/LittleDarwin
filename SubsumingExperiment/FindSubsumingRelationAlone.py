@@ -112,7 +112,7 @@ class MutantSet(object):
                 else:
                     testKillsMutants[test] = {mutant}
 
-        # selection algorithm
+        # selection greedy algorithm
         selectedTests = list()
         while len(testKillsMutants) > 0:
             # find the test that kills most mutants
@@ -127,15 +127,6 @@ class MutantSet(object):
                     testKillsMutants.pop(key)
 
         return sorted(selectedTests)
-
-
-
-
-
-
-
-
-
 
     def printSubsuming(self):
         lines = [str(m) for m in self.mutants if m.isSubsuming is True]
