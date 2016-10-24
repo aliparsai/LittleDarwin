@@ -236,6 +236,7 @@ interfaceMethodDeclaration
     :   (jType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         ';'
+    |   ('default'|'static') methodDeclaration
     ;
 
 genericInterfaceMethodDeclaration
@@ -515,6 +516,27 @@ constantExpression
     :   expression
     ;
 
+
+lambdaExpression
+	:	lambdaParameters '->' lambdaBody
+	;
+
+lambdaParameters
+	:	Identifier
+	|	'(' formalParameterList? ')'
+	|	'(' inferredFormalParameterList ')'
+	;
+
+inferredFormalParameterList
+	:	Identifier (',' Identifier)*
+	;
+
+lambdaBody
+	:	expression
+	|	block
+	;
+
+
 expression
     :   primary
     |   expression '.' Identifier
@@ -541,6 +563,7 @@ expression
     |   expression '&&' expression
     |   expression '||' expression
     |   expression '?' expression ':' expression
+    |   lambdaExpression
     |   <assoc=right> expression
         (   '='
         |   '+='
