@@ -246,16 +246,23 @@ def main(argv):
 
         # go through each file, parse it, calculate all mutations, and generate files accordingly.
         for srcFile in javaRead.fileList:
-            fileCounter += 1
-            print "(" + str(fileCounter) + "/" + str(fileCount) + ") source file: ", srcFile
+            print "(" + str(fileCounter + 1) + "/" + str(fileCount) + ") source file: ", srcFile
             targetList = list()
 
-            # parsing the source file into a tree.
-            tree = javaParse.parse(javaRead.getFileContent(srcFile))
+            try:
+                # parsing the source file into a tree.
+                tree = javaParse.parse(javaRead.getFileContent(srcFile))
 
-            # assigning a number to each node to be able to identify it uniquely.
-            javaParse.numerify(tree)
-            # javaParse.tree2DOT(tree)
+                # assigning a number to each node to be able to identify it uniquely.
+                javaParse.numerify(tree)
+                # javaParse.tree2DOT(tree)
+
+            except Exception as e:
+                # Java 8 problem
+                print "Error in parsing, skipping the file."
+                continue
+
+            fileCounter += 1
 
             if options.isAll:
                 enabledMutators = "all"

@@ -1,4 +1,28 @@
 import java.util.ArrayList;
+import java.lang.Runnable;
+
+
+
+
+@FunctionalInterface
+public interface Interface1 {
+
+	void method1(String str);
+
+	default void log(String str){
+		System.out.println("I1 logging::"+str);
+
+Runnable r1 = () -> {
+			System.out.println("My Runnable");
+		};
+
+	}
+
+	static void print(String str){
+		System.out.println("Printing "+str);
+	}
+}
+
 
 
 public class ExampleProgram {
@@ -65,8 +89,6 @@ public class ExampleProgram {
 
         return var3;
     }
-
-
 
 
 }
