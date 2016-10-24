@@ -260,6 +260,7 @@ def main(argv):
             except Exception as e:
                 # Java 8 problem
                 print "Error in parsing, skipping the file."
+                sys.stderr.write(e.message)
                 continue
 
             fileCounter += 1
