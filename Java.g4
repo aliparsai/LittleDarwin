@@ -516,6 +516,7 @@ constantExpression
     :   expression
     ;
 
+// Java 8 Stuff //
 
 lambdaExpression
 	:	lambdaParameters '->' lambdaBody
@@ -535,6 +536,18 @@ lambdaBody
 	:	expression
 	|	block
 	;
+//
+//methodReference
+//	:	//expression '::' typeArguments? Identifier
+//	|	jType
+//	|	primary '::' typeArguments? Identifier
+//	|	'super' '::' typeArguments? Identifier
+//	|	jType '.' 'super' '::' typeArguments? Identifier
+//	|	jType '::' typeArguments? 'new'
+//	|	jType '::' 'new'
+//	;
+
+// End Java 8 Stuff //
 
 
 expression
@@ -564,6 +577,8 @@ expression
     |   expression '||' expression
     |   expression '?' expression ':' expression
     |   lambdaExpression
+    |   expression '::' typeArguments? Identifier
+    |   expression '::' typeArguments? 'new'
     |   <assoc=right> expression
         (   '='
         |   '+='
