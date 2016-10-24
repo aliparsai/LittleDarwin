@@ -1,8 +1,9 @@
 from ManualMutation import *
 import tempfile
 
+
 class SearchAndReplaceMutation(ManualMutation):
-    def __init__(self, sourcePath = None):
+    def __init__(self, sourcePath=None):
         ManualMutation.__init__(self, sourcePath, None)
         self.tmpFilePaths = list()
 
@@ -27,7 +28,7 @@ class SearchAndReplaceMutation(ManualMutation):
         results = list()
         tokens = sourceFile.contents.split(searchTerm)
 
-        for i in range(0, len(tokens)-1):
+        for i in range(0, len(tokens) - 1):
             tmpList = list()
 
             for j in range(0, len(tokens)):
@@ -40,7 +41,13 @@ class SearchAndReplaceMutation(ManualMutation):
 
             results.append("".join(tmpList))
 
-        return results
+        # !! dirty workaround ##
+        changedResults = list()
+        for r in results:
+            tmpR = r.split("import java.util.", 1)
+            changedResults.append(("import java.util." + "".join(replacement.split("new ")).strip() + ";\nimport java.util.").join(tmpR))
+
+        return changedResults  # results
 
     def createTempMutantFile(self, contents=""):
         assert isinstance(contents, str)
@@ -65,20 +72,20 @@ class SearchAndReplaceMutation(ManualMutation):
 
 if __name__ == "__main__":
     srcPath = sys.argv[1]
-    search = sys.argv[2]
-    replace = sys.argv[3]
+
+    sr = {"new LinkedHashMap": "new HashMap", "new TreeMap": "new LinkedHashMap",
+          "new LinkedHashSet": "new HashSet", "new TreeSet": "new LinkedHashSet"}
 
     assert os.path.isdir(srcPath)
 
     mm = SearchAndReplaceMutation(srcPath)
 
     mm.initialize()
-    mm.mutateAllSourceFiles(search, replace)
+
+    for key, value in sr.iteritems():
+        mm.mutateAllSourceFiles(key, value)
+
     mm.createMutationStructure()
 
     for tmpfile in mm.tmpFilePaths:
         os.remove(tmpfile)
-
-
-
-
