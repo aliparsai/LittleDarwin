@@ -18,6 +18,12 @@ class Mutant(object):
         self.mutuallySubsuming = set()
         self.globalPath = None
 
+    def isMutuallySubsuming(self):
+        return True if len(self.mutuallySubsuming) > 0 else False
+
+    def isKilled(self):
+        return True if len(self.failedTests) > 0 else False
+
     def toCSV(self, short=True):
         appStr = lambda l, q: l.append(str(q)) if " " not in str(q) else l.append("\"" + str(q) + "\"")
 
@@ -376,11 +382,34 @@ if __name__ == "__main__":
 
     fSet.assignStatus()
 
-    minimalSet = fSet.minimalTestSelection()
+    # minimalSet = fSet.minimalTestSelection()
+    #
+    # print len(fSet.printSubsumingTests()), len(minimalSet)
+    #
+    # print os.linesep.join(minimalSet)
 
-    print len(fSet.printSubsumingTests()), len(minimalSet)
+    totalMutants = len(fSet.mutants)
+    killedMutants = 0
+    subsumingMutants = 0
+    mutuallySubsumingMutants = 0
+    msGroups = set()
 
-    print os.linesep.join(minimalSet)
+    for mutant in fSet.mutants:
+        assert isinstance(mutant, Mutant)
+        killedMutants += 1 if mutant.isKilled() is True else 0
+        subsumingMutants += 1 if mutant.isSubsuming is True else 0
+        mutuallySubsumingMutants += 1 if mutant.isMutuallySubsuming() is True and mutant.isSubsuming is True else 0
+        msGroup = set(mutant.mutuallySubsuming)
+        msGroup.update({mutant})
+        if mutant.isSubsuming and len(msGroup) > 1:
+            msGroups.add(frozenset(msGroup))
+
+    print "Total Mutants:\t\t\t\t\t\t\t", totalMutants, "\t100%"
+    print "Killed Mutants:\t\t\t\t\t\t\t", killedMutants, "\t{:.2f}%".format(float(killedMutants) * 100.0 / totalMutants)
+    print "Subsuming Mutants:\t\t\t\t\t\t", subsumingMutants, "\t{:.2f}%".format(float(subsumingMutants)*100.0/totalMutants)
+    print "Mutually Subsuming Mutants:\t\t\t\t", mutuallySubsumingMutants, "\t{:.2f}%".format(float(mutuallySubsumingMutants) * 100.0 / totalMutants)
+    print "Number of Mutually Subsuming Groups:\t", len(msGroups)
+
 
     # normalDist = getStatsforMutantList(fSet.mutants)
     # subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
