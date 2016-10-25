@@ -18,11 +18,10 @@ class JavaListen(JavaListener):
         JavaListener.__init__(self)
 
 
-
-
 class JavaParse(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
+        self.lookupTable = dict()
 
     # antlr-based parser
 
@@ -32,6 +31,7 @@ class JavaParse(object):
         stream = CommonTokenStream(lexer)
         parser = JavaParser(stream)
         tree = parser.compilationUnit()
+        self.lookupTable = dict()
         # tree.getText()
         return tree
 
@@ -94,11 +94,16 @@ class JavaParse(object):
         return None
 
     def getNode(self, myTree, index):
+        if index in self.lookupTable:
+            return self.lookupTable[index]
+
         stack = list()
         stack.append(myTree)
 
         while len(stack) > 0:
             tmp = stack.pop()
+            if tmp.nodeIndex not in self.lookupTable:
+                self.lookupTable[tmp.nodeIndex] = tmp
 
             if tmp.nodeIndex == index:
                 return tmp
