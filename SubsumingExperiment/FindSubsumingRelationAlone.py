@@ -2,11 +2,15 @@ import fnmatch
 import itertools
 import os
 import sys
+from graphviz import Digraph
 
 
 class Mutant(object):
+    newID = itertools.count().next
+
     def __init__(self):
         self.id = None
+        self.nid = Mutant.newID()
         self.type = None
         self.isSubsuming = False
         self.path = None
@@ -17,6 +21,12 @@ class Mutant(object):
         self.subsumes = set()
         self.mutuallySubsuming = set()
         self.globalPath = None
+
+    def isMutuallySubsuming(self):
+        return True if len(self.mutuallySubsuming) > 0 else False
+
+    def isKilled(self):
+        return True if len(self.failedTests) > 0 else False
 
     def toCSV(self, short=True):
         appStr = lambda l, q: l.append(str(q)) if " " not in str(q) else l.append("\"" + str(q) + "\"")
@@ -41,18 +51,16 @@ class Mutant(object):
     def getBuildResultFilePath(self):
         return ".txt".join(self.path.rsplit('.java', 1))
 
-    def __str__(self):
+    def __repr__(self):
         return " ".join(str(x) for x in
                         ["Mutant ", self.id, ":", self.type, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
                          self.isSubsuming])
-
-    def __repr__(self):
-        return self.__str__()
 
 
 class MutantSet(object):
     def __init__(self, globalPath=None):
         self.globalPath = None if globalPath is None else os.path.abspath(globalPath)
+        self.mutantSubsumptionGraph = None
         self.mutants = list()
 
     def __str__(self):
@@ -244,6 +252,8 @@ class MutantSubsumptionGraphNode(object):
 
     def __init__(self, predicted=False):
         self.id = MutantSubsumptionGraphNode.newID()
+        self.outEdges = list()
+        self.inEdges = list()
         self.mutants = set()
         self.predicted = predicted
 
@@ -252,6 +262,9 @@ class MutantSubsumptionGraphNode(object):
         if self.mutants == other.mutants:
             return True
         return False
+
+    def __str__(self):
+        return '{' + ','.join([str(m.nid) for m in self.mutants]) + '}'
 
     def addMutant(self, mutant):
         assert isinstance(mutant, Mutant)
@@ -297,10 +310,80 @@ class MutantSubsumptionGraph(object):
     def __init__(self, predicted=False):
         self.nodes = list()
         self.edges = list()
+        self.spanningEdges = list()
+        self.rootNodes = list()
+        self.leafNodes = list()
         self.predicted = predicted
+
+    def findRootNodes(self):
+        for n in self.nodes:
+            assert isinstance(n, MutantSubsumptionGraphNode)
+            isRoot = True
+            for e in self.edges:
+                assert isinstance(e, MutantSubsumptionGraphEdge)
+                if n is e.mutantSubsumed:
+                    isRoot = False
+                    break
+            if isRoot:
+                self.rootNodes.append(n)
+
+    def findLeafNodes(self):
+        for n in self.nodes:
+            assert isinstance(n, MutantSubsumptionGraphNode)
+            isLeaf = True
+            for e in self.edges:
+                assert isinstance(e, MutantSubsumptionGraphEdge)
+                if n is e.mutantSubsuming:
+                    isLeaf = False
+                    break
+            if isLeaf:
+                self.leafNodes.append(n)
+
+    def maxPathLength(self, node1, node2):
+        assert isinstance(node1, MutantSubsumptionGraphNode)
+        assert isinstance(node2, MutantSubsumptionGraphNode)
+        stack = list()
+        maxL = -1
+
+        stack.append((node1, 0))
+
+        while len(stack) > 0:
+            node, l = stack.pop()
+
+            if node is node2:
+                maxL = max(l, maxL)
+                continue
+
+            for e in node.outEdges:
+                assert isinstance(e, MutantSubsumptionGraphEdge)
+                stack.append((e.mutantSubsumed, l + 1))
+
+        # print maxL
+        return maxL
+
+    def findSpanningEdges(self):
+        for e in self.edges:
+            assert isinstance(e, MutantSubsumptionGraphEdge)
+            if self.maxPathLength(e.mutantSubsuming, e.mutantSubsumed) == 1:
+                self.spanningEdges.append(e)
+
+    def dotGraph(self):
+        dot = Digraph(comment='Dynamic Subsumption Graph')
+        for n in self.nodes:
+            assert isinstance(n, MutantSubsumptionGraphNode)
+            dot.node(str(n.id), str(n))
+
+        for e in self.spanningEdges:
+            assert isinstance(e, MutantSubsumptionGraphEdge)
+            dot.edge(str(e.mutantSubsuming.id), str(e.mutantSubsumed.id))
+
+        return dot.source
 
     def addMutant(self, mutant):
         assert isinstance(mutant, Mutant)
+        if len(mutant.failedTests) == 0:
+            return
+
         addCounter = 0
 
         for node in self.nodes:
@@ -333,24 +416,20 @@ class MutantSubsumptionGraph(object):
 
                     if not exists:
                         self.edges.append(newEdge)
+                        node2.inEdges.append(newEdge)
+                        node1.outEdges.append(newEdge)
 
 
 def createMutantSubsumptionGraph(mutantSet):
     assert isinstance(mutantSet, MutantSet)
     mutantSet.mutantSubsumptionGraph = MutantSubsumptionGraph()
-    mutantSet.predictedMutantSubsumptionGraph = MutantSubsumptionGraph()
 
     counter = 0
     total = len(mutantSet.mutants)
 
     for mutant in mutantSet.mutants:
         counter += 1
-        # sys.stdout.write(str(counter) + "/" + str(total) + "N")
         mutantSet.mutantSubsumptionGraph.addMutant(mutant)
-        # sys.stdout.write("P")
-        mutantSet.predictedMutantSubsumptionGraph.addMutant(mutant)
-        # sys.stdout.write("        \r")
-        # sys.stdout.flush()
 
 
 def getStatsforMutantList(mList):
@@ -376,11 +455,34 @@ if __name__ == "__main__":
 
     fSet.assignStatus()
 
-    minimalSet = fSet.minimalTestSelection()
+    # minimalSet = fSet.minimalTestSelection()
+    #
+    # print len(fSet.printSubsumingTests()), len(minimalSet)
+    #
+    # print os.linesep.join(minimalSet)
 
-    print len(fSet.printSubsumingTests()), len(minimalSet)
+    totalMutants = len(fSet.mutants)
+    killedMutants = 0
+    subsumingMutants = 0
+    mutuallySubsumingMutants = 0
+    msGroups = set()
 
-    print os.linesep.join(minimalSet)
+    for mutant in fSet.mutants:
+        assert isinstance(mutant, Mutant)
+        killedMutants += 1 if mutant.isKilled() is True else 0
+        subsumingMutants += 1 if mutant.isSubsuming is True else 0
+        mutuallySubsumingMutants += 1 if mutant.isMutuallySubsuming() is True and mutant.isSubsuming is True else 0
+        msGroup = set(mutant.mutuallySubsuming)
+        msGroup.update({mutant})
+        if mutant.isSubsuming and len(msGroup) > 1:
+            msGroups.add(frozenset(msGroup))
+
+    print "Total Mutants:\t\t\t\t\t\t\t", totalMutants, "\t100%"
+    print "Killed Mutants:\t\t\t\t\t\t\t", killedMutants, "\t{:.2f}%".format(float(killedMutants) * 100.0 / totalMutants)
+    print "Subsuming Mutants:\t\t\t\t\t\t", subsumingMutants, "\t{:.2f}%".format(float(subsumingMutants)*100.0/totalMutants)
+    print "Mutually Subsuming Mutants:\t\t\t\t", mutuallySubsumingMutants, "\t{:.2f}%".format(float(mutuallySubsumingMutants) * 100.0 / totalMutants)
+    print "Number of Mutually Subsuming Groups:\t", len(msGroups)
+
 
     # normalDist = getStatsforMutantList(fSet.mutants)
     # subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
@@ -400,3 +502,7 @@ if __name__ == "__main__":
     # print ",,"
     # print "Total," + str(len(fSet.mutants)) + "," + str(len(subsumingMutants))
 
+
+    createMutantSubsumptionGraph(fSet)
+    fSet.mutantSubsumptionGraph.findSpanningEdges()
+    print fSet.mutantSubsumptionGraph.dotGraph()
