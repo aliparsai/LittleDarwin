@@ -395,7 +395,16 @@ def main(argv):
         print "Initial build... ",
 
         try:
-            initialOutput = subprocess.check_output(commandString, stderr=subprocess.STDOUT, cwd=buildDir)
+            processKilled, processExitCode, initialOutput = timeoutAlternative(commandString,
+                                                                           workingDirectory=buildDir,
+                                                                           timeout=int(options.timeout))
+
+            # initialOutput = subprocess.check_output(commandString, stderr=subprocess.STDOUT, cwd=buildDir)
+            # workaround for older python versions
+            if processKilled or processExitCode:
+                raise subprocess.CalledProcessError(1 if processKilled else processExitCode, commandString, initialOutput)
+
+
             with open(os.path.abspath(os.path.join(options.sourcePath, os.path.pardir, "mutated", "initialbuild.txt")),
                       'w') as content_file:
                 content_file.write(initialOutput)
