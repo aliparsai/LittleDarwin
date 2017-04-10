@@ -92,9 +92,9 @@ class MutantSet(object):
         print minT, maxT
         return sorted(list(testList))
 
-#########################################
-#          Selection Algorithm          #
-#########################################
+    #########################################
+    #          Selection Algorithm          #
+    #########################################
 
     def minimalTestSelection(self):
         def maxFinder(testSet):
@@ -371,7 +371,11 @@ class MutantSubsumptionGraph(object):
         dot = Digraph(comment='Dynamic Subsumption Graph')
         for n in self.nodes:
             assert isinstance(n, MutantSubsumptionGraphNode)
+            if len(n.inEdges) == 0:
+                dot.attr('node', peripheries='2')
+
             dot.node(str(n.id), str(n))
+            dot.attr('node', peripheries='1')
 
         for e in self.spanningEdges:
             assert isinstance(e, MutantSubsumptionGraphEdge)
@@ -446,7 +450,8 @@ def getStatsforMutantList(mList):
 
 
 if __name__ == "__main__":
-    mutantSets = [MutantSet(ms) for ms in sys.argv[1:]]
+    mutantSets = [MutantSet(ms) for ms in sys.argv[2:]]
+    projectName = str(sys.argv[1])
 
     fSet = MutantSet()
     for mSet in mutantSets:
@@ -478,11 +483,13 @@ if __name__ == "__main__":
             msGroups.add(frozenset(msGroup))
 
     print "Total Mutants:\t\t\t\t\t\t\t", totalMutants, "\t100%"
-    print "Killed Mutants:\t\t\t\t\t\t\t", killedMutants, "\t{:.2f}%".format(float(killedMutants) * 100.0 / totalMutants)
-    print "Subsuming Mutants:\t\t\t\t\t\t", subsumingMutants, "\t{:.2f}%".format(float(subsumingMutants)*100.0/totalMutants)
-    print "Mutually Subsuming Mutants:\t\t\t\t", mutuallySubsumingMutants, "\t{:.2f}%".format(float(mutuallySubsumingMutants) * 100.0 / totalMutants)
+    print "Killed Mutants:\t\t\t\t\t\t\t", killedMutants, "\t{:.2f}%".format(
+        float(killedMutants) * 100.0 / totalMutants)
+    print "Subsuming Mutants:\t\t\t\t\t\t", subsumingMutants, "\t{:.2f}%".format(
+        float(subsumingMutants) * 100.0 / totalMutants)
+    print "Mutually Subsuming Mutants:\t\t\t\t", mutuallySubsumingMutants, "\t{:.2f}%".format(
+        float(mutuallySubsumingMutants) * 100.0 / totalMutants)
     print "Number of Mutually Subsuming Groups:\t", len(msGroups)
-
 
     # normalDist = getStatsforMutantList(fSet.mutants)
     # subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
@@ -505,4 +512,5 @@ if __name__ == "__main__":
 
     createMutantSubsumptionGraph(fSet)
     fSet.mutantSubsumptionGraph.findSpanningEdges()
-    print fSet.mutantSubsumptionGraph.dotGraph()
+    with open(projectName + ".dot", "w") as dotFile:
+        dotFile.write(fSet.mutantSubsumptionGraph.dotGraph())

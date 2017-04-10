@@ -2,6 +2,8 @@ import sys
 from JavaParser import JavaParser
 from JavaParse import JavaParse
 import copy
+
+from antlr4 import Token
 from antlr4.tree.Tree import TerminalNodeImpl
 from random import shuffle
 from math import log10
@@ -563,6 +565,7 @@ class JavaMutate(object):
                     continue  # primitive typed method
 
                 mutationBefore = "----> before: " + node.getParent().getText()
+                assert isinstance(node.symbol, Token)
                 if self.verbose:
                     print mutationBefore
                 originalText0 = copy.deepcopy(node.symbol.text)
