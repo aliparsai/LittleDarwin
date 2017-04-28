@@ -79,7 +79,7 @@ class MutantSet(object):
 
         for mutant in self.mutants:
             assert isinstance(mutant, Mutant)
-            if mutant in skipSet:
+            if mutant in skipSet or not mutant.isKilled():
                 continue
             msGroup = set(mutant.mutuallySubsuming)
             msGroup.update({mutant})
