@@ -73,6 +73,21 @@ class MutantSet(object):
         tmpMSet.mutants.extend(other.mutants)
         return tmpMSet
 
+    def getSubsumptionGroups(self):
+        msGroups = set()
+        skipSet = set()
+
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            if mutant in skipSet:
+                continue
+            msGroup = set(mutant.mutuallySubsuming)
+            msGroup.update({mutant})
+            msGroups.add(frozenset(msGroup))
+            skipSet.union(msGroup)
+
+        return msGroups
+
     def printSubsumingTests(self):
         testList = set()
         minT = 10000000
@@ -264,7 +279,8 @@ class MutantSubsumptionGraphNode(object):
         return False
 
     def __str__(self):
-        return '{' + ','.join([str(m.nid) for m in self.mutants]) + '}'
+        sortedMutantIDs = sorted([m.nid for m in self.mutants])
+        return '{' + ','.join([str(m) for m in sortedMutantIDs]) + '}'
 
     def addMutant(self, mutant):
         assert isinstance(mutant, Mutant)
@@ -300,20 +316,20 @@ class MutantSubsumptionGraphEdge(object):
         self.mutantSubsumed = subsumed
 
     def __eq__(self, other):
-        assert isinstance(other, MutantSubsumptionGraphEdge)
         if self.mutantSubsuming is other.mutantSubsuming and self.mutantSubsumed is other.mutantSubsumed:
             return True
         return False
 
 
 class MutantSubsumptionGraph(object):
-    def __init__(self, predicted=False):
+    def __init__(self, predicted=False, mutantSet=None):
         self.nodes = list()
         self.edges = list()
         self.spanningEdges = list()
         self.rootNodes = list()
         self.leafNodes = list()
         self.predicted = predicted
+        self.mutantSet = mutantSet
 
     def findRootNodes(self):
         for n in self.nodes:
@@ -340,8 +356,8 @@ class MutantSubsumptionGraph(object):
                 self.leafNodes.append(n)
 
     def maxPathLength(self, node1, node2):
-        assert isinstance(node1, MutantSubsumptionGraphNode)
-        assert isinstance(node2, MutantSubsumptionGraphNode)
+        # assert isinstance(node1, MutantSubsumptionGraphNode)
+        # assert isinstance(node2, MutantSubsumptionGraphNode)
         stack = list()
         maxL = -1
 
@@ -361,10 +377,33 @@ class MutantSubsumptionGraph(object):
         # print maxL
         return maxL
 
+    def maxPathLengthIsMoreThanOne(self, node1, node2):
+        # assert isinstance(node1, MutantSubsumptionGraphNode)
+        # assert isinstance(node2, MutantSubsumptionGraphNode)
+        stack = list()
+        maxL = -1
+
+        stack.append((node1, 0))
+
+        while len(stack) > 0:
+            node, l = stack.pop()
+
+            if node is node2:
+                maxL = max(l, maxL)
+                if maxL > 1:
+                    return True
+                continue
+
+            for e in node.outEdges:
+                # assert isinstance(e, MutantSubsumptionGraphEdge)
+                stack.append((e.mutantSubsumed, l + 1))
+
+        return False
+
     def findSpanningEdges(self):
         for e in self.edges:
             assert isinstance(e, MutantSubsumptionGraphEdge)
-            if self.maxPathLength(e.mutantSubsuming, e.mutantSubsumed) == 1:
+            if not self.maxPathLengthIsMoreThanOne(e.mutantSubsuming, e.mutantSubsumed):
                 self.spanningEdges.append(e)
 
     def dotGraph(self):
@@ -382,6 +421,42 @@ class MutantSubsumptionGraph(object):
             dot.edge(str(e.mutantSubsuming.id), str(e.mutantSubsumed.id))
 
         return dot.source
+
+    def createNodes(self):
+        assert isinstance(self.mutantSet, MutantSet)
+        subsumptionGroups = self.mutantSet.getSubsumptionGroups()
+        for subsumptionGroup in subsumptionGroups:
+            newNode = MutantSubsumptionGraphNode(self.predicted)
+            newNode.mutants = set(subsumptionGroup)
+            self.nodes.append(newNode)
+
+    def createEdges(self):
+        for node1 in self.nodes:
+            # assert isinstance(node1, MutantSubsumptionGraphNode)
+
+            for node2 in self.nodes:
+                # assert isinstance(node2, MutantSubsumptionGraphNode)
+
+                if node1 is node2:
+                    continue
+
+                if node1.checkSubsuming(node2):
+                    newEdge = MutantSubsumptionGraphEdge(node1, node2)
+                    # exists = False
+
+                    # for edge in self.edges:
+                    #     if newEdge == edge:
+                    #         exists = True
+                    #         break
+
+                    # if not exists:
+                    self.edges.append(newEdge)
+                    node2.inEdges.append(newEdge)
+                    node1.outEdges.append(newEdge)
+
+    def createGraph(self):
+        self.createNodes()
+        self.createEdges()
 
     def addMutant(self, mutant):
         assert isinstance(mutant, Mutant)
@@ -426,14 +501,16 @@ class MutantSubsumptionGraph(object):
 
 def createMutantSubsumptionGraph(mutantSet):
     assert isinstance(mutantSet, MutantSet)
-    mutantSet.mutantSubsumptionGraph = MutantSubsumptionGraph()
+    mutantSet.mutantSubsumptionGraph = MutantSubsumptionGraph(mutantSet=mutantSet)
 
-    counter = 0
-    total = len(mutantSet.mutants)
+    mutantSet.mutantSubsumptionGraph.createGraph()
 
-    for mutant in mutantSet.mutants:
-        counter += 1
-        mutantSet.mutantSubsumptionGraph.addMutant(mutant)
+    # counter = 0
+    # total = len(mutantSet.mutants)
+
+    # for mutant in mutantSet.mutants:
+    #     counter += 1
+    #     mutantSet.mutantSubsumptionGraph.addMutant(mutant)
 
 
 def getStatsforMutantList(mList):
@@ -482,14 +559,14 @@ if __name__ == "__main__":
         if mutant.isSubsuming and len(msGroup) > 1:
             msGroups.add(frozenset(msGroup))
 
-    print "Total Mutants:\t\t\t\t\t\t\t", totalMutants, "\t100%"
-    print "Killed Mutants:\t\t\t\t\t\t\t", killedMutants, "\t{:.2f}%".format(
+    print "Total Mutants:                                  ", totalMutants, "\t100%"
+    print "Killed Mutants:                                 ", killedMutants, "\t{:.2f}%".format(
         float(killedMutants) * 100.0 / totalMutants)
-    print "Subsuming Mutants:\t\t\t\t\t\t", subsumingMutants, "\t{:.2f}%".format(
+    print "Subsuming Mutants:                              ", subsumingMutants, "\t{:.2f}%".format(
         float(subsumingMutants) * 100.0 / totalMutants)
-    print "Mutually Subsuming Mutants:\t\t\t\t", mutuallySubsumingMutants, "\t{:.2f}%".format(
+    print "Mutually Subsuming Mutants:                     ", mutuallySubsumingMutants, "\t{:.2f}%".format(
         float(mutuallySubsumingMutants) * 100.0 / totalMutants)
-    print "Number of Mutually Subsuming Groups:\t", len(msGroups)
+    print "Number of Mutually Subsuming Groups:            ", len(msGroups)
 
     # normalDist = getStatsforMutantList(fSet.mutants)
     # subsumingMutants = [m for m in fSet.mutants if m.isSubsuming is True]
