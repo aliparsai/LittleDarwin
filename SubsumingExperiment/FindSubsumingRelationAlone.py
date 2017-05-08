@@ -9,7 +9,7 @@ class Mutant(object):
     newID = itertools.count().next
 
     def __init__(self):
-        self.id = None
+        # self.id = None
         self.nid = Mutant.newID()
         self.type = None
         self.isSubsuming = False
@@ -32,7 +32,7 @@ class Mutant(object):
         appStr = lambda l, q: l.append(str(q)) if " " not in str(q) else l.append("\"" + str(q) + "\"")
 
         values = list()
-        appStr(values, self.id)
+        appStr(values, self.nid)
         appStr(values, self.type)
         appStr(values, self.path)
         appStr(values, self.cuPath)
@@ -42,9 +42,9 @@ class Mutant(object):
         if not short:
             appStr(values, self.failedTests)
 
-        appStr(values, ";".join([str(x.id) for x in self.subsumes]))
-        appStr(values, ";".join([str(x.id) for x in self.subsumedby]))
-        appStr(values, ";".join([str(x.id) for x in self.mutuallySubsuming]))
+        appStr(values, ";".join([str(x.nid) for x in self.subsumes]))
+        appStr(values, ";".join([str(x.nid) for x in self.subsumedby]))
+        appStr(values, ";".join([str(x.nid) for x in self.mutuallySubsuming]))
 
         return ",".join(values)
 
@@ -53,7 +53,7 @@ class Mutant(object):
 
     def __repr__(self):
         return " ".join(str(x) for x in
-                        ["Mutant ", self.id, ":", self.type, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
+                        ["Mutant ", self.nid, ":", self.type, "| File:", os.path.basename(self.cuPath), "| Subsuming:",
                          self.isSubsuming])
 
 
@@ -160,14 +160,14 @@ class MutantSet(object):
 
         numMutants = len(self.mutants)
 
-        mutantIndex = 0
+        # mutantIndex = 0
         fileHandle.write("MutantSet\r\nField,Value\r\nGlobalPath," + str(self.globalPath))
         fileHandle.write("\r\nNumberOfMutants," + str(numMutants) + "\r\n\r\nMutants\r\n")
 
-        for mutant in self.mutants:
-            assert isinstance(mutant, Mutant)
-            mutantIndex += 1
-            mutant.id = mutantIndex
+        # for mutant in self.mutants:
+        #     assert isinstance(mutant, Mutant)
+        #     mutantIndex += 1
+        #     mutant.id = mutantIndex
 
         if short:
             fileHandle.write(
@@ -188,7 +188,7 @@ class MutantSet(object):
                 newMutant = Mutant()
                 newMutant.path = os.path.relpath(os.path.join(root, filename), self.globalPath)
                 newMutant.cuPath = os.path.dirname(newMutant.path)
-                newMutant.id = int(str(filename).rsplit(".java", 1)[0])
+                # newMutant.id = int(str(filename).rsplit(".java", 1)[0])
 
                 with open(os.path.join(root, filename), "r") as mutantHandle:
                     mutantContent = mutantHandle.readlines()
@@ -591,3 +591,7 @@ if __name__ == "__main__":
     fSet.mutantSubsumptionGraph.findSpanningEdges()
     with open(projectName + ".dot", "w") as dotFile:
         dotFile.write(fSet.mutantSubsumptionGraph.dotGraph())
+
+    with open(projectName + "-mutants.csv", "w") as logFile:
+        fSet.toCSV(logFile)
+        
