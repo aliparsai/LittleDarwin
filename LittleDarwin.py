@@ -106,8 +106,12 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
     assert isinstance(timeout, int)
 
     # starting the process with the given parameters.
-    process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
+    try:
+        process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+    except AttributeError as e:     # probably in Windows
+        process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 
     # passing the process and timeout references to threading's timer method, so that it kills the process
