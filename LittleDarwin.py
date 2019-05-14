@@ -60,7 +60,7 @@ from JavaMutate import JavaMutate
 from ReportGenerator import ReportGenerator
 import License
 
-littleDarwinVersion = "0.2"
+littleDarwinVersion = "0.3"
 
 # Alternative to subprocess32
 
