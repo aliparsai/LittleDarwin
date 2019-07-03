@@ -27,8 +27,8 @@ ali@parsai.net
 
 """
 
-
 # generic imports
+import io
 import sys
 import platform
 import os
@@ -42,7 +42,7 @@ import time
 import subprocess
 
 # workaround for stupid ATNDeserializer error
-#subprocess.call(['find', '.', '-iname', '*.pyc', '-delete'], stdout=sys.stdout, stderr=sys.stderr)
+# subprocess.call(['find', '.', '-iname', '*.pyc', '-delete'], stdout=sys.stdout, stderr=sys.stderr)
 
 
 # try:
@@ -60,7 +60,8 @@ from JavaMutate import JavaMutate
 from ReportGenerator import ReportGenerator
 import License
 
-littleDarwinVersion = "0.3"
+littleDarwinVersion = "0.4"
+
 
 # Alternative to subprocess32
 
@@ -98,7 +99,6 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
             except:
                 os.kill(pipe.pid, signal.SIGTERM)
 
-
         # we just killed the process. let everyone know.
         killCheck.set()
 
@@ -108,11 +108,10 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
     # starting the process with the given parameters.
     try:
         process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
-    except AttributeError as e:     # probably in Windows
+                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+    except AttributeError as e:  # probably in Windows
         process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
 
     # passing the process and timeout references to threading's timer method, so that it kills the process
     # if timeout expires.
@@ -170,7 +169,8 @@ def main(argv):
     optionParser.add_option("-p", "--path", action="store", dest="sourcePath",
                             default=os.path.dirname(os.path.realpath(__file__)), help="Path to source files.")
     optionParser.add_option("-t", "--build-path", action="store", dest="buildPath",
-                            default=os.path.dirname(os.path.realpath(__file__)), help="Path to build system working directory.")
+                            default=os.path.dirname(os.path.realpath(__file__)),
+                            help="Path to build system working directory.")
     optionParser.add_option("-c", "--build-command", action="store", dest="buildCommand", default="mvn,test",
                             help="Command to run the build system. If it includes more than a single argument, they should be seperated by comma. For example: mvn,install")
     optionParser.add_option("--test-path", action="store", dest="testPath",
@@ -191,11 +191,33 @@ def main(argv):
                             help="Define order of mutation. Use -1 to dynamically adjust per class.")
     optionParser.add_option("--null-check", action="store_true", dest="isNullCheck", default=False,
                             help="Use null check mutation operators.")
-
     optionParser.add_option("--all", action="store_true", dest="isAll", default=False,
                             help="Use all mutation operators.")
+    optionParser.add_option("--whitelist", action="store", dest="whitelist", default="***dummy***",
+                            help="Analyze only included packages defined in this file (one package name per line).")
+    optionParser.add_option("--blacklist", action="store", dest="blacklist", default="***dummy***",
+                            help="Analyze everything except packages defined in this file (one package name per line).")
 
     (options, args) = optionParser.parse_args()
+
+    if options.whitelist != "***dummy***" and options.blacklist != "***dummy***":
+        print "You can either define a whitelist or a blacklist but not both."
+        sys.exit(0)
+
+    filterList = None
+    filterType = None
+    if options.whitelist != "***dummy***" and os.path.isfile(options.whitelist):
+        with io.open(options.whitelist, mode='r', errors='replace') as contentFile:
+            filterList = contentFile.readlines()
+            filterType = "whitelist"
+
+    if options.blacklist != "***dummy***" and os.path.isfile(options.blacklist):
+        with io.open(options.blacklist, mode='r', errors='replace') as contentFile:
+            filterList = contentFile.readlines()
+            filterType = "blacklist"
+
+    if filterList is not None:
+        filterList = filter(None, filterList)
 
     if options.isLicenseActive:
         License.outputLicense()
@@ -210,10 +232,9 @@ def main(argv):
     if options.isBuildActive and options.isMutationActive:
         print "it is strongly recommended to do the analysis in two different phases.\n\n"
 
-
-    #*****************************************************************************************************************
-    #---------------------------------------- mutant generation phase ------------------------------------------------
-    #*****************************************************************************************************************
+    # *****************************************************************************************************************
+    # ---------------------------------------- mutant generation phase ------------------------------------------------
+    # *****************************************************************************************************************
 
     if options.isMutationActive:
         assert options.isVerboseActive is not None
@@ -224,16 +245,15 @@ def main(argv):
 
         totalMutantCount = 0
 
-
         try:
             assert os.path.isdir(options.sourcePath)
         except AssertionError as exception:
             print "source path must be a directory."
             sys.exit(1)
 
-
         # getting the list of files.
-        javaRead.listFiles(os.path.abspath(options.sourcePath))
+        javaRead.listFiles(targetPath=os.path.abspath(options.sourcePath), buildPath=os.path.abspath(options.buildPath),
+                           filterType=filterType, filterList=filterList)
         fileCounter = 0
         fileCount = len(javaRead.fileList)
 
@@ -304,10 +324,9 @@ def main(argv):
             if mutantTypeDatabase[mutantType] > 0:
                 print "-->", mutantType, ":", mutantTypeDatabase[mutantType]
 
-
-    #*****************************************************************************************************************
-    #---------------------------------------- test suite running phase -----------------------------------------------
-    #*****************************************************************************************************************
+    # *****************************************************************************************************************
+    # ---------------------------------------- test suite running phase -----------------------------------------------
+    # *****************************************************************************************************************
 
     if options.isBuildActive:
 
@@ -318,9 +337,12 @@ def main(argv):
         reportGenerator = ReportGenerator()
 
         if options.alternateDb == "***dummy***":
-            databasePath = os.path.abspath(os.path.join(options.sourcePath, os.path.pardir, "mutated", "mutationdatabase"))
+            databasePath = os.path.abspath(os.path.join(options.buildPath, "LittleDarwinResults", "mutationdatabase"))
         else:
             databasePath = options.alternateDb
+
+        mutantsPath = os.path.dirname(databasePath)
+        assert os.path.isdir(mutantsPath)
 
         resultsDatabasePath = databasePath + "-results"
         reportGenerator.initiateDatabase(resultsDatabasePath)
@@ -335,8 +357,6 @@ def main(argv):
 
         except AssertionError as exception:
             print "build system working directory should be a directory."
-
-
 
         # check if we have separate test-suite
         if options.testCommand != "***dummy***":
@@ -380,14 +400,10 @@ def main(argv):
         # databaseKeys.insert(0, databaseKeys.pop(desiredIndex))
         #
 
-
         mutationDatabaseLength = len(databaseKeys)
         textReportData = list()
         htmlReportData = list()
         fileCounter = 0
-
-
-
 
         # initial build check to avoid false results. the system must be able to build cleanly without errors.
 
@@ -401,31 +417,31 @@ def main(argv):
 
         try:
             processKilled, processExitCode, initialOutput = timeoutAlternative(commandString,
-                                                                           workingDirectory=buildDir,
-                                                                           timeout=int(options.timeout))
+                                                                               workingDirectory=buildDir,
+                                                                               timeout=int(options.timeout))
 
             # initialOutput = subprocess.check_output(commandString, stderr=subprocess.STDOUT, cwd=buildDir)
             # workaround for older python versions
             if processKilled or processExitCode:
-                raise subprocess.CalledProcessError(1 if processKilled else processExitCode, commandString, initialOutput)
+                raise subprocess.CalledProcessError(1 if processKilled else processExitCode, commandString,
+                                                    initialOutput)
 
-
-            with open(os.path.abspath(os.path.join(options.sourcePath, os.path.pardir, "mutated", "initialbuild.txt")),
-                      'w') as content_file:
-                content_file.write(initialOutput)
+            with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
+                contentFile.write(initialOutput)
             print "done.\n\n"
 
         except subprocess.CalledProcessError as exception:
             initialOutput = exception.output
-            with open(os.path.abspath(os.path.join(options.sourcePath, os.path.pardir, "mutated", "initialbuild.txt")),
-                      'w') as content_file:
-                content_file.write(initialOutput)
-            print "failed.\n\nInitial build failed. Try building the system manually first to make sure it can be built."
+            with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
+                contentFile.write(initialOutput)
+
+            print "failed.\n"
+            print "Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
+                os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened."
             sys.exit(1)
 
         totalMutantCount = 0
         totalMutantCounter = 0
-
 
         for key in databaseKeys:
             totalMutantCount += len(mutationDatabase[key])
@@ -447,7 +463,7 @@ def main(argv):
 
             # for each mutant, replace the original file, run the build, store the results
             for replacementFileRel in mutationDatabase[key]:
-                replacementFile = os.path.join(options.sourcePath, os.path.pardir, "mutated", replacementFileRel)
+                replacementFile = os.path.abspath(os.path.join(mutantsPath, replacementFileRel))
                 mutantCounter += 1
                 totalMutantCounter += 1
 
@@ -474,23 +490,23 @@ def main(argv):
                     # else, run our alternative method
                     # else:
                     processKilled, processExitCode, runOutput = timeoutAlternative(commandString,
-                                                                              workingDirectory=buildDir,
-                                                                              timeout=int(options.timeout))
+                                                                                   workingDirectory=buildDir,
+                                                                                   timeout=int(options.timeout))
 
                     # raise the same exception as the original check_output.
                     if processKilled or processExitCode:
                         raise subprocess.CalledProcessError(1 if processKilled else processExitCode, commandString,
-                                                                runOutput)
+                                                            runOutput)
 
                     if separateTestSuite:
                         processKilled, processExitCode, runOutputTest = timeoutAlternative(testCommandString,
-                                                              workingDirectory=testDir, timeout=int(options.timeout))
+                                                                                           workingDirectory=testDir,
+                                                                                           timeout=int(options.timeout))
 
-                            # raise the same exception as the original check_output.
+                        # raise the same exception as the original check_output.
                         if processKilled or processExitCode:
                             raise subprocess.CalledProcessError(1 if processKilled else processExitCode,
-                                                              commandString, "\n".join([runOutput, runOutputTest]))
-
+                                                                commandString, "\n".join([runOutput, runOutputTest]))
 
                     # if we are here, it means no exceptions happened, so lets add this to our success list.
                     runOutput += "\n" + runOutputTest
@@ -509,7 +525,6 @@ def main(argv):
 
                 targetTextOutputFile = os.path.splitext(replacementFile)[0] + ".txt"
 
-
                 # we can't use print, since we like to write on the same line again.
                 sys.stdout.write(
                     "elapsed: " + str(datetime.timedelta(seconds=int(time.time() - startTime))) + " remaining: " + str(
@@ -521,8 +536,8 @@ def main(argv):
                 sys.stdout.flush()
 
                 # writing the build output to disk.
-                with open(targetTextOutputFile, 'w') as content_file:
-                    content_file.write(runOutput)
+                with open(targetTextOutputFile, 'w') as contentFile:
+                    contentFile.write(runOutput)
 
                 # if there's a cleanup option, execute it. the results will be ignored because we don't want our process
                 #  to be interrupted if there's nothing to clean up.
@@ -531,9 +546,8 @@ def main(argv):
                     if separateTestSuite:
                         subprocess.call(options.cleanUp.split(","), cwd=testDir)
 
-                #workaround:
-                #shutil.rmtree(os.path.join(testDir,"VolumetryLoggerTest"),ignore_errors=True)
-
+                # workaround:
+                # shutil.rmtree(os.path.join(testDir,"VolumetryLoggerTest"),ignore_errors=True)
 
             # all mutants must be checked by now, so we should have a complete divide between success and failure.
             assert len(successList) + len(failureList) == mutantCount
@@ -545,25 +559,26 @@ def main(argv):
             htmlReportData.append([key, len(successList), mutantCount])
 
             # we are done with the file. let's return it to the original state.
-            shutil.copyfile(os.path.join(os.path.dirname(replacementFile), "original.java"), os.path.join(options.sourcePath, key))
+            shutil.copyfile(os.path.join(os.path.dirname(replacementFile), "original.java"),
+                            os.path.join(options.sourcePath, key))
 
             # generate an HTML report for the file.
 
             targetHTMLOutputFile = os.path.join(os.path.dirname(replacementFile), "results.html")
-            with open(targetHTMLOutputFile, 'w') as content_file:
-                content_file.write(
+            with open(targetHTMLOutputFile, 'w') as contentFile:
+                contentFile.write(
                     reportGenerator.generateHTMLReportPerFile(key, targetHTMLOutputFile, successList, failureList))
 
             print "\n\n"
 
         # write final text report.
-        with open(os.path.abspath(os.path.join(options.sourcePath, os.path.pardir, "mutated", "report.txt")),
+        with open(os.path.abspath(os.path.join(mutantsPath, "report.txt")),
                   'w') as textReportFile:
             textReportFile.writelines(textReportData)
 
         # write final HTML report.
         targetHTMLReportFile = os.path.abspath(
-            os.path.join(options.sourcePath, os.path.pardir, "mutated", "report.html"))
+            os.path.join(mutantsPath, "report.html"))
         with open(targetHTMLReportFile, 'w') as htmlReportFile:
             htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
 
@@ -573,4 +588,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-        main(sys.argv)
+    main(sys.argv)

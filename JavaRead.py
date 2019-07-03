@@ -12,14 +12,44 @@ class JavaRead(object):
         self.targetDirectory = None
         self.fileList = list()
 
-    def listFiles(self, target_path=None, desired_type="*.java"):
-        # print target_path, desired_type
-        self.sourceDirectory = target_path
-        self.targetDirectory = os.path.abspath(os.path.join(target_path, os.path.pardir, "mutated"))
+    def filterFiles(self, mode="blacklist", filterList=None):
+        if filterList is None:
+            return
 
-        for root, dirnames, filenames in os.walk(target_path):
-            for filename in fnmatch.filter(filenames, desired_type):
+        assert isinstance(filterList, list)
+        assert mode == "blacklist" or mode == "whitelist"
+
+        alteredList = list()
+
+        for packageName in filterList:
+            if str(packageName).strip() == "":
+                continue
+
+            # we need to do this so that we avoid partial matching
+
+            dirList = list()
+            dirList.append("")
+            dirList.extend(packageName.strip().split("."))
+            dirList.append("")
+            dirName = os.sep.join(dirList)
+
+            alteredList.extend([x for x in self.fileList if dirName in os.sep.join(["", x, ""])])
+
+        if mode == "whitelist":
+            self.fileList = list(set(alteredList))
+        elif mode == "blacklist":
+            self.fileList = list(set(self.fileList) - set(alteredList))
+
+    def listFiles(self, targetPath=None, buildPath = None, filterList=None, filterType="blacklist", desiredType="*.java"):
+        # print targetPath, desiredType
+        self.sourceDirectory = targetPath
+        self.targetDirectory = os.path.abspath(os.path.join(buildPath, "LittleDarwinResults"))
+
+        for root, dirnames, filenames in os.walk(self.sourceDirectory):
+            for filename in fnmatch.filter(filenames, desiredType):
                 self.fileList.append(os.path.join(root, filename))
+
+        self.filterFiles(mode=filterType, filterList=filterList)
 
         if not os.path.exists(self.targetDirectory):
             os.makedirs(self.targetDirectory)
@@ -30,26 +60,24 @@ class JavaRead(object):
         normalizedData = unicodedata.normalize('NFKD', file_data).encode('ascii', 'replace')
         return normalizedData
 
-    def generateNewFile(self, original_file=None, file_data=None):
-        original_file_root, original_file_name = os.path.split(original_file)
+    def generateNewFile(self, originalFile=None, fileData=None):
+        originalFileRoot, originalFileName = os.path.split(originalFile)
 
-        target_dir = \
-            os.path.join(self.targetDirectory, os.path.relpath(original_file_root, self.sourceDirectory),
-                         original_file_name)
+        targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory), originalFileName)
 
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
-        if not os.path.isfile(os.path.join(target_dir, "original.java")):
-            shutil.copyfile(original_file, os.path.join(target_dir, "original.java"))
+        if not os.path.exists(targetDir):
+            os.makedirs(targetDir)
+        if not os.path.isfile(os.path.join(targetDir, "original.java")):
+            shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
 
         counter = 1
-        while os.path.isfile(os.path.join(target_dir, str(counter) + ".java")):
+        while os.path.isfile(os.path.join(targetDir, str(counter) + ".java")):
             counter += 1
 
-        target_file = os.path.abspath(os.path.join(target_dir, str(counter) + ".java"))
-        with open(target_file, 'w') as content_file:
-            content_file.write(file_data)
+        targetFile = os.path.abspath(os.path.join(targetDir, str(counter) + ".java"))
+        with open(targetFile, 'w') as contentFile:
+            contentFile.write(fileData)
 
         if self.verbose:
-            print "--> generated file: ", target_file
-        return os.path.relpath(target_file, self.targetDirectory)
+            print "--> generated file: ", targetFile
+        return os.path.relpath(targetFile, self.targetDirectory)
