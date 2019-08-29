@@ -144,7 +144,7 @@ def main(argv):
                                   /
 
 
-    LittleDarwin version %s Copyright (C) 2014 Ali Parsai
+    LittleDarwin version %s Copyright (C) 2019 Ali Parsai
 
     LittleDarwin comes with ABSOLUTELY NO WARRANTY.
     This is free software, and you are welcome to redistribute it
@@ -194,9 +194,9 @@ def main(argv):
     optionParser.add_option("--all", action="store_true", dest="isAll", default=False,
                             help="Use all mutation operators.")
     optionParser.add_option("--whitelist", action="store", dest="whitelist", default="***dummy***",
-                            help="Analyze only included packages defined in this file (one package name per line).")
+                            help="Analyze only included packages or files defined in this file (one package name or path to file per line).")
     optionParser.add_option("--blacklist", action="store", dest="blacklist", default="***dummy***",
-                            help="Analyze everything except packages defined in this file (one package name per line).")
+                            help="Analyze everything except packages or files defined in this file (one package name or path to file per line).")
 
     (options, args) = optionParser.parse_args()
 

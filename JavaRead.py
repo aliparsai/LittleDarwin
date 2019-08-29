@@ -20,8 +20,16 @@ class JavaRead(object):
         assert mode == "blacklist" or mode == "whitelist"
 
         alteredList = list()
+        packageList = list()
+        cuList = list()
 
-        for packageName in filterList:
+        for statement in filterList:
+            if '\\' in statement or '/' in statement:
+                cuList.append(statement)
+            else:
+                packageList.append(statement)
+
+        for packageName in packageList:
             if str(packageName).strip() == "":
                 continue
 
@@ -34,6 +42,9 @@ class JavaRead(object):
             dirName = os.sep.join(dirList)
 
             alteredList.extend([x for x in self.fileList if dirName in os.sep.join(["", x, ""])])
+
+        for cuName in cuList:
+            alteredList.extend([x for x in self.fileList if cuName in x])
 
         if mode == "whitelist":
             self.fileList = list(set(alteredList))
