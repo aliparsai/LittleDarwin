@@ -693,13 +693,13 @@ class JavaLexer(Lexer):
         self._predicates = None
 
     def isJavaIdentifierStart(self, codePoint):
-        if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_':
+        if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) == u'$' or chr(codePoint) == u'_':
             return True
         return False
 
     def isJavaIdentifierPart(self, codePoint):
         if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(
-                codePoint) is u'$' or chr(codePoint) is u'_':
+                codePoint) == u'$' or chr(codePoint) == u'_':
             return True
         return False
 
