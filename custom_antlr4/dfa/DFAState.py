@@ -30,6 +30,8 @@
 #/
 
 # Map a predicate to a predicted alternative.#/
+from builtins import str
+from builtins import object
 from io import StringIO
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
 
@@ -39,10 +41,10 @@ class PredPrediction(object):
         self.pred = pred
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
-        return u"(" + unicode(self.pred) + u", " + unicode(self.alt) +  u")"
+        return u"(" + str(self.pred) + u", " + str(self.alt) +  u")"
 
 # A DFA state represents a set of possible ATN configurations.
 #  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -138,17 +140,17 @@ class DFAState(object):
             return self.configs==other.configs
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         with StringIO() as buf:
-            buf.write(unicode(self.stateNumber))
+            buf.write(str(self.stateNumber))
             buf.write(u":")
-            buf.write(unicode(self.configs))
+            buf.write(str(self.configs))
             if self.isAcceptState:
                 buf.write(u"=>")
                 if self.predicates is not None:
-                    buf.write(unicode(self.predicates))
+                    buf.write(str(self.predicates))
                 else:
-                    buf.write(unicode(self.prediction))
+                    buf.write(str(self.prediction))
             return buf.getvalue()

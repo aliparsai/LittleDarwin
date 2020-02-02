@@ -30,6 +30,7 @@
 
 # Represents the type of recognizer an ATN applies to.
 
+from builtins import object
 class ATNType(object):
 
     LEXER = 0

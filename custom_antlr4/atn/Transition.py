@@ -41,7 +41,12 @@
 #  the states. We'll use the term Edge for the DFA to distinguish them from
 #  ATN transitions.</p>
 #
-from __builtin__ import unicode
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import chr
+from builtins import object
+from builtins import str
 from custom_antlr4.IntervalSet import IntervalSet, Interval
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.SemanticContext import Predicate, PrecedencePredicate
@@ -85,7 +90,7 @@ class Transition (object):
         self.label = None
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
 # TODO: make all transitions sets? no, should remove set edges
@@ -106,7 +111,7 @@ class AtomTransition(Transition):
         return self.label_ == symbol
 
     def __unicode__(self):
-        return unicode(self.label_)
+        return str(self.label_)
 
 class RuleTransition(Transition):
 
@@ -178,7 +183,7 @@ class PredicateTransition(AbstractPredicateTransition):
         return Predicate(self.ruleIndex, self.predIndex, self.isCtxDependent)
 
     def __unicode__(self):
-        return u"pred_" + unicode(self.ruleIndex) + u":" + unicode(self.predIndex)
+        return u"pred_" + str(self.ruleIndex) + u":" + str(self.predIndex)
 
 class ActionTransition(Transition):
 
@@ -194,7 +199,7 @@ class ActionTransition(Transition):
         return False
 
     def __unicode__(self):
-        return u"action_" + unicode(self.ruleIndex) + u":" + unicode(self.actionIndex)
+        return u"action_" + str(self.ruleIndex) + u":" + str(self.actionIndex)
 
 # A transition containing a set of values.
 class SetTransition(Transition):
@@ -212,7 +217,7 @@ class SetTransition(Transition):
         return symbol in self.label
 
     def __unicode__(self):
-        return unicode(self.label)
+        return str(self.label)
 
 class NotSetTransition(SetTransition):
 

@@ -33,6 +33,8 @@
 # info about the set, with support for combining similar configurations using a
 # graph-structured stack.
 #/
+from builtins import str
+from builtins import object
 from io import StringIO
 from custom_antlr4.PredictionContext import PredictionContext, merge
 from custom_antlr4.Utils import str_list
@@ -173,7 +175,7 @@ class ATNConfigSet(object):
     def hashConfigs(self):
         with StringIO() as buf:
             for cfg in self.configs:
-                buf.write(unicode(cfg))
+                buf.write(str(cfg))
             return hash(buf.getvalue())
 
     def __len__(self):
@@ -205,20 +207,20 @@ class ATNConfigSet(object):
         self.configLookup = None # can't mod, no need for lookup cache
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         with StringIO() as buf:
             buf.write(str_list(self.configs))
             if self.hasSemanticContext:
                 buf.write(u",hasSemanticContext=")
-                buf.write(unicode(self.hasSemanticContext))
+                buf.write(str(self.hasSemanticContext))
             if self.uniqueAlt!=ATN.INVALID_ALT_NUMBER:
                 buf.write(u",uniqueAlt=")
-                buf.write(unicode(self.uniqueAlt))
+                buf.write(str(self.uniqueAlt))
             if self.conflictingAlts is not None:
                 buf.write(u",conflictingAlts=")
-                buf.write(unicode(self.conflictingAlts))
+                buf.write(str(self.conflictingAlts))
             if self.dipsIntoOuterContext:
                 buf.write(u",dipsIntoOuterContext")
             return buf.getvalue()

@@ -1,4 +1,5 @@
 #!/bin/python
+from __future__ import print_function
 import bz2
 import base64
 
@@ -8,7 +9,7 @@ def returnLicense():
     return bz2.decompress(base64.decodestring(licenseText))
 
 def outputLicense():
-    print returnLicense()
+    print(returnLicense())
 
 if __name__ == "__main__":
     outputLicense()

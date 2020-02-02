@@ -32,6 +32,8 @@
 # The basic notion of a tree has a parent, a payload, and a list of children.
 #  It is the most abstract interface for all the trees used by ANTLR.
 #/
+from builtins import str
+from builtins import object
 from custom_antlr4.Token import Token
 
 INVALID_INTERVAL = (-1, -2)
@@ -39,7 +41,7 @@ INVALID_INTERVAL = (-1, -2)
 class Tree(object):
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 class SyntaxTree(Tree):
     pass

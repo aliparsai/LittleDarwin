@@ -28,6 +28,8 @@
 #   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
+from builtins import str
+from builtins import object
 import unittest
 
 
@@ -41,7 +43,7 @@ class InputStream (object):
     
     def __init__(self, data):
         self.name = "<empty>"
-        self.strdata = unicode(data)
+        self.strdata = str(data)
         self._loadString()
 
     def _loadString(self):    
@@ -109,7 +111,7 @@ class InputStream (object):
             return self.strdata[start:stop+1]
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         return self.strdata

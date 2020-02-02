@@ -33,6 +33,7 @@
 # A pattern like {@code <ID> = <expr>;} converted to a {@link ParseTree} by
 # {@link ParseTreePatternMatcher#compile(String, int)}.
 #
+from builtins import object
 from custom_antlr4.xpath.XPath import XPath
 
 

@@ -1,5 +1,7 @@
 # Generated from java-escape by ANTLR 4.4
 from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
 from custom_antlr4 import *
 from io import StringIO
 
@@ -8,7 +10,7 @@ ischild = len(package) > 0 if package is not None else False
 if ischild:
     from .JavaListener import JavaListener
 else:
-    from JavaListener import JavaListener
+    from .JavaListener import JavaListener
 
 
 # def serializedATN():

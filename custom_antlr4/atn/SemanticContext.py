@@ -36,6 +36,8 @@
 #  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
 #  {@link SemanticContext} within the scope of this outer class.</p>
 #
+from builtins import str
+from builtins import object
 from io import StringIO
 
 
@@ -84,10 +86,10 @@ class SemanticContext(object):
         return self
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
     
     def __unicode__(self):
-        return unicode(super(SemanticContext, self))
+        return str(super(SemanticContext, self))
 
 
 def andContext(a, b):
@@ -137,11 +139,11 @@ class Predicate(SemanticContext):
 
     def __hash__(self):
         with StringIO() as buf:
-            buf.write(unicode(self.ruleIndex))
+            buf.write(str(self.ruleIndex))
             buf.write(u"/")
-            buf.write(unicode(self.predIndex))
+            buf.write(str(self.predIndex))
             buf.write(u"/")
-            buf.write(unicode(self.isCtxDependent))
+            buf.write(str(self.isCtxDependent))
             return hash(buf.getvalue())
 
     def __eq__(self, other):
@@ -154,7 +156,7 @@ class Predicate(SemanticContext):
                self.isCtxDependent == other.isCtxDependent
 
     def __unicode__(self):
-        return u"{" + unicode(self.ruleIndex) + u":" + unicode(self.predIndex) + u"}?"
+        return u"{" + str(self.ruleIndex) + u":" + str(self.predIndex) + u"}?"
 
 
 class PrecedencePredicate(SemanticContext):
@@ -267,7 +269,7 @@ class AND(SemanticContext):
             for o in self.opnds:
                 if not first:
                     buf.write(u"&&")
-                buf.write(unicode(o))
+                buf.write(str(o))
                 first = False
             return buf.getvalue()
 
@@ -352,7 +354,7 @@ class OR (SemanticContext):
             for o in self.opnds:
                 if not first:
                     buf.write(u"||")
-                buf.write(unicode(o))
+                buf.write(str(o))
                 first = False
             return buf.getvalue()
 

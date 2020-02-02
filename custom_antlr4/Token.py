@@ -31,6 +31,8 @@
 # A token has properties: text, type, line, character position in the line
 # (so we can ignore tabs), token channel, index, and source from which
 # we obtained this token.
+from builtins import str
+from builtins import object
 from io import StringIO
 
 
@@ -92,7 +94,7 @@ class Token (object):
         return self.source[1]
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
 class CommonToken(Token):
@@ -156,11 +158,11 @@ class CommonToken(Token):
     def __unicode__(self):
         with StringIO() as buf:
             buf.write(u"[@")
-            buf.write(unicode(self.tokenIndex))
+            buf.write(str(self.tokenIndex))
             buf.write(u",")
-            buf.write(unicode(self.start))
+            buf.write(str(self.start))
             buf.write(u":")
-            buf.write(unicode(self.stop))
+            buf.write(str(self.stop))
             buf.write(u"='")
             txt = self.text
             if txt is not None:
@@ -171,14 +173,14 @@ class CommonToken(Token):
                 txt = u"<no text>"
             buf.write(txt)
             buf.write(u"',<")
-            buf.write(unicode(self.type))
+            buf.write(str(self.type))
             buf.write(u">")
             if self.channel > 0:
                 buf.write(u",channel=")
-                buf.write(unicode(self.channel))
+                buf.write(str(self.channel))
             buf.write(u",")
-            buf.write(unicode(self.line))
+            buf.write(str(self.line))
             buf.write(u":")
-            buf.write(unicode(self.column))
+            buf.write(str(self.column))
             buf.write(u"]")
             return buf.getvalue()

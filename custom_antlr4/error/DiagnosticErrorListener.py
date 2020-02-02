@@ -49,6 +49,7 @@
 # this situation occurs.</li>
 # </ul>
 
+from builtins import str
 from io import StringIO
 from custom_antlr4.Utils import str_set
 from custom_antlr4.error.ErrorListener import ErrorListener
@@ -101,13 +102,13 @@ class DiagnosticErrorListener(ErrorListener):
 
         ruleNames = recognizer.ruleNames
         if ruleIndex < 0 or ruleIndex >= len(ruleNames):
-            return unicode(decision)
+            return str(decision)
 
         ruleName = ruleNames[ruleIndex]
         if ruleName is None or len(ruleName)==0:
-            return unicode(decision)
+            return str(decision)
 
-        return unicode(decision) + u" (" + ruleName + u")"
+        return str(decision) + u" (" + ruleName + u")"
 
     #
     # Computes the set of conflicting or ambiguous alternatives from a

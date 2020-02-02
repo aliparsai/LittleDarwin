@@ -28,6 +28,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from builtins import str
+from builtins import object
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
 from custom_antlr4.dfa.DFAState import DFAState
 from custom_antlr4.error.Errors import IllegalStateException
@@ -126,10 +128,10 @@ class DFA(object):
 
     # Return a list of all states in this DFA, ordered by state number.
     def sortedStates(self):
-        return sorted(self._states.keys(), key=lambda state: state.stateNumber)
+        return sorted(list(self._states.keys()), key=lambda state: state.stateNumber)
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         return self.toString(None)
@@ -139,12 +141,12 @@ class DFA(object):
             return ""
         from custom_antlr4.dfa.DFASerializer import DFASerializer
         serializer = DFASerializer(self,tokenNames)
-        return unicode(serializer)
+        return str(serializer)
 
     def toLexerString(self):
         if self.s0 is None:
             return ""
         from custom_antlr4.dfa.DFASerializer import LexerDFASerializer
         serializer = LexerDFASerializer(self)
-        return unicode(serializer)
+        return str(serializer)
 

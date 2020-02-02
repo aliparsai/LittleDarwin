@@ -34,6 +34,8 @@
 # ambiguities.
 
 
+from builtins import str
+from builtins import object
 from custom_antlr4.atn.ATN import ATN
 from custom_antlr4.atn.ATNConfig import ATNConfig
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
@@ -504,7 +506,7 @@ class PredictionMode(object):
                 alts = set()
                 configToAlts[s] = alts
             alts.add(c.alt)
-        return configToAlts.values()
+        return list(configToAlts.values())
 
     #
     # Get a map from state to alt subset from a configuration set. For each
@@ -528,7 +530,7 @@ class PredictionMode(object):
     @classmethod
     def hasStateAssociatedWithOneAlt(cls, configs):
         x = cls.getStateToAltMap(configs)
-        for alts in x.values():
+        for alts in list(x.values()):
             if len(alts)==1:
                 return True
         return False

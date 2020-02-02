@@ -27,6 +27,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  self SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from __future__ import print_function
+from builtins import str
+from builtins import range
 from custom_antlr4.error.ErrorStrategy import DefaultErrorStrategy
 from custom_antlr4.Recognizer import Recognizer
 from custom_antlr4.Token import Token
@@ -540,7 +542,7 @@ class Parser (Recognizer):
 
     # For debugging and other purposes.#
     def getDFAStrings(self):
-        return [ unicode(dfa) for dfa in self._interp.decisionToDFA]
+        return [ str(dfa) for dfa in self._interp.decisionToDFA]
 
     # For debugging and other purposes.#
     def dumpDFA(self):

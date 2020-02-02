@@ -28,6 +28,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from builtins import str
 from io import StringIO
 
 def str_collection(val, begin, end):
@@ -37,7 +38,7 @@ def str_collection(val, begin, end):
         for item in val:
             if not first:
                 buf.write(u', ')
-            buf.write(unicode(item))
+            buf.write(str(item))
             first = False
         buf.write(end)
         return buf.getvalue()
@@ -60,5 +61,5 @@ def escapeWhitespace(s, escapeSpaces):
             elif c=='\r':
                 buf.write(u"\\r")
             else:
-                buf.write(unicode(c))
+                buf.write(str(c))
         return buf.getvalue()

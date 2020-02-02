@@ -28,6 +28,9 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
+from builtins import str
+from builtins import range
+from builtins import object
 from io import StringIO
 from custom_antlr4.RuleContext import RuleContext
 from custom_antlr4.atn.ATNState import ATNState
@@ -84,7 +87,7 @@ class PredictionContext(object):
         return self.cachedHashCode
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
 def calculateHashCode(parent, returnState):
@@ -167,14 +170,14 @@ class SingletonPredictionContext(PredictionContext):
         return self.cachedHashCode
 
     def __unicode__(self):
-        up = "" if self.parentCtx is None else unicode(self.parentCtx)
+        up = "" if self.parentCtx is None else str(self.parentCtx)
         if len(up)==0:
             if self.returnState == self.EMPTY_RETURN_STATE:
                 return u"$"
             else:
-                return unicode(self.returnState)
+                return str(self.returnState)
         else:
-            return unicode(self.returnState) + u" " + up
+            return str(self.returnState) + u" " + up
 
 
 class EmptyPredictionContext(SingletonPredictionContext):
@@ -250,7 +253,7 @@ class ArrayPredictionContext(PredictionContext):
                 buf.write(self.returnStates[i])
                 if self.parents[i] is not None:
                     buf.write(u' ')
-                    buf.write(unicode(self.parents[i]))
+                    buf.write(str(self.parents[i]))
                 else:
                     buf.write(u"null")
             buf.write(u"]")
@@ -280,9 +283,9 @@ def calculateListsHashCode(parents, returnStates ):
 
     with StringIO() as s:
         for parent in parents:
-            s.write(unicode(parent))
+            s.write(str(parent))
         for returnState in returnStates:
-            s.write(unicode(returnState))
+            s.write(str(returnState))
         return hash(s.getvalue())
 
 def merge(a, b, rootIsWildcard, mergeCache):

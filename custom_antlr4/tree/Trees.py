@@ -31,6 +31,9 @@
 
 
 # A set of utility routines useful for all kinds of ANTLR trees.#
+from builtins import str
+from builtins import range
+from builtins import object
 from io import StringIO
 from custom_antlr4.Token import Token
 from custom_antlr4.Utils import escapeWhitespace
@@ -67,7 +70,7 @@ class Trees(object):
             if isinstance(t, RuleNode):
                 return ruleNames[t.getRuleContext().getRuleIndex()]
             elif isinstance( t, ErrorNode):
-                return unicode(t)
+                return str(t)
             elif isinstance(t, TerminalNode):
                 if t.symbol is not None:
                     return t.symbol.text
@@ -75,7 +78,7 @@ class Trees(object):
         payload = t.getPayload()
         if isinstance(payload, Token ):
             return payload.text
-        return unicode(t.getPayload())
+        return str(t.getPayload())
 
 
     # Return ordered list of all children of this node

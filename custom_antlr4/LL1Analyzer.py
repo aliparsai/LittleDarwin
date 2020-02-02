@@ -28,6 +28,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
+from builtins import range
+from builtins import object
 from custom_antlr4.IntervalSet import IntervalSet, Interval
 from custom_antlr4.Token import Token
 from custom_antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext

@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -28,7 +29,13 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-from __builtin__ import unicode
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import zip
+from builtins import range
+from builtins import object
+from builtins import str
 from custom_antlr4.Token import Token
 from custom_antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 
@@ -71,7 +78,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of token names.")
         result = self.tokenTypeMapCache.get(tokenNames, None)
         if result is None:
-            result = zip( tokenNames, range(0, len(tokenNames)))
+            result = list(zip( tokenNames, list(range(0, len(tokenNames)))))
             result["EOF"] = Token.EOF
             self.tokenTypeMapCache[tokenNames] = result
         return result
@@ -87,7 +94,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of rule names.")
         result = self.ruleIndexMapCache.get(ruleNames, None)
         if result is None:
-            result = zip( ruleNames, range(0, len(ruleNames)))
+            result = list(zip( ruleNames, list(range(0, len(ruleNames)))))
             self.ruleIndexMapCache[ruleNames] = result
         return result
 
@@ -103,7 +110,7 @@ class Recognizer(object):
     def getErrorHeader(self, e):
         line = e.getOffendingToken().line
         column = e.getOffendingToken().column
-        return u"line " + unicode(line) + u":" + unicode(column)
+        return u"line " + str(line) + u":" + str(column)
 
 
     # How should a token be displayed in an error message? The default
@@ -127,7 +134,7 @@ class Recognizer(object):
             if t.type==Token.EOF:
                 s = u"<EOF>"
             else:
-                s = u"<" + unicode(t.type) + u">"
+                s = u"<" + str(t.type) + u">"
         s = s.replace(u"\n",u"\\n")
         s = s.replace(u"\r",u"\\r")
         s = s.replace(u"\t",u"\\t")

@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 from io import StringIO
 import unittest
 from custom_antlr4.Token import Token
@@ -7,7 +9,7 @@ class Interval(object):
     def __init__(self, start, stop):
         self.start = start
         self.stop = stop
-        self.range = xrange(start, stop)
+        self.range = range(start, stop)
 
     def __contains__(self, item):
         return item in self.range

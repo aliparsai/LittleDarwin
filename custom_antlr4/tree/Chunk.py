@@ -1,7 +1,9 @@
+from builtins import str
+from builtins import object
 class Chunk(object):
 
    def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
 class TagChunk(Chunk):

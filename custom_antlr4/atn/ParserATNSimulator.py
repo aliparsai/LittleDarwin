@@ -257,6 +257,8 @@
 # the input.</p>
 #
 from __future__ import print_function
+from builtins import str
+from builtins import range
 import sys
 from custom_antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext
 from custom_antlr4.ParserRuleContext import ParserRuleContext
@@ -1357,8 +1359,8 @@ class ParserATNSimulator(ATNSimulator):
                 print(str(t) + " ttype out of range: " + str_list(self.parser.tokenNames))
                 print(str_list(self.parser.getInputStream().getTokens()))
             else:
-                return self.parser.tokensNames[t] + u"<" + unicode(t) + ">"
-        return unicode(t)
+                return self.parser.tokensNames[t] + u"<" + str(t) + ">"
+        return str(t)
 
     def getLookaheadName(self, input):
         return self.getTokenName(input.LA(1))
@@ -1468,7 +1470,7 @@ class ParserATNSimulator(ATNSimulator):
 
     def reportAttemptingFullContext(self, dfa, conflictingAlts, configs, startIndex, stopIndex):
         if self.debug or self.retry_debug:
-            interval = range(startIndex, stopIndex + 1)
+            interval = list(range(startIndex, stopIndex + 1))
             print("reportAttemptingFullContext decision=" + str(dfa.decision) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
@@ -1476,7 +1478,7 @@ class ParserATNSimulator(ATNSimulator):
 
     def reportContextSensitivity(self, dfa, prediction, configs, startIndex, stopIndex):
         if self.debug or self.retry_debug:
-            interval = range(startIndex, stopIndex + 1)
+            interval = list(range(startIndex, stopIndex + 1))
             print("reportContextSensitivity decision=" + str(dfa.decision) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
@@ -1502,7 +1504,7 @@ class ParserATNSimulator(ATNSimulator):
 #				}
 #				i++;
 #			}
-            interval = range(startIndex, stopIndex + 1)
+            interval = list(range(startIndex, stopIndex + 1))
             print("reportAmbiguity " + str(ambigAlts) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:

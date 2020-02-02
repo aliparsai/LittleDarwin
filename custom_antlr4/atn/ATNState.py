@@ -89,6 +89,8 @@
 # <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
 #
 
+from builtins import str
+from builtins import object
 INITIAL_NUM_TRANSITIONS = 4
 
 class ATNState(object):
@@ -153,10 +155,10 @@ class ATNState(object):
         return False
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
-        return unicode(self.stateNumber)
+        return str(self.stateNumber)
 
     def addTransition(self, trans, index=-1):
         if len(self.transitions)==0:

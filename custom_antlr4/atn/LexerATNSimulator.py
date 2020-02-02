@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -44,6 +45,10 @@
 #  then the ATN does the accept and the DFA simulator that invoked it
 #  can simply return the predicted token type.</p>
 #/
+from builtins import chr
+from builtins import str
+from builtins import range
+from builtins import object
 from custom_antlr4 import Lexer
 from custom_antlr4.PredictionContext import SingletonPredictionContext, PredictionContext
 from custom_antlr4.Token import Token
@@ -158,7 +163,7 @@ class LexerATNSimulator(ATNSimulator):
 
         while True: # while more work
             if self.debug:
-                print("execATN loop starting closure: %s\n", s.configs)
+                print(("execATN loop starting closure: %s\n", s.configs))
 
             # As we move src->trg, src->trg, we keep track of the previous trg to
             # avoid looking up the DFA state again, which is expensive.
@@ -272,7 +277,7 @@ class LexerATNSimulator(ATNSimulator):
                 continue
 
             if self.debug:
-                print("testing %s at %s\n", self.getTokenName(t), cfg.toString(self.recog, True))
+                print(("testing %s at %s\n", self.getTokenName(t), cfg.toString(self.recog, True)))
 
             for trans in cfg.state.transitions:          # for each transition
                 target = self.getReachableTarget(trans, t)
@@ -290,7 +295,7 @@ class LexerATNSimulator(ATNSimulator):
 
     def accept(self, input, lexerActionExecutor, startIndex, index, line, charPos):
         if self.debug:
-            print("ACTION %s\n", lexerActionExecutor)
+            print(("ACTION %s\n", lexerActionExecutor))
 
         # seek to after last char in token
         input.seek(index)
@@ -333,9 +338,9 @@ class LexerATNSimulator(ATNSimulator):
         if isinstance( config.state, RuleStopState ):
             if self.debug:
                 if self.recog is not None:
-                    print("closure at %s rule stop %s\n", self.recog.getRuleNames()[config.state.ruleIndex], config)
+                    print(("closure at %s rule stop %s\n", self.recog.getRuleNames()[config.state.ruleIndex], config))
                 else:
-                    print("closure at rule stop %s\n", config)
+                    print(("closure at rule stop %s\n", config))
 
             if config.context is None or config.context.hasEmptyPath():
                 if config.context is None or config.context.isEmpty():

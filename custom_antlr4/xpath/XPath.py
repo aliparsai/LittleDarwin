@@ -42,6 +42,9 @@
 # <p>
 # Whitespace is not allowed.</p>
 #
+from builtins import str
+from builtins import range
+from builtins import object
 from custom_antlr4 import CommonTokenStream, DFA, PredictionContextCache, Lexer, LexerATNSimulator, ParserRuleContext, TerminalNode
 from custom_antlr4.InputStream import InputStream
 from custom_antlr4.Parser import Parser
@@ -238,7 +241,7 @@ class XPathElement(object):
         self.invert = False
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         return type(self).__name__ + "[" + ("!" if self.invert else "") + self.nodeName + "]"

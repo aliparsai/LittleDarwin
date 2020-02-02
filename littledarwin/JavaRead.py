@@ -1,3 +1,6 @@
+from __future__ import print_function
+from builtins import str
+from builtins import object
 import fnmatch
 import io
 import os
@@ -90,5 +93,5 @@ class JavaRead(object):
             contentFile.write(fileData)
 
         if self.verbose:
-            print "--> generated file: ", targetFile
+            print("--> generated file: ", targetFile)
         return os.path.relpath(targetFile, self.targetDirectory)

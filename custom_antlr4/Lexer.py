@@ -1,3 +1,4 @@
+from __future__ import print_function
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
 #  Copyright (c) 2012 Sam Harwell
@@ -33,6 +34,8 @@
 #  uses simplified match() and error recovery mechanisms in the interest
 #  of speed.
 #/
+from builtins import str
+from builtins import object
 from io import StringIO
 from custom_antlr4.CommonTokenFactory import CommonTokenFactory
 from custom_antlr4.Recognizer import Recognizer

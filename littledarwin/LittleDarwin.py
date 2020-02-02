@@ -1,3 +1,8 @@
+from __future__ import print_function
+from __future__ import division
+
+from builtins import str
+from past.utils import old_div
 """
     __     _  __   __   __       ____                          _
    / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____
@@ -5,7 +10,7 @@
  / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /
 /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/
 
-Copyright (C) 2014 Ali Parsai
+Copyright (c) 2014-2020 Ali Parsai
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -128,7 +133,7 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
 
 def main(argv):
-    print """
+    print("""
     __     _  __   __   __       ____                          _
    / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____
   / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \\
@@ -148,14 +153,10 @@ def main(argv):
     under certain conditions; run LittleDarwin --license for details.
 
 
-    """ % littleDarwinVersion
-
-    # let's caution the user that we are using the alternative method.
-    # if not timeoutSupport:
-    #     print "!!! CAUTION !!!\nmodule subprocess32 not found. using alternative method. build procedure may hang in an infinite loop.\n\n"
+    """ % littleDarwinVersion)
 
     # parsing input options
-    optionParser = OptionParser()
+    optionParser = OptionParser(prog="LittleDarwin")
 
     optionParser.add_option("-m", "--mutate", action="store_true", dest="isMutationActive", default=False,
                             help="Activate the mutation phase.")
@@ -198,7 +199,7 @@ def main(argv):
     (options, args) = optionParser.parse_args()
 
     if options.whitelist != "***dummy***" and options.blacklist != "***dummy***":
-        print "You can either define a whitelist or a blacklist but not both."
+        print("You can either define a whitelist or a blacklist but not both.")
         sys.exit(0)
 
     filterList = None
@@ -214,7 +215,7 @@ def main(argv):
             filterType = "blacklist"
 
     if filterList is not None:
-        filterList = filter(None, filterList)
+        filterList = [_f for _f in filterList if _f]
 
     if options.isLicenseActive:
         License.outputLicense()
@@ -227,7 +228,7 @@ def main(argv):
 
     # there is an upside in not running two phases together. we may include the ability to edit some mutants later.
     if options.isBuildActive and options.isMutationActive:
-        print "it is strongly recommended to do the analysis in two different phases.\n\n"
+        print("it is strongly recommended to do the analysis in two different phases.\n\n")
 
     # *****************************************************************************************************************
     # ---------------------------------------- mutant generation phase ------------------------------------------------
@@ -245,7 +246,7 @@ def main(argv):
         try:
             assert os.path.isdir(options.sourcePath)
         except AssertionError as exception:
-            print "source path must be a directory."
+            print("source path must be a directory.")
             sys.exit(1)
 
         # getting the list of files.
@@ -258,16 +259,16 @@ def main(argv):
         # so it cannot be simply copied from a platform to another.
         databasePath = os.path.join(javaRead.targetDirectory, "mutationdatabase")
 
-        print "source dir: ", javaRead.sourceDirectory
-        print "target dir: ", javaRead.targetDirectory
-        print "creating mutation database: ", databasePath
+        print("source dir: ", javaRead.sourceDirectory)
+        print("target dir: ", javaRead.targetDirectory)
+        print("creating mutation database: ", databasePath)
 
         mutationDatabase = shelve.open(databasePath, "c")
         mutantTypeDatabase = dict()
 
         # go through each file, parse it, calculate all mutations, and generate files accordingly.
         for srcFile in javaRead.fileList:
-            print "(" + str(fileCounter + 1) + "/" + str(fileCount) + ") source file: ", srcFile
+            print("(" + str(fileCounter + 1) + "/" + str(fileCount) + ") source file: ", srcFile)
             targetList = list()
 
             try:
@@ -280,7 +281,7 @@ def main(argv):
 
             except Exception as e:
                 # Java 8 problem
-                print "Error in parsing, skipping the file."
+                print("Error in parsing, skipping the file.")
                 sys.stderr.write(e.message)
                 continue
 
@@ -297,12 +298,12 @@ def main(argv):
             # list of which operators created how many mutants.
             mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, enabledMutators)
 
-            print "--> mutations found: ", len(mutated)
+            print("--> mutations found: ", len(mutated))
 
             # go through all mutant types, and add them in total. also output the info to the user.
-            for mutantType in mutantTypes.keys():
+            for mutantType in list(mutantTypes.keys()):
                 if mutantTypes[mutantType] > 0:
-                    print "---->", mutantType, ":", mutantTypes[mutantType]
+                    print("---->", mutantType, ":", mutantTypes[mutantType])
                 mutantTypeDatabase[mutantType] = mutantTypes[mutantType] + mutantTypeDatabase.get(mutantType, 0)
             totalMutantCount += len(mutated)
 
@@ -316,10 +317,10 @@ def main(argv):
 
         mutationDatabase.close()
 
-        print "total mutations found: ", totalMutantCount
-        for mutantType in mutantTypeDatabase.keys():
+        print("total mutations found: ", totalMutantCount)
+        for mutantType in list(mutantTypeDatabase.keys()):
             if mutantTypeDatabase[mutantType] > 0:
-                print "-->", mutantType, ":", mutantTypeDatabase[mutantType]
+                print("-->", mutantType, ":", mutantTypeDatabase[mutantType])
 
     # *****************************************************************************************************************
     # ---------------------------------------- test suite running phase -----------------------------------------------
@@ -328,8 +329,8 @@ def main(argv):
     if options.isBuildActive:
 
         # let's tell the user upfront that this may corrupt the source code.
-        print "\n\n!!! CAUTION !!!"
-        print "code can be changed accidentally. use a backup version.\n"
+        print("\n\n!!! CAUTION !!!")
+        print("code can be changed accidentally. use a backup version.\n")
 
         reportGenerator = ReportGenerator()
 
@@ -353,7 +354,7 @@ def main(argv):
                 buildDir = os.path.abspath(options.buildPath)
 
         except AssertionError as exception:
-            print "build system working directory should be a directory."
+            print("build system working directory should be a directory.")
 
         # check if we have separate test-suite
         if options.testCommand != "***dummy***":
@@ -370,7 +371,7 @@ def main(argv):
                         testDir = os.path.abspath(options.testPath)
 
                 except AssertionError as exception:
-                    print "test project build system working directory should be a directory."
+                    print("test project build system working directory should be a directory.")
 
         else:
             separateTestSuite = False
@@ -379,10 +380,10 @@ def main(argv):
         try:
             mutationDatabase = shelve.open(databasePath, "r")
         except:
-            print "cannot open mutation database. it may be corrupted or unavailable. delete all generated files and run the mutant generation phase again."
+            print("cannot open mutation database. it may be corrupted or unavailable. delete all generated files and run the mutant generation phase again.")
             sys.exit(1)
 
-        databaseKeys = mutationDatabase.keys()
+        databaseKeys = list(mutationDatabase.keys())
         assert isinstance(databaseKeys, list)
 
         # let's sort the mutants by name to create the possibility of following the flow of the process by user.
@@ -410,7 +411,7 @@ def main(argv):
         else:
             commandString = options.initialBuildCommand.split(',')
 
-        print "Initial build... ",
+        print("Initial build... ",)
 
         try:
             processKilled, processExitCode, initialOutput = timeoutAlternative(commandString,
@@ -425,16 +426,16 @@ def main(argv):
 
             with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
                 contentFile.write(initialOutput)
-            print "done.\n\n"
+            print("done.\n\n")
 
         except subprocess.CalledProcessError as exception:
             initialOutput = exception.output
             with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
                 contentFile.write(initialOutput)
 
-            print "failed.\n"
-            print "Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
-                os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened."
+            print("failed.\n")
+            print("Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
+                os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened.")
             sys.exit(1)
 
         totalMutantCount = 0
@@ -450,7 +451,7 @@ def main(argv):
 
             fileCounter += 1
 
-            print "(" + str(fileCounter) + "/" + str(mutationDatabaseLength) + ") collecting results for ", key
+            print("(" + str(fileCounter) + "/" + str(mutationDatabaseLength) + ") collecting results for ", key)
 
             mutantCount = len(mutationDatabase[key])
             mutantCounter = 0
@@ -525,7 +526,7 @@ def main(argv):
                 # we can't use print, since we like to write on the same line again.
                 sys.stdout.write(
                     "elapsed: " + str(datetime.timedelta(seconds=int(time.time() - startTime))) + " remaining: " + str(
-                        datetime.timedelta(seconds=int((float(time.time() - startTime) / totalMutantCounter) * float(
+                        datetime.timedelta(seconds=int((old_div(float(time.time() - startTime), totalMutantCounter)) * float(
                             totalMutantCount - totalMutantCounter)))) + " total: " + str(
                         totalMutantCounter) + "/" + str(totalMutantCount) + " current: " + str(
                         mutantCounter) + "/" + str(mutantCount) + " *** survived: " + str(
@@ -566,7 +567,7 @@ def main(argv):
                 contentFile.write(
                     reportGenerator.generateHTMLReportPerFile(key, targetHTMLOutputFile, successList, failureList))
 
-            print "\n\n"
+            print("\n\n")
 
         # write final text report.
         with open(os.path.abspath(os.path.join(mutantsPath, "report.txt")),
@@ -582,4 +583,6 @@ def main(argv):
     # if neither build nor mutation phase is active, let's help the user.
     if not (options.isBuildActive or options.isMutationActive):
         optionParser.print_help()
+        print("\nExample:\n  LittleDarwin -m -b -t ./ -p ./src/main -c mvn,clean,test --timeout=120\n\n")
+
 

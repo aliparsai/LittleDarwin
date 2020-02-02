@@ -27,6 +27,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
+from builtins import str
 from custom_antlr4.atn.Transition import PredicateTransition
 
 
@@ -95,7 +96,7 @@ class RecognitionException(Exception):
             return None
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
 class LexerNoViableAltException(RecognitionException):

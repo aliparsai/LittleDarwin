@@ -37,6 +37,9 @@
 # not cause bloating of the {@link DFA} created for the lexer.</p>
 
 
+from builtins import str
+from builtins import range
+from builtins import object
 from custom_antlr4.atn.LexerAction import LexerIndexedCustomAction
 
 class LexerActionExecutor(object):

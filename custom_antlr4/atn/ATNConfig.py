@@ -36,6 +36,8 @@
 #  the tree of semantic predicates encountered before reaching
 #  an ATN state.
 #/
+from builtins import str
+from builtins import object
 from io import StringIO
 from custom_antlr4.atn.ATNState import ATNState, DecisionState
 from custom_antlr4.atn.SemanticContext import SemanticContext
@@ -100,24 +102,24 @@ class ATNConfig(object):
                  str(self.semanticContext) )
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         with StringIO() as buf:
             buf.write(u"(")
-            buf.write(unicode(self.state))
+            buf.write(str(self.state))
             buf.write(u",")
-            buf.write(unicode(self.alt))
+            buf.write(str(self.alt))
             if self.context is not None:
                 buf.write(u",[")
-                buf.write(unicode(self.context))
+                buf.write(str(self.context))
                 buf.write(u"]")
             if self.semanticContext is not None and self.semanticContext is not SemanticContext.NONE:
                 buf.write(u",")
-                buf.write(unicode(self.semanticContext))
+                buf.write(str(self.semanticContext))
             if self.reachesIntoOuterContext>0:
                 buf.write(u",up=")
-                buf.write(unicode(self.reachesIntoOuterContext))
+                buf.write(str(self.reachesIntoOuterContext))
             buf.write(u')')
             return buf.getvalue()
 

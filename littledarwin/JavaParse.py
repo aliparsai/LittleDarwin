@@ -1,8 +1,12 @@
-from JavaListener import JavaListener
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
+from .JavaListener import JavaListener
 from custom_antlr4.InputStream import InputStream
 from custom_antlr4 import *
-from JavaLexer import JavaLexer
-from JavaParser import JavaParser
+from .JavaLexer import JavaLexer
+from .JavaParser import JavaParser
 from custom_antlr4.tree.Tree import TerminalNodeImpl
 
 try:
@@ -51,7 +55,7 @@ class JavaParse(object):
             for child in tree.getChildren():
                 self.toString(child)
         except AttributeError:
-            print "Index: ", tree.nodeIndex, "Text: ", tree.getText()
+            print("Index: ", tree.nodeIndex, "Text: ", tree.getText())
 
     def seek(self, myTree, type):
         seekList = list()

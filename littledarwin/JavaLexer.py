@@ -1,5 +1,7 @@
 # Generated from java-escape by ANTLR 4.4
 from __future__ import print_function
+from builtins import chr
+from builtins import str
 from custom_antlr4 import *
 from io import StringIO
 
@@ -691,13 +693,13 @@ class JavaLexer(Lexer):
         self._predicates = None
 
     def isJavaIdentifierStart(self, codePoint):
-        if 'L' in unicodedata.category(unichr(codePoint)) or unichr(codePoint) is u'$' or unichr(codePoint) is u'_':
+        if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_':
             return True
         return False
 
     def isJavaIdentifierPart(self, codePoint):
-        if 'L' in unicodedata.category(unichr(codePoint)) or 'N' in unicodedata.category(unichr(codePoint)) or unichr(
-                codePoint) is u'$' or unichr(codePoint) is u'_':
+        if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(
+                codePoint) is u'$' or chr(codePoint) is u'_':
             return True
         return False
 

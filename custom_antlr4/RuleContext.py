@@ -49,6 +49,7 @@
 #
 #  @see ParserRuleContext
 #/
+from builtins import str
 from io import StringIO
 from custom_antlr4.tree.Tree import RuleNode, INVALID_INTERVAL, TerminalNodeImpl
 from custom_antlr4.tree.Trees import Trees
@@ -226,10 +227,10 @@ class RuleContext(RuleNode):
             while p is not None and p is not stop:
                 if ruleNames is None:
                     if not p.isEmpty():
-                        buf.write(unicode(p.invokingState))
+                        buf.write(str(p.invokingState))
                 else:
                     ri = p.getRuleIndex()
-                    ruleName = ruleNames[ri] if ri >= 0 and ri < len(ruleNames) else unicode(ri)
+                    ruleName = ruleNames[ri] if ri >= 0 and ri < len(ruleNames) else str(ri)
                     buf.write(ruleName)
 
                 if p.parentCtx is not None and (ruleNames is not None or not p.parentCtx.isEmpty()):

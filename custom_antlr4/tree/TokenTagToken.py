@@ -34,6 +34,7 @@
 # {@code <ID>}. These tokens are created for {@link TagChunk} chunks where the
 # tag corresponds to a lexer rule or token type.
 #
+from builtins import str
 from custom_antlr4.Token import CommonToken
 
 
@@ -69,4 +70,4 @@ class TokenTagToken(CommonToken):
     # {@code tokenName:type}.</p>
     #
     def __unicode__(self):
-        return self.tokenName + u":" + unicode(self.type)
+        return self.tokenName + u":" + str(self.type)

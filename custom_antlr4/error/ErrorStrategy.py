@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -28,6 +29,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+from builtins import str
+from builtins import object
 from custom_antlr4.IntervalSet import IntervalSet
 
 from custom_antlr4.Token import Token
@@ -539,7 +542,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             if t.type==Token.EOF:
                 s = u"<EOF>"
             else:
-                s = u"<" + unicode(t.type) + u">"
+                s = u"<" + str(t.type) + u">"
         return self.escapeWSAndQuote(s)
 
     def escapeWSAndQuote(self, s):

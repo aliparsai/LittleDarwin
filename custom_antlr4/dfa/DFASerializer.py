@@ -30,6 +30,10 @@
 #/
 
 # A DFA walker that knows how to dump them to serialized strings.#/
+from builtins import chr
+from builtins import str
+from builtins import range
+from builtins import object
 from io import StringIO
 from custom_antlr4.Utils import str_list
 
@@ -41,7 +45,7 @@ class DFASerializer(object):
         self.tokenNames = tokenNames
 
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
     def __unicode__(self):
         if self.dfa.s0 is None:
@@ -73,17 +77,17 @@ class DFASerializer(object):
         if self.tokenNames is not None:
             return self.tokenNames[i-1]
         else:
-            return unicode(i-1)
+            return str(i-1)
 
     def getStateString(self, s):
         n = s.stateNumber
-        baseStateStr = ( u":" if s.isAcceptState else u"") + u"s" + unicode(n) + \
+        baseStateStr = ( u":" if s.isAcceptState else u"") + u"s" + str(n) + \
             ( u"^" if s.requiresFullContext else u"")
         if s.isAcceptState:
             if s.predicates is not None:
                 return baseStateStr + u"=>" + str_list(s.predicates)
             else:
-                return baseStateStr + u"=>" + unicode(s.prediction)
+                return baseStateStr + u"=>" + str(s.prediction)
         else:
             return baseStateStr
 
@@ -93,4 +97,4 @@ class LexerDFASerializer(DFASerializer):
         super(LexerDFASerializer, self).__init__(dfa, None)
 
     def getEdgeLabel(self, i):
-        return u"'" + unichr(i) + u"'"
+        return u"'" + chr(i) + u"'"

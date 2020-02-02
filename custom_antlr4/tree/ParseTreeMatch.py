@@ -33,6 +33,8 @@
 #
 # Represents the result of matching a {@link ParseTree} against a tree pattern.
 #
+from builtins import str
+from builtins import object
 from io import StringIO
 
 
@@ -132,7 +134,7 @@ class ParseTreeMatch(object):
     # {@inheritDoc}
     #
     def __str__(self):
-        return unicode(self)
+        return str(self)
 
 
     def __unicode__(self):
@@ -140,6 +142,6 @@ class ParseTreeMatch(object):
             buf.write(u"Match ")
             buf.write(u"succeeded" if self.succeeded() else "failed")
             buf.write(u"; found ")
-            buf.write(unicode(len(self.labels)))
+            buf.write(str(len(self.labels)))
             buf.write(u" labels")
             return buf.getvalue()

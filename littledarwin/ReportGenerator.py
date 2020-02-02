@@ -1,3 +1,6 @@
+from builtins import str
+from builtins import range
+from builtins import object
 import os
 import shelve
 
@@ -281,12 +284,12 @@ class ReportGenerator(object):
         for i in range(0, maxIndex):
             try:
                 survivedItem = survived[i]
-            except IndexError, e:
+            except IndexError as e:
                 survivedItem = None
 
             try:
                 killedItem = killed[i]
-            except IndexError, e:
+            except IndexError as e:
                 killedItem = None
 
             joinedList.append([os.path.relpath(os.path.join(os.path.dirname(reportPath), survivedItem),
