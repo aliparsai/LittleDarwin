@@ -44,8 +44,7 @@ class DFASerializer(object):
         self.dfa = dfa
         self.tokenNames = tokenNames
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         if self.dfa.s0 is None:

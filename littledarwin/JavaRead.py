@@ -71,7 +71,7 @@ class JavaRead(object):
     def getFileContent(self, filePath=None):
         with io.open(filePath, mode='r', errors='replace') as contentFile:
             file_data = contentFile.read()
-        normalizedData = unicodedata.normalize('NFKD', file_data).encode('ascii', 'replace')
+        normalizedData = str(file_data)
         return normalizedData
 
     def generateNewFile(self, originalFile=None, fileData=None):

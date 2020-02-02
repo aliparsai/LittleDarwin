@@ -240,8 +240,7 @@ class XPathElement(object):
         self.nodeName = nodeName
         self.invert = False
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return type(self).__name__ + "[" + ("!" if self.invert else "") + self.nodeName + "]"

@@ -130,8 +130,7 @@ class DFA(object):
     def sortedStates(self):
         return sorted(list(self._states.keys()), key=lambda state: state.stateNumber)
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return self.toString(None)

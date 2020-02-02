@@ -89,8 +89,7 @@ class Transition (object):
         self.isEpsilon = False
         self.label = None
 
-    def __str__(self):
-        return str(self)
+
 
 
 # TODO: make all transitions sets? no, should remove set edges

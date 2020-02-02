@@ -101,8 +101,7 @@ class ATNConfig(object):
                  str(self.context) + "/" +
                  str(self.semanticContext) )
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         with StringIO() as buf:

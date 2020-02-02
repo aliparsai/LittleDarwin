@@ -54,8 +54,7 @@ class LexerAction(object):
     def __eq__(self, other):
         return self is other
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return str(super(LexerAction, self))

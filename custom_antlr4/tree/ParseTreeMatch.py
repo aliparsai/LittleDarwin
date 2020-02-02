@@ -133,8 +133,7 @@ class ParseTreeMatch(object):
     #
     # {@inheritDoc}
     #
-    def __str__(self):
-        return str(self)
+
 
 
     def __unicode__(self):

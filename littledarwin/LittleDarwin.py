@@ -47,13 +47,17 @@ import time
 import subprocess
 
 
-# try:
-#     import subprocess32 as subprocess
-#     timeoutSupport = True
-#
-# except ImportError as e:
-#     import subprocess
-#     timeoutSupport = False
+### DEBUG ###
+
+
+# def trace(frame, event, arg):
+#     print("%s, %s:%d" % (event, frame.f_code.co_filename, frame.f_lineno))
+#     return trace
+
+# sys.settrace(trace)
+
+#############
+
 
 # LittleDarwin modules
 from littledarwin.JavaParse import JavaParse
@@ -425,13 +429,13 @@ def main(argv):
                                                     initialOutput)
 
             with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
-                contentFile.write(initialOutput)
+                contentFile.write(str(initialOutput))
             print("done.\n\n")
 
         except subprocess.CalledProcessError as exception:
             initialOutput = exception.output
             with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
-                contentFile.write(initialOutput)
+                contentFile.write(str(initialOutput))
 
             print("failed.\n")
             print("Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
@@ -466,8 +470,8 @@ def main(argv):
                 totalMutantCounter += 1
 
                 # let's make sure that runOutput is empty, and not None to begin with.
-                runOutput = ""
-                runOutputTest = ""
+                runOutput = str()
+                runOutputTest = str()
 
                 # replace the original file with the mutant
                 shutil.copyfile(replacementFile, os.path.join(options.sourcePath, key))
@@ -507,13 +511,13 @@ def main(argv):
                                                                 commandString, "\n".join([runOutput, runOutputTest]))
 
                     # if we are here, it means no exceptions happened, so lets add this to our success list.
-                    runOutput += "\n" + runOutputTest
+                    runOutput = str(runOutput) + '\n' + str(runOutputTest)
                     successList.append(os.path.basename(replacementFile))
 
                 # putting two exceptions in one except clause, specially when one of them is not defined on some
                 # platforms does not look like a good idea; even though both of them do exactly the same thing.
                 except subprocess.CalledProcessError as exception:
-                    runOutput = exception.output
+                    runOutput = str(exception.output)
                     # oops, error. let's add this to failure list.
                     failureList.append(os.path.basename(replacementFile))
 
@@ -535,7 +539,7 @@ def main(argv):
 
                 # writing the build output to disk.
                 with open(targetTextOutputFile, 'w') as contentFile:
-                    contentFile.write(runOutput)
+                    contentFile.write(str(runOutput))
 
                 # if there's a cleanup option, execute it. the results will be ignored because we don't want our process
                 #  to be interrupted if there's nothing to clean up.

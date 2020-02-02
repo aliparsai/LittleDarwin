@@ -110,8 +110,7 @@ class InputStream (object):
         else:
             return self.strdata[start:stop+1]
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return self.strdata

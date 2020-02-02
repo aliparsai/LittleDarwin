@@ -206,8 +206,7 @@ class ATNConfigSet(object):
         self.readonly = readonly
         self.configLookup = None # can't mod, no need for lookup cache
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         with StringIO() as buf:

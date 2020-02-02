@@ -95,8 +95,7 @@ class RecognitionException(Exception):
         else:
             return None
 
-    def __str__(self):
-        return str(self)
+
 
 
 class LexerNoViableAltException(RecognitionException):

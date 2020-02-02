@@ -154,8 +154,7 @@ class ATNState(object):
     def isNonGreedyExitState(self):
         return False
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return str(self.stateNumber)

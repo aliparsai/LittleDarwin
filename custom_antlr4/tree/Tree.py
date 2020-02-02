@@ -39,9 +39,7 @@ from custom_antlr4.Token import Token
 INVALID_INTERVAL = (-1, -2)
 
 class Tree(object):
-
-    def __str__(self):
-        return str(self)
+    pass
 
 class SyntaxTree(Tree):
     pass

@@ -85,9 +85,6 @@ class SemanticContext(object):
     def evalPrecedence(self, parser, outerContext):
         return self
 
-    def __str__(self):
-        return str(self)
-    
     def __unicode__(self):
         return str(super(SemanticContext, self))
 

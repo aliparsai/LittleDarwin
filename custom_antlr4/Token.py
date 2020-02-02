@@ -93,8 +93,7 @@ class Token (object):
     def getInputStream(self):
         return self.source[1]
 
-    def __str__(self):
-        return str(self)
+
 
 
 class CommonToken(Token):

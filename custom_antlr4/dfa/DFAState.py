@@ -40,8 +40,7 @@ class PredPrediction(object):
         self.alt = alt
         self.pred = pred
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         return u"(" + str(self.pred) + u", " + str(self.alt) +  u")"
@@ -139,8 +138,7 @@ class DFAState(object):
         else:
             return self.configs==other.configs
 
-    def __str__(self):
-        return str(self)
+
 
     def __unicode__(self):
         with StringIO() as buf:

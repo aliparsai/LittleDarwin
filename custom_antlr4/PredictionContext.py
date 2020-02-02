@@ -86,8 +86,8 @@ class PredictionContext(object):
     def __hash__(self):
         return self.cachedHashCode
 
-    def __str__(self):
-        return str(self)
+    # def __str__(self):
+    #     return str(self)
 
 
 def calculateHashCode(parent, returnState):
