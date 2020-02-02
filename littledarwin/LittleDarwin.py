@@ -470,8 +470,8 @@ def main(argv):
                 totalMutantCounter += 1
 
                 # let's make sure that runOutput is empty, and not None to begin with.
-                runOutput = str()
-                runOutputTest = str()
+                runOutput = bytes()
+                runOutputTest = bytes()
 
                 # replace the original file with the mutant
                 shutil.copyfile(replacementFile, os.path.join(options.sourcePath, key))
@@ -511,13 +511,13 @@ def main(argv):
                                                                 commandString, "\n".join([runOutput, runOutputTest]))
 
                     # if we are here, it means no exceptions happened, so lets add this to our success list.
-                    runOutput = str(runOutput) + '\n' + str(runOutputTest)
+                    runOutput = runOutput.decode("utf-8") + '\n' + runOutputTest.decode("utf-8")
                     successList.append(os.path.basename(replacementFile))
 
                 # putting two exceptions in one except clause, specially when one of them is not defined on some
                 # platforms does not look like a good idea; even though both of them do exactly the same thing.
                 except subprocess.CalledProcessError as exception:
-                    runOutput = str(exception.output)
+                    runOutput = exception.output.decode("utf-8")
                     # oops, error. let's add this to failure list.
                     failureList.append(os.path.basename(replacementFile))
 
