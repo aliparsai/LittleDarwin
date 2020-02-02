@@ -1,8 +1,6 @@
 from __future__ import print_function
 from __future__ import division
 
-from builtins import str
-from past.utils import old_div
 """
     __     _  __   __   __       ____                          _
    / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____
@@ -46,6 +44,8 @@ import signal
 import time
 import subprocess
 
+from builtins import str
+from past.utils import old_div
 
 ### DEBUG ###
 
@@ -60,11 +60,12 @@ import subprocess
 
 
 # LittleDarwin modules
-from littledarwin.JavaParse import JavaParse
-from littledarwin.JavaRead import JavaRead
-from littledarwin.JavaMutate import JavaMutate
-from littledarwin.ReportGenerator import ReportGenerator
+from .JavaParse import JavaParse
+from .JavaRead import JavaRead
+from .JavaMutate import JavaMutate
+from .ReportGenerator import ReportGenerator
 from littledarwin import License
+
 
 littleDarwinVersion = "0.5"
 
@@ -336,7 +337,7 @@ def main(argv):
         print("\n\n!!! CAUTION !!!")
         print("code can be changed accidentally. use a backup version.\n")
 
-        reportGenerator = ReportGenerator()
+        reportGenerator = ReportGenerator(littleDarwinVersion)
 
         if options.alternateDb == "***dummy***":
             databasePath = os.path.abspath(os.path.join(options.buildPath, "LittleDarwinResults", "mutationdatabase"))
