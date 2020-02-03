@@ -301,6 +301,7 @@ def main(argv):
 
             # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
             # list of which operators created how many mutants.
+            javaMutate.mutantsPerLine = dict()
             mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, enabledMutators)
 
             print("--> mutations found: ", len(mutated))
@@ -314,7 +315,7 @@ def main(argv):
 
             # for each mutant, generate the file, and add it to the list.
             for mutatedFile in mutated:
-                targetList.append(javaRead.generateNewFile(srcFile, mutatedFile))
+                targetList.append(javaRead.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine))
 
             # if the list is not empty (some mutants were found), put the data in the database.
             if len(targetList) != 0:

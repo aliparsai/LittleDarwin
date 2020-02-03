@@ -74,7 +74,9 @@ class JavaRead(object):
         normalizedData = str(file_data)
         return normalizedData
 
-    def generateNewFile(self, originalFile=None, fileData=None):
+    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None):
+        if mutantsPerLine is None:
+            mutantsPerLine = dict()
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
         targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory), originalFileName)
@@ -83,6 +85,12 @@ class JavaRead(object):
             os.makedirs(targetDir)
         if not os.path.isfile(os.path.join(targetDir, "original.java")):
             shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
+
+        if mutantsPerLine:
+            densityFile = os.path.abspath(os.path.join(targetDir, "density.csv"))
+            with open(densityFile, 'w') as densityFileHandle:
+                for key in sorted(mutantsPerLine.keys()):
+                    densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
 
         counter = 1
         while os.path.isfile(os.path.join(targetDir, str(counter) + ".java")):
