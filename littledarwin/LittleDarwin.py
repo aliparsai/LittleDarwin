@@ -151,7 +151,7 @@ def main(argv):
                                   /
 
 
-    LittleDarwin version %s Copyright (C) 2019 Ali Parsai
+    LittleDarwin version %s Copyright (C) 2014-2020 Ali Parsai
 
     LittleDarwin comes with ABSOLUTELY NO WARRANTY.
     This is free software, and you are welcome to redistribute it
