@@ -1,14 +1,15 @@
 import fnmatch
 import os
+import sys
 
 from pygments import highlight
 from pygments.lexers.jvm import JavaLexer
 from pygments.formatters.html import HtmlFormatter
-import sys
 
 
 class DensityFormatter(HtmlFormatter):
     """Overriding formatter to highlight more than one kind of lines"""
+
     def __init__(self, **kwargs):
         super(DensityFormatter, self).__init__(**kwargs)
         # a list of [ (highlight_colour, [lines]) ]
@@ -64,11 +65,11 @@ def calculateColorList(minVal, maxVal):
     distance = maxVal - minVal + 1
     colorList = list()
 
-    for i in range(0, 255, (256//(distance-1))):
+    for i in range(0, 255, (256 // (distance - 1))):
         hexVal = str(hex(i)[2:])
         if len(hexVal) == 1:
             hexVal = '0' + hexVal
-        colorList.append("#ff"+hexVal+hexVal)
+        colorList.append("#ff" + hexVal + hexVal)
 
     colorList.append("#ffffff")
     colorList.reverse()
@@ -80,16 +81,18 @@ def calculateLineGroups(densityFile, maxLines):
     with open(densityFile, mode='r') as densityFileHandle:
         densityDict = dict()
         lineList = list()
+        sumOfDensity = 0
         for line in densityFileHandle:
             lineNumber, density = [int(x) for x in line.split(',')]
             lineList.append(lineNumber)
+            sumOfDensity += density
             if density in densityDict.keys():
                 densityDict[density].append(lineNumber)
             else:
                 densityDict[density] = [lineNumber]
 
     densityDict[0] = list()
-    for lineNumber in range(1,maxLines):
+    for lineNumber in range(1, maxLines):
         if lineNumber not in lineList:
             densityDict[0].append(lineNumber)
 
@@ -99,21 +102,25 @@ def calculateLineGroups(densityFile, maxLines):
     for key in densityDict.keys():
         highlightGroups.append((colorList[key], densityDict[key]))
 
-    return highlightGroups
+    return highlightGroups, sumOfDensity
 
 
 def highlightFile(fileDirPath):
     filePath = os.path.join(fileDirPath, "original.java")
     densityFile = os.path.join(fileDirPath, "density.csv")
     maxLines = sum(1 for line in open(filePath, mode='r'))
-    highlightGroups = calculateLineGroups(densityFile, maxLines)
+    highlightGroups, sumOfDensity = calculateLineGroups(densityFile, maxLines)
+    averageDensity = sumOfDensity / maxLines
 
     outputFile = os.path.join(fileDirPath, "original.html")
     with open(filePath, 'r') as filePathHandle:
         fileContent = filePathHandle.read()
 
     with open(outputFile, 'w') as outputFileHandle:
+        outputFileHandle.write("<br>Average Density: %.2f<br>" % averageDensity)
         outputFileHandle.write(highlightCode(fileContent, highlightGroups))
+
+    return averageDensity
 
 
 def findFiles(dirPath):
@@ -130,5 +137,13 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         print("Usage: \nMutantDensityChart [path to LittleDarwin results]\n\n")
     else:
-        for dirPath in findFiles(sys.argv[1]):
-            highlightFile(dirPath)
+        averageDensityDict = dict()
+        resultsPath = sys.argv[1]
+        for dirPath in findFiles(resultsPath):
+            relativePath = os.path.relpath(dirPath, resultsPath)
+            averageDensityDict[relativePath] = highlightFile(dirPath)
+
+        with open(os.path.join(resultsPath, "densityreport.csv"), 'w') as densityReportHandle:
+            for key in averageDensityDict.keys():
+                densityReportHandle.write(key + ',' + str(averageDensityDict[key]) + '\n')
+
