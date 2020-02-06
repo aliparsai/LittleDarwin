@@ -584,10 +584,10 @@ class JavaMutate(object):
                 node.symbol.text = copy.deepcopy(originalText0)
                 node.getParent().getChild(2).symbol.text = copy.deepcopy(originalText2)
 
-                if node.start.line in self.mutantsPerLine.keys():
-                    self.mutantsPerLine[node.start.line] += 1
+                if node.getParent().start.line in self.mutantsPerLine.keys():
+                    self.mutantsPerLine[node.getParent().start.line] += 1
                 else:
-                    self.mutantsPerLine[node.start.line] = 1
+                    self.mutantsPerLine[node.getParent().start.line] = 1
 
             return mutatedTreesTexts
 
@@ -654,10 +654,10 @@ class JavaMutate(object):
 
                     node.symbol.text = copy.deepcopy(originalText)
 
-                    if node.start.line in self.mutantsPerLine.keys():
-                        self.mutantsPerLine[node.start.line] += 1
+                    if node.parentCtx.start.line in self.mutantsPerLine.keys():
+                        self.mutantsPerLine[node.parentCtx.start.line] += 1
                     else:
-                        self.mutantsPerLine[node.start.line] = 1
+                        self.mutantsPerLine[node.parentCtx.start.line] = 1
 
             return mutatedTreesTexts
 
