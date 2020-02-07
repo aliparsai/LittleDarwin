@@ -1,26 +1,32 @@
 import sys
 
-r1 = open(sys.argv[1],'r')
-r2 = open(sys.argv[2],'r')
-r1name = sys.argv[3]
-r2name = sys.argv[4]
-r1dict = dict()
-r2dict = dict()
+reportFileHandleDict = dict()
+for reportArg in sys.argv[1:]:
+    reportFile, reportName = reportArg.split(',')
+    reportFileHandleDict[reportName] = open(reportFile, 'r')
+
+reportValuesDict = dict()
 
 
-for line in r1:
-    name, value = line.strip('\n').split(',')
-    r1dict[name] = value
+for reportName in reportFileHandleDict.keys():
+    reportValuesDict[reportName] = dict()
+    for line in reportFileHandleDict[reportName]:
+        name, value = line.strip('\n').split(',')
+        reportValuesDict[reportName][name] = value
 
-for line in r2:
-    name, value = line.strip('\n').split(',')
-    r2dict[name] = value
-
-names = set(r1dict.keys())
-names.update(set(r2dict.keys()))
+names = set()
+for reportName in reportFileHandleDict.keys():
+    names.update(set(reportValuesDict[reportName].keys()))
 
 with open("result.csv", 'w') as result:
-    result.write("Name,"+r1name+','+r2name+'\n')
+    result.write("Name")
+    for reportName in reportFileHandleDict.keys():
+        result.write(',' + reportName)
+    result.write('\n')
+
     namesList = sorted(list(names))
     for name in namesList:
-        result.write(name+','+(r1dict[name] if name in r1dict.keys() else '0')+','+(r2dict[name] if name in r2dict.keys() else '0')+'\n')
+        result.write(name)
+        for reportName in reportFileHandleDict.keys():
+            result.write(',' + (reportValuesDict[reportName][name] if name in reportValuesDict[reportName].keys() else '0'))
+        result.write('\n')
