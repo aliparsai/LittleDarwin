@@ -9,6 +9,7 @@ reportValuesDict = dict()
 
 
 for reportName in reportFileHandleDict.keys():
+    print(reportName)
     reportValuesDict[reportName] = dict()
     for line in reportFileHandleDict[reportName]:
         name, value = line.strip('\n').split(',')
@@ -26,7 +27,7 @@ with open("result.csv", 'w') as result:
 
     namesList = sorted(list(names))
     for name in namesList:
-        result.write(name)
+        result.write('.'.join(str(name).split('.java')[0].split('/')))
         for reportName in reportFileHandleDict.keys():
-            result.write(',' + (reportValuesDict[reportName][name] if name in reportValuesDict[reportName].keys() else '0'))
+            result.write(',' + (reportValuesDict[reportName][name] if name in reportValuesDict[reportName].keys() else 'N/A'))
         result.write('\n')
