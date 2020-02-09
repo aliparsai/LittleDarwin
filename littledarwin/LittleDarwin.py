@@ -67,7 +67,7 @@ from .ReportGenerator import ReportGenerator
 from littledarwin import License
 
 
-littleDarwinVersion = "0.5"
+littleDarwinVersion = "0.5.1"
 
 
 # Alternative to subprocess32

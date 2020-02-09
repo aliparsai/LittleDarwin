@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='littledarwin',
-    version='0.5',
+    version='0.5.1',
     url='https://littledarwin.parsai.net',
     author="Ali Parsai",
     author_email="ali.parsai@live.com",
@@ -15,6 +15,7 @@ setuptools.setup(
     license='GNU GPLv3',
     packages=setuptools.find_packages(),
 #   packages=['littledarwin', 'custom_antlr4', 'custom_antlr4.atn', 'custom_antlr4.dfa', 'custom_antlr4.tree', 'custom_antlr4.error', 'custom_antlr4.xpath'],
+    install_requires=['future'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
