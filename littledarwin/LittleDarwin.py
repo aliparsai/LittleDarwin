@@ -285,9 +285,8 @@ def main(argv):
                 # javaParse.tree2DOT(tree)
 
             except Exception as e:
-                # Java 8 problem
-                print("Error in parsing, skipping the file.")
-                sys.stderr.write(e.message)
+                print("Error in parsing Java code, skipping the file.")
+                sys.stderr.write(str(e))
                 continue
 
             fileCounter += 1
