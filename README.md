@@ -40,8 +40,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ------------------------------------------------------------------------------------
 Find me at:
 
-www.parsai.net
-ali@parsai.net
-ali.parsai@live.com
+[parsai.net](http://www.parsai.net)
 
 ------------------------------------------------------------------------------------
+
+

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='littledarwin',
-    version='0.5.1',
+    version='0.5.2',
     url='https://littledarwin.parsai.net',
     author="Ali Parsai",
     author_email="ali.parsai@live.com",
