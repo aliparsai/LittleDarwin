@@ -26,38 +26,46 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 
 # The basic notion of a tree has a parent, a payload, and a list of children.
 #  It is the most abstract interface for all the trees used by ANTLR.
-#/
+# /
 # from builtins import str
 # from builtins import object
 from custom_antlr4.Token import Token
 
 INVALID_INTERVAL = (-1, -2)
 
+
 class Tree(object):
     pass
+
 
 class SyntaxTree(Tree):
     pass
 
+
 class ParseTree(SyntaxTree):
     pass
+
 
 class RuleNode(ParseTree):
     pass
 
+
 class TerminalNode(ParseTree):
     pass
+
 
 class ErrorNode(TerminalNode):
     pass
 
+
 class ParseTreeVisitor(object):
     pass
+
 
 class ParseTreeListener(object):
 
@@ -72,6 +80,7 @@ class ParseTreeListener(object):
 
     def exitEveryRule(self, ctx):
         pass
+
 
 class TerminalNodeImpl(TerminalNode):
 
@@ -113,13 +122,14 @@ class TerminalNodeImpl(TerminalNode):
         else:
             return self.symbol.text
 
+
 # Represents a token that was consumed during resynchronization
 #  rather than during a valid match operation. For example,
 #  we will create this kind of a node during single token insertion
 #  and deletion as well as during "consume until error recovery set"
 #  upon no viable alternative exceptions.
 
-class ErrorNodeImpl(TerminalNodeImpl,ErrorNode):
+class ErrorNodeImpl(TerminalNodeImpl, ErrorNode):
 
     def __init__(self, token):
         super(ErrorNodeImpl, self).__init__(token)
@@ -129,7 +139,6 @@ class ErrorNodeImpl(TerminalNodeImpl,ErrorNode):
 
 
 class ParseTreeWalker(object):
-
     DEFAULT = None
 
     def walk(self, listener, t):
@@ -159,5 +168,6 @@ class ParseTreeWalker(object):
         ctx = r.getRuleContext()
         ctx.exitRule(listener)
         listener.exitEveryRule(ctx)
+
 
 ParseTreeWalker.DEFAULT = ParseTreeWalker()

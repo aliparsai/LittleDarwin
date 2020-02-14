@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 # A DFA walker that knows how to dump them to serialized strings.#/
 # from builtins import chr
@@ -35,6 +35,7 @@
 # from builtins import range
 # from builtins import object
 from io import StringIO
+
 from custom_antlr4.Utils import str_list
 
 
@@ -43,8 +44,6 @@ class DFASerializer(object):
     def __init__(self, dfa, tokenNames=None):
         self.dfa = dfa
         self.tokenNames = tokenNames
-
-
 
     def __unicode__(self):
         if self.dfa.s0 is None:
@@ -65,23 +64,23 @@ class DFASerializer(object):
                         buf.write(self.getStateString(t))
                         buf.write(u'\n')
             output = buf.getvalue()
-            if len(output)==0:
+            if len(output) == 0:
                 return None
             else:
                 return output
 
     def getEdgeLabel(self, i):
-        if i==0:
+        if i == 0:
             return u"EOF"
         if self.tokenNames is not None:
-            return self.tokenNames[i-1]
+            return self.tokenNames[i - 1]
         else:
-            return str(i-1)
+            return str(i - 1)
 
     def getStateString(self, s):
         n = s.stateNumber
-        baseStateStr = ( u":" if s.isAcceptState else u"") + u"s" + str(n) + \
-            ( u"^" if s.requiresFullContext else u"")
+        baseStateStr = (u":" if s.isAcceptState else u"") + u"s" + str(n) + \
+                       (u"^" if s.requiresFullContext else u"")
         if s.isAcceptState:
             if s.predicates is not None:
                 return baseStateStr + u"=>" + str_list(s.predicates)
@@ -89,6 +88,7 @@ class DFASerializer(object):
                 return baseStateStr + u"=>" + str(s.prediction)
         else:
             return baseStateStr
+
 
 class LexerDFASerializer(DFASerializer):
 

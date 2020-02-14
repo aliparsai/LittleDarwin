@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -39,24 +40,24 @@ from __future__ import print_function
 from custom_antlr4.Token import Token
 from custom_antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 
-class Recognizer(object):
 
+class Recognizer(object):
     tokenTypeMapCache = dict()
     ruleIndexMapCache = dict()
 
     def __init__(self):
-        self._listeners = [ ConsoleErrorListener.INSTANCE ]
+        self._listeners = [ConsoleErrorListener.INSTANCE]
         self._interp = None
         self._stateNumber = -1
 
     def extractVersion(self, version):
         pos = version.find(".")
         major = version[0:pos]
-        version = version[pos+1:]
+        version = version[pos + 1:]
         pos = version.find(".")
-        if pos==-1:
+        if pos == -1:
             pos = version.find("-")
-        if pos==-1:
+        if pos == -1:
             pos = len(version)
         minor = version[0:pos]
         return major, minor
@@ -65,8 +66,8 @@ class Recognizer(object):
         runtimeVersion = "4.4.1"
         rvmajor, rvminor = self.extractVersion(runtimeVersion)
         tvmajor, tvminor = self.extractVersion(toolVersion)
-        if rvmajor!=tvmajor or rvminor!=tvminor:
-            print("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion)
+        if rvmajor != tvmajor or rvminor != tvminor:
+            print("ANTLR runtime and generated code versions disagree: " + runtimeVersion + "!=" + toolVersion)
 
     def addErrorListener(self, listener):
         self._listeners.append(listener)
@@ -78,7 +79,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of token names.")
         result = self.tokenTypeMapCache.get(tokenNames, None)
         if result is None:
-            result = list(zip( tokenNames, list(range(0, len(tokenNames)))))
+            result = list(zip(tokenNames, list(range(0, len(tokenNames)))))
             result["EOF"] = Token.EOF
             self.tokenTypeMapCache[tokenNames] = result
         return result
@@ -94,7 +95,7 @@ class Recognizer(object):
             raise UnsupportedOperationException("The current recognizer does not provide a list of rule names.")
         result = self.ruleIndexMapCache.get(ruleNames, None)
         if result is None:
-            result = list(zip( ruleNames, list(range(0, len(ruleNames)))))
+            result = list(zip(ruleNames, list(range(0, len(ruleNames)))))
             self.ruleIndexMapCache[ruleNames] = result
         return result
 
@@ -105,13 +106,11 @@ class Recognizer(object):
         else:
             return Token.INVALID_TYPE
 
-
     # What is the error header, normally line/character position information?#
     def getErrorHeader(self, e):
         line = e.getOffendingToken().line
         column = e.getOffendingToken().column
         return u"line " + str(line) + u":" + str(column)
-
 
     # How should a token be displayed in an error message? The default
     #  is to display just the text, but during development you might
@@ -131,13 +130,13 @@ class Recognizer(object):
             return u"<no token>"
         s = t.text
         if s is None:
-            if t.type==Token.EOF:
+            if t.type == Token.EOF:
                 s = u"<EOF>"
             else:
                 s = u"<" + str(t.type) + u">"
-        s = s.replace(u"\n",u"\\n")
-        s = s.replace(u"\r",u"\\r")
-        s = s.replace(u"\t",u"\\t")
+        s = s.replace(u"\n", u"\\n")
+        s = s.replace(u"\r", u"\\r")
+        s = s.replace(u"\t", u"\\t")
         return u"'" + s + u"'"
 
     def getErrorListenerDispatch(self):
@@ -148,7 +147,7 @@ class Recognizer(object):
     def sempred(self, localctx, ruleIndex, actionIndex):
         return True
 
-    def precpred(self, localctx , precedence):
+    def precpred(self, localctx, precedence):
         return True
 
     @property

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # from __future__ import print_function
-import bz2
 import base64
+import bz2
 
 
 def returnLicense():

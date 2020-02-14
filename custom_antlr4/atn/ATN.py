@@ -26,18 +26,17 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 # from builtins import object
 from custom_antlr4.IntervalSet import IntervalSet
 from custom_antlr4.Token import Token
 
 
 class ATN(object):
-
     INVALID_ALT_NUMBER = 0
 
     # Used for runtime deserialization of ATNs from strings#/
-    def __init__(self, grammarType , maxTokenType ):
+    def __init__(self, grammarType, maxTokenType):
         # The type of the ATN.
         self.grammarType = grammarType
         # The maximum value for any symbol recognized by a transition in the ATN.
@@ -82,8 +81,8 @@ class ATN(object):
         s.nextTokenWithinRule.readonly = True
         return s.nextTokenWithinRule
 
-    def nextTokens(self, s, ctx = None):
-        if ctx==None:
+    def nextTokens(self, s, ctx=None):
+        if ctx == None:
             return self.nextTokensNoContext(s)
         else:
             return self.nextTokensInContext(s, ctx)
@@ -95,15 +94,15 @@ class ATN(object):
         self.states.append(state)
 
     def removeState(self, state):
-        self.states[state.stateNumber] = None # just free mem, don't shift states in list
+        self.states[state.stateNumber] = None  # just free mem, don't shift states in list
 
     def defineDecisionState(self, s):
         self.decisionToState.append(s)
-        s.decision = len(self.decisionToState)-1
+        s.decision = len(self.decisionToState) - 1
         return s.decision
 
     def getDecisionState(self, decision):
-        if len(self.decisionToState)==0:
+        if len(self.decisionToState) == 0:
             return None
         else:
             return self.decisionToState[decision]
@@ -125,8 +124,8 @@ class ATN(object):
     # specified state in the specified context.
     # @throws IllegalArgumentException if the ATN does not contain a state with
     # number {@code stateNumber}
-    #/
-    def getExpectedTokens(self, stateNumber, ctx ):
+    # /
+    def getExpectedTokens(self, stateNumber, ctx):
         if stateNumber < 0 or stateNumber >= len(self.states):
             raise Exception("Invalid state number.")
         s = self.states[stateNumber]

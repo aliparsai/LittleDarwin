@@ -26,7 +26,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 # from builtins import str
 from custom_antlr4.atn.Transition import PredicateTransition
 
@@ -36,15 +36,18 @@ class UnsupportedOperationException(Exception):
     def __init__(self, msg):
         super(UnsupportedOperationException, self).__init__(msg)
 
+
 class IllegalStateException(Exception):
 
     def __init__(self, msg):
         super(IllegalStateException, self).__init__(msg)
 
+
 class CancellationException(IllegalStateException):
 
     def __init__(self, msg):
         super(CancellationException, self).__init__(msg)
+
 
 # The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 #  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -52,12 +55,8 @@ class CancellationException(IllegalStateException):
 #  in the input, where it is in the ATN, the rule invocation stack,
 #  and what kind of problem occurred.
 
-from custom_antlr4.InputStream import InputStream
-from custom_antlr4.ParserRuleContext import ParserRuleContext
-from custom_antlr4.Recognizer import Recognizer
 
 class RecognitionException(Exception):
-
 
     def __init__(self, message=None, recognizer=None, input=None, ctx=None):
         super(RecognitionException, self).__init__(message)
@@ -88,14 +87,12 @@ class RecognitionException(Exception):
     #
     # @return The set of token types that could potentially follow the current
     # state in the ATN, or {@code null} if the information is not available.
-    #/
+    # /
     def getExpectedTokens(self):
         if self.recognizer is not None:
             return self.recognizer.atn.getExpectedTokens(self.offendingState, self.ctx)
         else:
             return None
-
-
 
 
 class LexerNoViableAltException(RecognitionException):
@@ -108,9 +105,10 @@ class LexerNoViableAltException(RecognitionException):
     def __unicode__(self):
         symbol = ""
         if self.startIndex >= 0 and self.startIndex < self.input.size():
-            symbol = self.input.getText((self.startIndex,self.startIndex))
+            symbol = self.input.getText((self.startIndex, self.startIndex))
             # TODO symbol = Utils.escapeWhitespace(symbol, false);
         return u"LexerNoViableAltException" + symbol
+
 
 # Indicates that the parser could not decide which of two or more paths
 #  to take based upon the remaining input. It tracks the starting token
@@ -138,13 +136,15 @@ class NoViableAltException(RecognitionException):
         self.startToken = startToken
         self.offendingToken = offendingToken
 
+
 # This signifies any kind of mismatched input exceptions such as
 #  when the current input does not match the expected token.
 #
 class InputMismatchException(RecognitionException):
 
     def __init__(self, recognizer):
-        super(InputMismatchException, self).__init__(recognizer=recognizer, input=recognizer.getInputStream(), ctx=recognizer._ctx)
+        super(InputMismatchException, self).__init__(recognizer=recognizer, input=recognizer.getInputStream(),
+                                                     ctx=recognizer._ctx)
         self.offendingToken = recognizer.getCurrentToken()
 
 
@@ -156,8 +156,9 @@ class InputMismatchException(RecognitionException):
 class FailedPredicateException(RecognitionException):
 
     def __init__(self, recognizer, predicate=None, message=None):
-        super(FailedPredicateException, self).__init__(message=self.formatMessage(predicate,message), recognizer=recognizer,
-                         input=recognizer.getInputStream(), ctx=recognizer._ctx)
+        super(FailedPredicateException, self).__init__(message=self.formatMessage(predicate, message),
+                                                       recognizer=recognizer,
+                                                       input=recognizer.getInputStream(), ctx=recognizer._ctx)
         s = recognizer._interp.atn.states[recognizer.state]
         trans = s.transitions[0]
         if isinstance(trans, PredicateTransition):
@@ -175,7 +176,6 @@ class FailedPredicateException(RecognitionException):
         else:
             return "failed predicate: {" + predicate + "}?"
 
+
 class ParseCancellationException(CancellationException):
-
     pass
-

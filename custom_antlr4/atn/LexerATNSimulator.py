@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 # When we hit an accept state in either the DFA or the ATN, we
 #  have to notify the character stream to start buffering characters
@@ -43,7 +43,7 @@
 #  back to its previously accepted state, if any. If the ATN succeeds,
 #  then the ATN does the accept and the DFA simulator that invoked it
 #  can simply return the predicted token type.</p>
-#/
+# /
 # from builtins import chr
 # from builtins import str
 # from builtins import range
@@ -53,13 +53,14 @@ from custom_antlr4.PredictionContext import SingletonPredictionContext, Predicti
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.ATN import ATN
 from custom_antlr4.atn.ATNConfig import LexerATNConfig
+from custom_antlr4.atn.ATNConfigSet import OrderedATNConfigSet
 from custom_antlr4.atn.ATNSimulator import ATNSimulator
-from custom_antlr4.atn.ATNConfigSet import ATNConfigSet, OrderedATNConfigSet
-from custom_antlr4.atn.ATNState import RuleStopState, ATNState
+from custom_antlr4.atn.ATNState import RuleStopState
 from custom_antlr4.atn.LexerActionExecutor import LexerActionExecutor
 from custom_antlr4.atn.Transition import Transition
 from custom_antlr4.dfa.DFAState import DFAState
 from custom_antlr4.error.Errors import LexerNoViableAltException, UnsupportedOperationException
+
 
 class SimState(object):
 
@@ -72,13 +73,13 @@ class SimState(object):
         self.column = -1
         self.dfaState = None
 
+
 class LexerATNSimulator(ATNSimulator):
-    
     debug = False
     dfa_debug = False
 
     MIN_DFA_EDGE = 0
-    MAX_DFA_EDGE = 127 # forces unicode to stay in ATN
+    MAX_DFA_EDGE = 127  # forces unicode to stay in ATN
 
     ERROR = None
 
@@ -102,14 +103,13 @@ class LexerATNSimulator(ATNSimulator):
         # Used during DFA/ATN exec to record the most recent accept configuration info
         self.prevAccept = SimState()
 
-
-    def copyState(self, simulator ):
+    def copyState(self, simulator):
         self.column = simulator.column
         self.line = simulator.line
         self.mode = simulator.mode
         self.startIndex = simulator.startIndex
 
-    def match(self, input , mode):
+    def match(self, input, mode):
         self.match_calls += 1
         self.mode = mode
         mark = input.mark()
@@ -158,9 +158,9 @@ class LexerATNSimulator(ATNSimulator):
             print("start state closure=" + str(ds0.configs))
 
         t = input.LA(1)
-        s = ds0 # s is current/from DFA state
+        s = ds0  # s is current/from DFA state
 
-        while True: # while more work
+        while True:  # while more work
             if self.debug:
                 print(("execATN loop starting closure: %s\n", s.configs))
 
@@ -200,7 +200,7 @@ class LexerATNSimulator(ATNSimulator):
                 self.consume(input)
                 t = input.LA(1)
 
-            s = target # flip; current DFA target becomes new src/from state
+            s = target  # flip; current DFA target becomes new src/from state
 
         return self.failOrAccept(self.prevAccept, input, s.configs, t)
 
@@ -219,7 +219,7 @@ class LexerATNSimulator(ATNSimulator):
 
         target = s.edges[t - self.MIN_DFA_EDGE]
         if self.debug and target is not None:
-            print("reuse state "+s.stateNumber+ " edge to "+target.stateNumber)
+            print("reuse state " + s.stateNumber + " edge to " + target.stateNumber)
 
         return target
 
@@ -240,11 +240,11 @@ class LexerATNSimulator(ATNSimulator):
         # Fill reach starting from closure, following t transitions
         self.getReachableConfigSet(input, s.configs, reach, t)
 
-        if len(reach)==0: # we got nowhere on t from s
+        if len(reach) == 0:  # we got nowhere on t from s
             if not reach.hasSemanticContext:
                 # we got nowhere on t, don't throw out this knowledge; it'd
                 # cause a failover from DFA later.
-               self. addDFAEdge(s, t, self.ERROR)
+                self.addDFAEdge(s, t, self.ERROR)
 
             # stop when we can't match any more char
             return self.ERROR
@@ -252,14 +252,15 @@ class LexerATNSimulator(ATNSimulator):
         # Add an edge from s to target DFA found/created for reach
         return self.addDFAEdge(s, t, cfgs=reach)
 
-    def failOrAccept(self, prevAccept , input, reach, t):
+    def failOrAccept(self, prevAccept, input, reach, t):
         if self.prevAccept.dfaState is not None:
             lexerActionExecutor = prevAccept.dfaState.lexerActionExecutor
-            self.accept(input, lexerActionExecutor, self.startIndex, prevAccept.index, prevAccept.line, prevAccept.column)
+            self.accept(input, lexerActionExecutor, self.startIndex, prevAccept.index, prevAccept.line,
+                        prevAccept.column)
             return prevAccept.dfaState.prediction
         else:
             # if no accept and EOF is first char, return EOF
-            if t==Token.EOF and input.index==self.startIndex:
+            if t == Token.EOF and input.index == self.startIndex:
                 return Token.EOF
             raise LexerNoViableAltException(self.recog, input, self.startIndex, reach)
 
@@ -271,14 +272,14 @@ class LexerATNSimulator(ATNSimulator):
         # than a config that already reached an accept state for the same rule
         skipAlt = ATN.INVALID_ALT_NUMBER
         for cfg in closure:
-            currentAltReachedAcceptState = ( cfg.alt == skipAlt )
+            currentAltReachedAcceptState = (cfg.alt == skipAlt)
             if currentAltReachedAcceptState and cfg.passedThroughNonGreedyDecision:
                 continue
 
             if self.debug:
                 print(("testing %s at %s\n", self.getTokenName(t), cfg.toString(self.recog, True)))
 
-            for trans in cfg.state.transitions:          # for each transition
+            for trans in cfg.state.transitions:  # for each transition
                 target = self.getReachableTarget(trans, t)
                 if target is not None:
                     lexerActionExecutor = cfg.lexerActionExecutor
@@ -315,9 +316,9 @@ class LexerATNSimulator(ATNSimulator):
     def computeStartState(self, input, p):
         initialContext = PredictionContext.EMPTY
         configs = OrderedATNConfigSet()
-        for i in range(0,len(p.transitions)):
+        for i in range(0, len(p.transitions)):
             target = p.transitions[i].target
-            c = LexerATNConfig(state=target, alt=i+1, context=initialContext)
+            c = LexerATNConfig(state=target, alt=i + 1, context=initialContext)
             self.closure(input, c, configs, False, False, False)
         return configs
 
@@ -332,9 +333,9 @@ class LexerATNSimulator(ATNSimulator):
     def closure(self, input, config, configs, currentAltReachedAcceptState,
                 speculative, treatEofAsEpsilon):
         if self.debug:
-            print("closure("+config.toString(self.recog, True)+")")
+            print("closure(" + config.toString(self.recog, True) + ")")
 
-        if isinstance( config.state, RuleStopState ):
+        if isinstance(config.state, RuleStopState):
             if self.debug:
                 if self.recog is not None:
                     print(("closure at %s rule stop %s\n", self.recog.getRuleNames()[config.state.ruleIndex], config))
@@ -350,13 +351,14 @@ class LexerATNSimulator(ATNSimulator):
                     currentAltReachedAcceptState = True
 
             if config.context is not None and not config.context.isEmpty():
-                for i in range(0,len(config.context)):
+                for i in range(0, len(config.context)):
                     if config.context.getReturnState(i) != PredictionContext.EMPTY_RETURN_STATE:
-                        newContext = config.context.getParent(i) # "pop" return state
+                        newContext = config.context.getParent(i)  # "pop" return state
                         returnState = self.atn.states[config.context.getReturnState(i)]
                         c = LexerATNConfig(state=returnState, config=config, context=newContext)
                         currentAltReachedAcceptState = self.closure(input, c, configs,
-                                    currentAltReachedAcceptState, speculative, treatEofAsEpsilon)
+                                                                    currentAltReachedAcceptState, speculative,
+                                                                    treatEofAsEpsilon)
 
             return currentAltReachedAcceptState
 
@@ -368,71 +370,72 @@ class LexerATNSimulator(ATNSimulator):
         for t in config.state.transitions:
             c = self.getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon)
             if c is not None:
-                currentAltReachedAcceptState = self.closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon)
+                currentAltReachedAcceptState = self.closure(input, c, configs, currentAltReachedAcceptState,
+                                                            speculative, treatEofAsEpsilon)
 
         return currentAltReachedAcceptState
 
     # side-effect: can alter configs.hasSemanticContext
     def getEpsilonTarget(self, input, config, t, configs, speculative, treatEofAsEpsilon):
         c = None
-        if t.serializationType==Transition.RULE:
-                newContext = SingletonPredictionContext.create(config.context, t.followState.stateNumber)
-                c = LexerATNConfig(state=t.target, config=config, context=newContext)
+        if t.serializationType == Transition.RULE:
+            newContext = SingletonPredictionContext.create(config.context, t.followState.stateNumber)
+            c = LexerATNConfig(state=t.target, config=config, context=newContext)
 
-        elif t.serializationType==Transition.PRECEDENCE:
-                raise UnsupportedOperationException("Precedence predicates are not supported in lexers.")
+        elif t.serializationType == Transition.PRECEDENCE:
+            raise UnsupportedOperationException("Precedence predicates are not supported in lexers.")
 
-        elif t.serializationType==Transition.PREDICATE:
-                #  Track traversing semantic predicates. If we traverse,
-                # we cannot add a DFA state for this "reach" computation
-                # because the DFA would not test the predicate again in the
-                # future. Rather than creating collections of semantic predicates
-                # like v3 and testing them on prediction, v4 will test them on the
-                # fly all the time using the ATN not the DFA. This is slower but
-                # semantically it's not used that often. One of the key elements to
-                # this predicate mechanism is not adding DFA states that see
-                # predicates immediately afterwards in the ATN. For example,
+        elif t.serializationType == Transition.PREDICATE:
+            #  Track traversing semantic predicates. If we traverse,
+            # we cannot add a DFA state for this "reach" computation
+            # because the DFA would not test the predicate again in the
+            # future. Rather than creating collections of semantic predicates
+            # like v3 and testing them on prediction, v4 will test them on the
+            # fly all the time using the ATN not the DFA. This is slower but
+            # semantically it's not used that often. One of the key elements to
+            # this predicate mechanism is not adding DFA states that see
+            # predicates immediately afterwards in the ATN. For example,
 
-                # a : ID {p1}? | ID {p2}? ;
+            # a : ID {p1}? | ID {p2}? ;
 
-                # should create the start state for rule 'a' (to save start state
-                # competition), but should not create target of ID state. The
-                # collection of ATN states the following ID references includes
-                # states reached by traversing predicates. Since this is when we
-                # test them, we cannot cash the DFA state target of ID.
+            # should create the start state for rule 'a' (to save start state
+            # competition), but should not create target of ID state. The
+            # collection of ATN states the following ID references includes
+            # states reached by traversing predicates. Since this is when we
+            # test them, we cannot cash the DFA state target of ID.
 
-                if self.debug:
-                    print("EVAL rule "+ str(t.ruleIndex) + ":" + str(t.predIndex))
-                configs.hasSemanticContext = True
-                if self.evaluatePredicate(input, t.ruleIndex, t.predIndex, speculative):
-                    c = LexerATNConfig(state=t.target, config=config)
+            if self.debug:
+                print("EVAL rule " + str(t.ruleIndex) + ":" + str(t.predIndex))
+            configs.hasSemanticContext = True
+            if self.evaluatePredicate(input, t.ruleIndex, t.predIndex, speculative):
+                c = LexerATNConfig(state=t.target, config=config)
 
-        elif t.serializationType==Transition.ACTION:
-                if config.context is None or config.context.hasEmptyPath():
-                    # execute actions anywhere in the start rule for a token.
-                    #
-                    # TODO: if the entry rule is invoked recursively, some
-                    # actions may be executed during the recursive call. The
-                    # problem can appear when hasEmptyPath() is true but
-                    # isEmpty() is false. In this case, the config needs to be
-                    # split into two contexts - one with just the empty path
-                    # and another with everything but the empty path.
-                    # Unfortunately, the current algorithm does not allow
-                    # getEpsilonTarget to return two configurations, so
-                    # additional modifications are needed before we can support
-                    # the split operation.
-                    lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor,
-                                    self.atn.lexerActions[t.actionIndex])
-                    c = LexerATNConfig(state=t.target, config=config, lexerActionExecutor=lexerActionExecutor)
+        elif t.serializationType == Transition.ACTION:
+            if config.context is None or config.context.hasEmptyPath():
+                # execute actions anywhere in the start rule for a token.
+                #
+                # TODO: if the entry rule is invoked recursively, some
+                # actions may be executed during the recursive call. The
+                # problem can appear when hasEmptyPath() is true but
+                # isEmpty() is false. In this case, the config needs to be
+                # split into two contexts - one with just the empty path
+                # and another with everything but the empty path.
+                # Unfortunately, the current algorithm does not allow
+                # getEpsilonTarget to return two configurations, so
+                # additional modifications are needed before we can support
+                # the split operation.
+                lexerActionExecutor = LexerActionExecutor.append(config.lexerActionExecutor,
+                                                                 self.atn.lexerActions[t.actionIndex])
+                c = LexerATNConfig(state=t.target, config=config, lexerActionExecutor=lexerActionExecutor)
 
-                else:
-                    # ignore actions in referenced rules
-                    c = LexerATNConfig(state=t.target, config=config)
+            else:
+                # ignore actions in referenced rules
+                c = LexerATNConfig(state=t.target, config=config)
 
-        elif t.serializationType==Transition.EPSILON:
+        elif t.serializationType == Transition.EPSILON:
             c = LexerATNConfig(state=t.target, config=config)
 
-        elif t.serializationType in [ Transition.ATOM, Transition.RANGE, Transition.SET ]:
+        elif t.serializationType in [Transition.ATOM, Transition.RANGE, Transition.SET]:
             if treatEofAsEpsilon:
                 if t.matches(Token.EOF, 0, 0xFFFF):
                     c = LexerATNConfig(state=t.target, config=config)
@@ -458,7 +461,7 @@ class LexerATNSimulator(ATNSimulator):
     #
     # @return {@code true} if the specified predicate evaluates to
     # {@code true}.
-    #/
+    # /
     def evaluatePredicate(self, input, ruleIndex, predIndex, speculative):
         # assume true if no recognizer was provided
         if self.recog is None:
@@ -499,7 +502,7 @@ class LexerATNSimulator(ATNSimulator):
             # TJP notes: next time through the DFA, we see a pred again and eval.
             # If that gets us to a previously created (but dangling) DFA
             # state, we can continue in pure DFA mode from there.
-            #/
+            # /
             suppressEdge = cfgs.hasSemanticContext
             cfgs.hasSemanticContext = False
 
@@ -514,16 +517,15 @@ class LexerATNSimulator(ATNSimulator):
             return to
 
         if self.debug:
-            print("EDGE " + str(from_) + " -> " + str(to) + " upon "+ chr(tk))
+            print("EDGE " + str(from_) + " -> " + str(to) + " upon " + chr(tk))
 
         if from_.edges is None:
             #  make room for tokens 1..n and -1 masquerading as index 0
-            from_.edges = [ None ] * (self.MAX_DFA_EDGE - self.MIN_DFA_EDGE + 1)
+            from_.edges = [None] * (self.MAX_DFA_EDGE - self.MIN_DFA_EDGE + 1)
 
-        from_.edges[tk - self.MIN_DFA_EDGE] = to # connect
+        from_.edges[tk - self.MIN_DFA_EDGE] = to  # connect
 
         return to
-
 
     # Add a new DFA state if there isn't one with this set of
     # configurations already. This method also detects the first
@@ -565,11 +567,11 @@ class LexerATNSimulator(ATNSimulator):
     # Get the text matched so far for the current token.
     def getText(self, input):
         # index is first lookahead char, don't include.
-        return input.getText(self.startIndex, input.index-1)
+        return input.getText(self.startIndex, input.index - 1)
 
     def consume(self, input):
         curChar = input.LA(1)
-        if curChar==ord('\n'):
+        if curChar == ord('\n'):
             self.line += 1
             self.column = 0
         else:
@@ -577,9 +579,7 @@ class LexerATNSimulator(ATNSimulator):
         input.consume()
 
     def getTokenName(self, t):
-        if t==-1:
+        if t == -1:
             return "EOF"
         else:
             return "'" + chr(t) + "'"
-
-

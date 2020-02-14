@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 #
 # This class extends {@link BufferedTokenStream} with functionality to filter
@@ -52,7 +52,7 @@
 # {@link Lexer#skip} do not produce tokens at all, so input text matched by
 # such a rule will not be available as part of the token stream, regardless of
 # channel.</p>
-#/
+# /
 
 # from builtins import range
 from custom_antlr4.BufferedTokenStream import BufferedTokenStream
@@ -69,7 +69,7 @@ class CommonTokenStream(BufferedTokenStream):
         return self.nextTokenOnChannel(i, self.channel)
 
     def LB(self, k):
-        if k==0 or (self.index-k)<0:
+        if k == 0 or (self.index - k) < 0:
             return None
         i = self.index
         n = 1
@@ -89,7 +89,7 @@ class CommonTokenStream(BufferedTokenStream):
         if k < 0:
             return self.LB(-k)
         i = self.index
-        n = 1 # we know tokens[pos] is a good one
+        n = 1  # we know tokens[pos] is a good one
         # find k good tokens
         while n < k:
             # skip off-channel tokens, but make sure to not look past EOF
@@ -104,8 +104,8 @@ class CommonTokenStream(BufferedTokenStream):
         self.fill()
         for i in range(0, len(self.tokens)):
             t = self.tokens[i]
-            if t.channel==self.channel:
+            if t.channel == self.channel:
                 n += 1
-            if t.type==Token.EOF:
+            if t.type == Token.EOF:
                 break
         return n

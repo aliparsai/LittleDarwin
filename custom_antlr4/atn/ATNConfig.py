@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 # A tuple: (ATN state, predicted alt, syntactic, semantic context).
 #  The syntactic context is a graph-structured stack node whose
@@ -35,12 +35,14 @@
 #  chain used to arrive at the state.  The semantic context is
 #  the tree of semantic predicates encountered before reaching
 #  an ATN state.
-#/
+# /
 # from builtins import str
 # from builtins import object
 from io import StringIO
+
 from custom_antlr4.atn.ATNState import ATNState, DecisionState
 from custom_antlr4.atn.SemanticContext import SemanticContext
+
 
 class ATNConfig(object):
 
@@ -79,29 +81,26 @@ class ATNConfig(object):
         # accurate depth since I don't ever decrement. TODO: make it a boolean then
         self.reachesIntoOuterContext = 0 if config is None else config.reachesIntoOuterContext
 
-
     # An ATN configuration is equal to another if both have
     #  the same state, they predict the same alternative, and
     #  syntactic/semantic contexts are the same.
-    #/
+    # /
     def __eq__(self, other):
         if self is other:
             return True
         elif not isinstance(other, ATNConfig):
             return False
         else:
-            return self.state.stateNumber==other.state.stateNumber \
-                and self.alt==other.alt \
-                and ((self.context is other.context) or (self.context==other.context)) \
-                and self.semanticContext==other.semanticContext
+            return self.state.stateNumber == other.state.stateNumber \
+                   and self.alt == other.alt \
+                   and ((self.context is other.context) or (self.context == other.context)) \
+                   and self.semanticContext == other.semanticContext
 
     def __hash__(self):
-        return hash( str(self.state.stateNumber) + "/" +
-                 str(self.alt) + "/" +
-                 str(self.context) + "/" +
-                 str(self.semanticContext) )
-
-
+        return hash(str(self.state.stateNumber) + "/" +
+                    str(self.alt) + "/" +
+                    str(self.context) + "/" +
+                    str(self.semanticContext))
 
     def __unicode__(self):
         with StringIO() as buf:
@@ -116,15 +115,17 @@ class ATNConfig(object):
             if self.semanticContext is not None and self.semanticContext is not SemanticContext.NONE:
                 buf.write(u",")
                 buf.write(str(self.semanticContext))
-            if self.reachesIntoOuterContext>0:
+            if self.reachesIntoOuterContext > 0:
                 buf.write(u",up=")
                 buf.write(str(self.reachesIntoOuterContext))
             buf.write(u')')
             return buf.getvalue()
 
+
 class LexerATNConfig(ATNConfig):
 
-    def __init__(self, state, alt=None, context=None, semantic=SemanticContext.NONE, lexerActionExecutor=None, config=None):
+    def __init__(self, state, alt=None, context=None, semantic=SemanticContext.NONE, lexerActionExecutor=None,
+                 config=None):
         super(LexerATNConfig, self).__init__(state=state, alt=alt, context=context, semantic=semantic, config=config)
         if config is not None:
             if lexerActionExecutor is None:
@@ -135,8 +136,8 @@ class LexerATNConfig(ATNConfig):
 
     def __hash__(self):
         return hash(str(self.state.stateNumber) + str(self.alt) + str(self.context) \
-                + str(self.semanticContext) + str(1 if self.passedThroughNonGreedyDecision else 0) \
-                + str(self.lexerActionExecutor))
+                    + str(self.semanticContext) + str(1 if self.passedThroughNonGreedyDecision else 0) \
+                    + str(self.lexerActionExecutor))
 
     def __eq__(self, other):
         if self is other:
@@ -151,4 +152,4 @@ class LexerATNConfig(ATNConfig):
 
     def checkNonGreedyDecision(self, source, target):
         return source.passedThroughNonGreedyDecision \
-            or isinstance(target, DecisionState) and target.nonGreedy
+               or isinstance(target, DecisionState) and target.nonGreedy

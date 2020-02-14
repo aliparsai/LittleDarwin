@@ -24,43 +24,37 @@
 ##                                                                                                      ##
 ##########################################################################################################
 
+import datetime
 #
 # from __future__ import print_function
 # from __future__ import division
 import io
-import sys
-import platform
 import os
-from optparse import OptionParser
+import platform
 import shelve
 import shutil
-import datetime
-import threading
 import signal
-import time
 import subprocess
-
-# from builtins import str
-# from past.utils import old_div
-
-### DEBUG ###
-
-
-# def trace(frame, event, arg):
-#     print("%s, %s:%d" % (event, frame.f_code.co_filename, frame.f_lineno))
-#     return trace
-
-# sys.settrace(trace)
-
-#############
-
+import sys
+import threading
+import time
+from optparse import OptionParser
 
 # LittleDarwin modules
 from .JavaParse import JavaParse
 from .JavaRead import JavaRead
-from .JavaMutate import JavaMutate
 from .ReportGenerator import ReportGenerator
 from littledarwin import License
+from .JavaMutate import JavaMutate
+
+# from builtins import str
+# from past.utils import old_div
+### DEBUG ###
+# def trace(frame, event, arg):
+#     print("%s, %s:%d" % (event, frame.f_code.co_filename, frame.f_lineno))
+#     return trace
+# sys.settrace(trace)
+#############
 
 littleDarwinVersion = "0.5.2"
 
@@ -287,7 +281,8 @@ def buildPhase(options):
             contentFile.write(str(initialOutput))
 
         print("failed.\n")
-        print("Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
+        print(
+            "Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
                 os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened.")
         sys.exit(1)
     totalMutantCount = 0
@@ -374,11 +369,11 @@ def buildPhase(options):
             targetTextOutputFile = os.path.splitext(replacementFile)[0] + ".txt"
 
             print("elapsed: " + str(datetime.timedelta(seconds=int(time.time() - startTime))) + " remaining: " + str(
-                    datetime.timedelta(seconds=int((float(time.time() - startTime) / totalMutantCounter) * float(
-                            totalMutantCount - totalMutantCounter)))) + " total: " + str(
-                    totalMutantCounter) + "/" + str(totalMutantCount) + " current: " + str(
-                    mutantCounter) + "/" + str(mutantCount) + " *** survived: " + str(
-                    len(successList)) + " - killed: " + str(len(failureList)) + "         \r", end="\r", flush=True)
+                datetime.timedelta(seconds=int((float(time.time() - startTime) / totalMutantCounter) * float(
+                    totalMutantCount - totalMutantCounter)))) + " total: " + str(
+                totalMutantCounter) + "/" + str(totalMutantCount) + " current: " + str(
+                mutantCounter) + "/" + str(mutantCount) + " *** survived: " + str(
+                len(successList)) + " - killed: " + str(len(failureList)) + "         \r", end="\r", flush=True)
 
             # writing the build output to disk.
             with open(targetTextOutputFile, 'w') as contentFile:

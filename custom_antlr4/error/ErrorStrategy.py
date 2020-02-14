@@ -1,4 +1,5 @@
 from __future__ import print_function
+
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -32,10 +33,11 @@ from __future__ import print_function
 # from builtins import str
 # from builtins import object
 from custom_antlr4.IntervalSet import IntervalSet
-
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.ATNState import ATNState
-from custom_antlr4.error.Errors import NoViableAltException, InputMismatchException, FailedPredicateException, ParseCancellationException
+from custom_antlr4.error.Errors import NoViableAltException, InputMismatchException, FailedPredicateException, \
+    ParseCancellationException
+
 
 class ErrorStrategy(object):
 
@@ -138,16 +140,16 @@ class DefaultErrorStrategy(ErrorStrategy):
     # </ul>
     #
     def reportError(self, recognizer, e):
-       # if we've already reported an error and have not matched a token
-       # yet successfully, don't report any errors.
+        # if we've already reported an error and have not matched a token
+        # yet successfully, don't report any errors.
         if self.inErrorRecoveryMode(recognizer):
-            return # don't report spurious errors
+            return  # don't report spurious errors
         self.beginErrorCondition(recognizer)
-        if isinstance( e, NoViableAltException ):
+        if isinstance(e, NoViableAltException):
             self.reportNoViableAlternative(recognizer, e)
-        elif isinstance( e, InputMismatchException ):
+        elif isinstance(e, InputMismatchException):
             self.reportInputMismatch(recognizer, e)
-        elif isinstance( e, FailedPredicateException ):
+        elif isinstance(e, FailedPredicateException):
             self.reportFailedPredicate(recognizer, e)
         else:
             print("unknown recognition error type: " + type(e).__name__)
@@ -161,13 +163,13 @@ class DefaultErrorStrategy(ErrorStrategy):
     # that can follow the current rule.</p>
     #
     def recover(self, recognizer, e):
-        if self.lastErrorIndex==recognizer.getInputStream().index \
-            and self.lastErrorStates is not None \
-            and recognizer.state in self.lastErrorStates:
-           # uh oh, another error at same token index and previously-visited
-           # state in ATN; must be a case where LT(1) is in the recovery
-           # token set so nothing got consumed. Consume a single token
-           # at least to prevent an infinite loop; this is a failsafe.
+        if self.lastErrorIndex == recognizer.getInputStream().index \
+                and self.lastErrorStates is not None \
+                and recognizer.state in self.lastErrorStates:
+            # uh oh, another error at same token index and previously-visited
+            # state in ATN; must be a case where LT(1) is in the recovery
+            # token set so nothing got consumed. Consume a single token
+            # at least to prevent an infinite loop; this is a failsafe.
             recognizer.consume()
 
         self.lastErrorIndex = recognizer._input.index
@@ -230,7 +232,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         s = recognizer._interp.atn.states[recognizer.state]
         la = recognizer.getTokenStream().LA(1)
         # try cheaper subset first; might get lucky. seems to shave a wee bit off
-        if la==Token.EOF or la in recognizer.atn.nextTokens(s):
+        if la == Token.EOF or la in recognizer.atn.nextTokens(s):
             return
 
         # Return but don't end recovery. only do that upon valid token match
@@ -238,9 +240,9 @@ class DefaultErrorStrategy(ErrorStrategy):
             return
 
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
-                                ATNState.PLUS_BLOCK_START, ATNState.STAR_LOOP_ENTRY]:
-           # report error and recover if possible
-            if self.singleTokenDeletion(recognizer)is not None:
+                           ATNState.PLUS_BLOCK_START, ATNState.STAR_LOOP_ENTRY]:
+            # report error and recover if possible
+            if self.singleTokenDeletion(recognizer) is not None:
                 return
             else:
                 raise InputMismatchException(recognizer)
@@ -252,8 +254,8 @@ class DefaultErrorStrategy(ErrorStrategy):
             self.consumeUntil(recognizer, whatFollowsLoopIterationOrRule)
 
         else:
-           # do nothing if we can't identify the exact kind of ATN state
-           pass
+            # do nothing if we can't identify the exact kind of ATN state
+            pass
 
     # This is called by {@link #reportError} when the exception is a
     # {@link NoViableAltException}.
@@ -266,7 +268,7 @@ class DefaultErrorStrategy(ErrorStrategy):
     def reportNoViableAlternative(self, recognizer, e):
         tokens = recognizer.getTokenStream()
         if tokens is not None:
-            if e.startToken.type==Token.EOF:
+            if e.startToken.type == Token.EOF:
                 input = "<EOF>"
             else:
                 input = tokens.getText((e.startToken, e.offendingToken))
@@ -329,7 +331,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         tokenName = self.getTokenErrorDisplay(t)
         expecting = self.getExpectedTokens(recognizer)
         msg = "extraneous input " + tokenName + " expecting " \
-            + expecting.toString(recognizer.tokenNames)
+              + expecting.toString(recognizer.tokenNames)
         recognizer.notifyErrorListeners(msg, t, None)
 
     # This method is called to report a syntax error which requires the
@@ -480,10 +482,10 @@ class DefaultErrorStrategy(ErrorStrategy):
             #     + str(recognizer.getTokenStream().LT(1)) \
             #     + " since " + str(recognizer.getTokenStream().LT(2)) \
             #     + " is what we want", file=sys.stderr)
-            recognizer.consume() # simply delete extra token
+            recognizer.consume()  # simply delete extra token
             # we want to return the token we're actually matching
             matchedSymbol = recognizer.getCurrentToken()
-            self.reportMatch(recognizer) # we know current token is correct
+            self.reportMatch(recognizer)  # we know current token is correct
             return matchedSymbol
         else:
             return None
@@ -510,18 +512,18 @@ class DefaultErrorStrategy(ErrorStrategy):
     def getMissingSymbol(self, recognizer):
         currentSymbol = recognizer.getCurrentToken()
         expecting = self.getExpectedTokens(recognizer)
-        expectedTokenType = expecting[0] # get any element
-        if expectedTokenType==Token.EOF:
+        expectedTokenType = expecting[0]  # get any element
+        if expectedTokenType == Token.EOF:
             tokenText = "<missing EOF>"
         else:
             tokenText = "<missing " + recognizer.tokenNames[expectedTokenType] + ">"
         current = currentSymbol
         lookback = recognizer.getTokenStream().LT(-1)
-        if current.type==Token.EOF and lookback is not None:
+        if current.type == Token.EOF and lookback is not None:
             current = lookback
         return recognizer.getTokenFactory().create(current.source,
-            expectedTokenType, tokenText, Token.DEFAULT_CHANNEL,
-            -1, -1, current.line, current.column)
+                                                   expectedTokenType, tokenText, Token.DEFAULT_CHANNEL,
+                                                   -1, -1, current.line, current.column)
 
     def getExpectedTokens(self, recognizer):
         return recognizer.getExpectedTokens()
@@ -539,16 +541,16 @@ class DefaultErrorStrategy(ErrorStrategy):
             return u"<no token>"
         s = t.text
         if s is None:
-            if t.type==Token.EOF:
+            if t.type == Token.EOF:
                 s = u"<EOF>"
             else:
                 s = u"<" + str(t.type) + u">"
         return self.escapeWSAndQuote(s)
 
     def escapeWSAndQuote(self, s):
-        s = s.replace(u"\n",u"\\n")
-        s = s.replace(u"\r",u"\\r")
-        s = s.replace(u"\t",u"\\t")
+        s = s.replace(u"\n", u"\\n")
+        s = s.replace(u"\r", u"\\r")
+        s = s.replace(u"\t", u"\\t")
         return u"'" + s + u"'"
 
     #  Compute the error recovery set for the current rule.  During
@@ -647,7 +649,7 @@ class DefaultErrorStrategy(ErrorStrategy):
         atn = recognizer._interp.atn
         ctx = recognizer._ctx
         recoverSet = IntervalSet()
-        while ctx is not None and ctx.invokingState>=0:
+        while ctx is not None and ctx.invokingState >= 0:
             # compute what follows who invoked us
             invokingState = atn.states[ctx.invokingState]
             rt = invokingState.transitions[0]

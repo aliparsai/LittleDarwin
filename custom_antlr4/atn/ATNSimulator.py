@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 # from builtins import object
 from custom_antlr4.PredictionContext import getCachedPredictionContext
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
@@ -35,10 +35,9 @@ from custom_antlr4.dfa.DFAState import DFAState
 
 
 class ATNSimulator(object):
-
     # Must distinguish between missing edge and edge we know leads nowhere#/
     ERROR = DFAState(0x7FFFFFFF, ATNConfigSet())
- 
+
     # The context cache maps all PredictionContext objects that are ==
     #  to a single cached copy. This cache is shared across all contexts
     #  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
@@ -58,7 +57,7 @@ class ATNSimulator(object):
     #  whacked after each adaptivePredict(). It cost a little bit
     #  more time I think and doesn't save on the overall footprint
     #  so it's not worth the complexity.</p>
-    #/
+    # /
     def __init__(self, atn, sharedContextCache):
         self.atn = atn
         self.sharedContextCache = sharedContextCache
@@ -68,4 +67,3 @@ class ATNSimulator(object):
             return context
         visited = dict()
         return getCachedPredictionContext(context, self.sharedContextCache, visited)
-

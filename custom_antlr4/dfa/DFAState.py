@@ -27,23 +27,24 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 # Map a predicate to a predicted alternative.#/
 # from builtins import str
 # from builtins import object
 from io import StringIO
+
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
+
 
 class PredPrediction(object):
     def __init__(self, pred, alt):
         self.alt = alt
         self.pred = pred
 
-
-
     def __unicode__(self):
-        return u"(" + str(self.pred) + u", " + str(self.alt) +  u")"
+        return u"(" + str(self.pred) + u", " + str(self.alt) + u")"
+
 
 # A DFA state represents a set of possible ATN configurations.
 #  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -68,7 +69,7 @@ class PredPrediction(object):
 #  <p>A DFA state may have multiple references to a particular state,
 #  but with different ATN contexts (with same or different alts)
 #  meaning that state was reached via a different set of rule invocations.</p>
-#/
+# /
 class DFAState(object):
 
     def __init__(self, stateNumber=-1, configs=ATNConfigSet()):
@@ -101,8 +102,6 @@ class DFAState(object):
         #  <p>This list is computed by {@link ParserATNSimulator#predicateDFAState}.</p>
         self.predicates = None
 
-
-
     # Get the set of all alts mentioned by all ATN configurations in this
     #  DFA state.
     def getAltSet(self):
@@ -110,7 +109,7 @@ class DFAState(object):
         if self.configs is not None:
             for c in self.configs:
                 alts.add(c.alt)
-        if len(alts)==0:
+        if len(alts) == 0:
             return None
         else:
             return alts
@@ -136,9 +135,7 @@ class DFAState(object):
         elif not isinstance(other, DFAState):
             return False
         else:
-            return self.configs==other.configs
-
-
+            return self.configs == other.configs
 
     def __unicode__(self):
         with StringIO() as buf:

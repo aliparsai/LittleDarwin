@@ -39,7 +39,6 @@ class ListTokenSource(TokenSource):
         # This is the backing field for {@link #getTokenFactory} and
         self._factory = CommonTokenFactory.DEFAULT
 
-
     #
     # {@inheritDoc}
     #
@@ -77,7 +76,8 @@ class ListTokenSource(TokenSource):
                         start = previousStop + 1
                 stop = max(-1, start - 1)
                 self.eofToken = self._factory.create((self, self.getInputStream()),
-                            Token.EOF, "EOF", Token.DEFAULT_CHANNEL, start, stop, self.line, self.column)
+                                                     Token.EOF, "EOF", Token.DEFAULT_CHANNEL, start, stop, self.line,
+                                                     self.column)
             return self.eofToken
         t = self.tokens[self.pos]
         if self.pos == len(self.tokens) - 1 and t.type == Token.EOF:
@@ -102,7 +102,7 @@ class ListTokenSource(TokenSource):
             tokenText = lastToken.text
             if tokenText is not None:
                 for c in tokenText:
-                    if c  == '\n':
+                    if c == '\n':
                         line += 1
 
             # if no text is available, assume the token did not contain any newline characters.

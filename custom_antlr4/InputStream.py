@@ -32,21 +32,20 @@
 # from builtins import object
 import unittest
 
-
-# 
-#  Vacuum all input from a string and then treat it like a buffer. 
+#
+#  Vacuum all input from a string and then treat it like a buffer.
 #
 from custom_antlr4.Token import Token
 
 
-class InputStream (object):
-    
+class InputStream(object):
+
     def __init__(self, data):
         self.name = "<empty>"
         self.strdata = str(data)
         self._loadString()
 
-    def _loadString(self):    
+    def _loadString(self):
         self._index = 0
         self.data = [ord(c) for c in self.strdata]
         self._size = len(self.data)
@@ -73,12 +72,12 @@ class InputStream (object):
         self._index += 1
 
     def LA(self, offset):
-        if offset==0:
-            return 0 # undefined
-        if offset<0:
-            offset += 1 # e.g., translate LA(-1) to use offset=0
+        if offset == 0:
+            return 0  # undefined
+        if offset < 0:
+            offset += 1  # e.g., translate LA(-1) to use offset=0
         pos = self._index + offset - 1
-        if pos < 0 or pos >= self._size: # invalid
+        if pos < 0 or pos >= self._size:  # invalid
             return Token.EOF
         return self.data[pos]
 
@@ -96,28 +95,26 @@ class InputStream (object):
     # update line and column. If we seek backwards, just set p
     #
     def seek(self, _index):
-        if _index<=self._index:
-            self._index = _index # just jump; don't update stream state (line, ...)
+        if _index <= self._index:
+            self._index = _index  # just jump; don't update stream state (line, ...)
             return
         # seek forward
         self._index = min(_index, self._size)
 
     def getText(self, start, stop):
         if stop >= self._size:
-            stop = self._size-1
+            stop = self._size - 1
         if start >= self._size:
             return ""
         else:
-            return self.strdata[start:stop+1]
-
-
+            return self.strdata[start:stop + 1]
 
     def __unicode__(self):
         return self.strdata
 
 
 class TestInputStream(unittest.TestCase):
-    
+
     def testStream(self):
         stream = InputStream("abcde")
         self.assertEqual(0, stream.index)
@@ -130,5 +127,3 @@ class TestInputStream(unittest.TestCase):
         self.assertEqual("bcd", stream.getText(1, 3))
         stream.reset()
         self.assertEqual(0, stream.index)
-        
-        

@@ -51,32 +51,33 @@ from custom_antlr4.IntervalSet import IntervalSet, Interval
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.SemanticContext import Predicate, PrecedencePredicate
 
-class Transition (object):
+
+class Transition(object):
     # constants for serialization
-    EPSILON			= 1
-    RANGE			= 2
-    RULE			= 3
-    PREDICATE		= 4 # e.g., {isType(input.LT(1))}?
-    ATOM			= 5
-    ACTION			= 6
-    SET				= 7 # ~(A|B) or ~atom, wildcard, which convert to next 2
-    NOT_SET			= 8
-    WILDCARD		= 9
-    PRECEDENCE		= 10
+    EPSILON = 1
+    RANGE = 2
+    RULE = 3
+    PREDICATE = 4  # e.g., {isType(input.LT(1))}?
+    ATOM = 5
+    ACTION = 6
+    SET = 7  # ~(A|B) or ~atom, wildcard, which convert to next 2
+    NOT_SET = 8
+    WILDCARD = 9
+    PRECEDENCE = 10
 
     serializationNames = [
-            u"INVALID",
-            u"EPSILON",
-            u"RANGE",
-            u"RULE",
-            u"PREDICATE",
-            u"ATOM",
-            u"ACTION",
-            u"SET",
-            u"NOT_SET",
-            u"WILDCARD",
-            u"PRECEDENCE"
-        ]
+        u"INVALID",
+        u"EPSILON",
+        u"RANGE",
+        u"RULE",
+        u"PREDICATE",
+        u"ATOM",
+        u"ACTION",
+        u"SET",
+        u"NOT_SET",
+        u"WILDCARD",
+        u"PRECEDENCE"
+    ]
 
     serializationTypes = dict()
 
@@ -90,14 +91,12 @@ class Transition (object):
         self.label = None
 
 
-
-
 # TODO: make all transitions sets? no, should remove set edges
 class AtomTransition(Transition):
 
     def __init__(self, target, label):
         super(AtomTransition, self).__init__(target)
-        self.label_ = label # The token type or character value; or, signifies special label.
+        self.label_ = label  # The token type or character value; or, signifies special label.
         self.label = self.makeLabel()
         self.serializationType = self.ATOM
 
@@ -106,23 +105,24 @@ class AtomTransition(Transition):
         s.addOne(self.label_)
         return s
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return self.label_ == symbol
 
     def __unicode__(self):
         return str(self.label_)
 
+
 class RuleTransition(Transition):
 
     def __init__(self, ruleStart, ruleIndex, precedence, followState):
         super(RuleTransition, self).__init__(ruleStart)
-        self.ruleIndex = ruleIndex # ptr to the rule definition object for this rule ref
+        self.ruleIndex = ruleIndex  # ptr to the rule definition object for this rule ref
         self.precedence = precedence
-        self.followState = followState # what node to begin computations following ref to rule
+        self.followState = followState  # what node to begin computations following ref to rule
         self.serializationType = self.RULE
         self.isEpsilon = True
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return False
 
 
@@ -133,11 +133,12 @@ class EpsilonTransition(Transition):
         self.serializationType = self.EPSILON
         self.isEpsilon = True
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return False
 
     def __unicode__(self):
         return "epsilon"
+
 
 class RangeTransition(Transition):
 
@@ -153,11 +154,12 @@ class RangeTransition(Transition):
         s.addRange(Interval(self.start, self.stop + 1))
         return s
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return symbol >= self.start and symbol <= self.stop
 
     def __unicode__(self):
         return "'" + chr(self.start) + "'..'" + chr(self.stop) + "'"
+
 
 class AbstractPredicateTransition(Transition):
 
@@ -172,10 +174,10 @@ class PredicateTransition(AbstractPredicateTransition):
         self.serializationType = self.PREDICATE
         self.ruleIndex = ruleIndex
         self.predIndex = predIndex
-        self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
+        self.isCtxDependent = isCtxDependent  # e.g., $i ref in pred
         self.isEpsilon = True
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return False
 
     def getPredicate(self):
@@ -184,6 +186,7 @@ class PredicateTransition(AbstractPredicateTransition):
     def __unicode__(self):
         return u"pred_" + str(self.ruleIndex) + u":" + str(self.predIndex)
 
+
 class ActionTransition(Transition):
 
     def __init__(self, target, ruleIndex, actionIndex=-1, isCtxDependent=False):
@@ -191,14 +194,15 @@ class ActionTransition(Transition):
         self.serializationType = self.ACTION
         self.ruleIndex = ruleIndex
         self.actionIndex = actionIndex
-        self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
+        self.isCtxDependent = isCtxDependent  # e.g., $i ref in pred
         self.isEpsilon = True
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return False
 
     def __unicode__(self):
         return u"action_" + str(self.ruleIndex) + u":" + str(self.actionIndex)
+
 
 # A transition containing a set of values.
 class SetTransition(Transition):
@@ -212,11 +216,12 @@ class SetTransition(Transition):
             self.label = IntervalSet()
             self.label.addRange(Interval(Token.INVALID_TYPE, Token.INVALID_TYPE + 1))
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return symbol in self.label
 
     def __unicode__(self):
         return str(self.label)
+
 
 class NotSetTransition(SetTransition):
 
@@ -224,10 +229,10 @@ class NotSetTransition(SetTransition):
         super(NotSetTransition, self).__init__(target, set)
         self.serializationType = self.NOT_SET
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return symbol >= minVocabSymbol \
-            and symbol <= maxVocabSymbol \
-            and not super(type(self), self).matches(symbol, minVocabSymbol, maxVocabSymbol)
+               and symbol <= maxVocabSymbol \
+               and not super(type(self), self).matches(symbol, minVocabSymbol, maxVocabSymbol)
 
     def __unicode__(self):
         return u'~' + super(type(self), self).__unicode__()
@@ -239,7 +244,7 @@ class WildcardTransition(Transition):
         super(WildcardTransition, self).__init__(target)
         self.serializationType = self.WILDCARD
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return symbol >= minVocabSymbol and symbol <= maxVocabSymbol
 
     def __unicode__(self):
@@ -254,9 +259,8 @@ class PrecedencePredicateTransition(AbstractPredicateTransition):
         self.precedence = precedence
         self.isEpsilon = True
 
-    def matches( self, symbol, minVocabSymbol,  maxVocabSymbol):
+    def matches(self, symbol, minVocabSymbol, maxVocabSymbol):
         return False
-
 
     def getPredicate(self):
         return PrecedencePredicate(self.precedence)
@@ -266,15 +270,14 @@ class PrecedencePredicateTransition(AbstractPredicateTransition):
 
 
 Transition.serializationTypes = {
-             EpsilonTransition: Transition.EPSILON,
-             RangeTransition: Transition.RANGE,
-             RuleTransition: Transition.RULE,
-             PredicateTransition: Transition.PREDICATE,
-             AtomTransition: Transition.ATOM,
-             ActionTransition: Transition.ACTION,
-             SetTransition: Transition.SET,
-             NotSetTransition: Transition.NOT_SET,
-             WildcardTransition: Transition.WILDCARD,
-             PrecedencePredicateTransition: Transition.PRECEDENCE
-         }
-
+    EpsilonTransition: Transition.EPSILON,
+    RangeTransition: Transition.RANGE,
+    RuleTransition: Transition.RULE,
+    PredicateTransition: Transition.PREDICATE,
+    AtomTransition: Transition.ATOM,
+    ActionTransition: Transition.ACTION,
+    SetTransition: Transition.SET,
+    NotSetTransition: Transition.NOT_SET,
+    WildcardTransition: Transition.WILDCARD,
+    PrecedencePredicateTransition: Transition.PRECEDENCE
+}

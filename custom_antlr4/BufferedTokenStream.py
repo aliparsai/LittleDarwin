@@ -42,12 +42,13 @@
 # from builtins import range
 # from builtins import object
 from io import StringIO
+
 from custom_antlr4.Token import Token
 from custom_antlr4.error.Errors import IllegalStateException
 
+
 # this is just to keep meaningful parameter types to Parser
 class TokenStream(object):
-
     pass
 
 
@@ -85,14 +86,14 @@ class BufferedTokenStream(TokenStream):
         # {@link #tokens} is trivial with this field.</li>
         # <ul>
         self.fetchedEOF = False
-        
+
     def mark(self):
         return 0
-    
+
     def release(self, marker):
         # no resources to release
         pass
-    
+
     def reset(self):
         self.seek(0)
 
@@ -112,7 +113,7 @@ class BufferedTokenStream(TokenStream):
                 # fetched token except the last.
                 skipEofCheck = self.index < len(self.tokens) - 1
             else:
-               # no EOF token in tokens. skip check if p indexes a fetched token.
+                # no EOF token in tokens. skip check if p indexes a fetched token.
                 skipEofCheck = self.index < len(self.tokens)
         else:
             # not yet initialized
@@ -129,11 +130,11 @@ class BufferedTokenStream(TokenStream):
     # @return {@code true} if a token is located at index {@code i}, otherwise
     #    {@code false}.
     # @see #get(int i)
-    #/
+    # /
     def sync(self, i):
         assert i >= 0
-        n = i - len(self.tokens) + 1 # how many more elements we need?
-        if n > 0 :
+        n = i - len(self.tokens) + 1  # how many more elements we need?
+        if n > 0:
             fetched = self.fetch(n)
             return fetched >= n
         return True
@@ -141,7 +142,7 @@ class BufferedTokenStream(TokenStream):
     # Add {@code n} elements to buffer.
     #
     # @return The actual number of elements added to the buffer.
-    #/
+    # /
     def fetch(self, n):
         if self.fetchedEOF:
             return 0
@@ -149,23 +150,22 @@ class BufferedTokenStream(TokenStream):
             t = self.tokenSource.nextToken()
             t.tokenIndex = len(self.tokens)
             self.tokens.append(t)
-            if t.type==Token.EOF:
+            if t.type == Token.EOF:
                 self.fetchedEOF = True
                 return i + 1
         return n
 
-
     # Get all tokens from start..stop inclusively#/
     def getTokens(self, start, stop, types=None):
-        if start<0 or stop<0:
+        if start < 0 or stop < 0:
             return None
         self.lazyInit()
         subset = []
         if stop >= len(self.tokens):
-            stop = len(self.tokens)-1
+            stop = len(self.tokens) - 1
         for i in range(start, stop):
             t = self.tokens[i]
-            if t.type==Token.EOF:
+            if t.type == Token.EOF:
                 break
             if types is None or t.type in types:
                 subset.append(t)
@@ -175,21 +175,21 @@ class BufferedTokenStream(TokenStream):
         return self.LT(i).type
 
     def LB(self, k):
-        if (self.index-k) < 0:
+        if (self.index - k) < 0:
             return None
-        return self.tokens[self.index-k]
+        return self.tokens[self.index - k]
 
     def LT(self, k):
         self.lazyInit()
-        if k==0:
+        if k == 0:
             return None
         if k < 0:
             return self.LB(-k)
         i = self.index + k - 1
         self.sync(i)
-        if i >= len(self.tokens): # return EOF token
+        if i >= len(self.tokens):  # return EOF token
             # EOF must be last token
-            return self.tokens[len(self.tokens)-1]
+            return self.tokens[len(self.tokens) - 1]
         return self.tokens[i]
 
     # Allowed derived classes to modify the behavior of operations which change
@@ -221,19 +221,17 @@ class BufferedTokenStream(TokenStream):
         self.tokens = []
         self.index = -1
 
-
-
     # Given a starting index, return the index of the next token on channel.
     #  Return i if tokens[i] is on channel.  Return -1 if there are no tokens
     #  on channel between i and EOF.
-    #/
+    # /
     def nextTokenOnChannel(self, i, channel):
         self.sync(i)
-        if i>=len(self.tokens):
+        if i >= len(self.tokens):
             return -1
         token = self.tokens[i]
-        while token.channel!=self.channel:
-            if token.type==Token.EOF:
+        while token.channel != self.channel:
+            if token.type == Token.EOF:
                 return -1
             i += 1
             self.sync(i)
@@ -244,7 +242,7 @@ class BufferedTokenStream(TokenStream):
     #  Return i if tokens[i] is on channel. Return -1 if there are no tokens
     #  on channel between i and 0.
     def previousTokenOnChannel(self, i, channel):
-        while i>=0 and self.tokens[i].channel!=channel:
+        while i >= 0 and self.tokens[i].channel != channel:
             i -= 1
         return i
 
@@ -253,44 +251,42 @@ class BufferedTokenStream(TokenStream):
     #  EOF. If channel is -1, find any non default channel token.
     def getHiddenTokensToRight(self, tokenIndex, channel=-1):
         self.lazyInit()
-        if self.tokenIndex<0 or tokenIndex>=len(self.tokens):
-            raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
+        if self.tokenIndex < 0 or tokenIndex >= len(self.tokens):
+            raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens) - 1))
         from custom_antlr4.Lexer import Lexer
         nextOnChannel = self.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL)
-        from_ = tokenIndex+1
+        from_ = tokenIndex + 1
         # if none onchannel to right, nextOnChannel=-1 so set to = last token
-        to = (len(self.tokens)-1) if nextOnChannel==-1 else nextOnChannel
+        to = (len(self.tokens) - 1) if nextOnChannel == -1 else nextOnChannel
         return self.filterForChannel(from_, to, channel)
-
 
     # Collect all tokens on specified channel to the left of
     #  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     #  If channel is -1, find any non default channel token.
     def getHiddenTokensToLeft(self, tokenIndex, channel=-1):
         self.lazyInit()
-        if tokenIndex<0 or tokenIndex>=len(self.tokens):
-            raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens)-1))
+        if tokenIndex < 0 or tokenIndex >= len(self.tokens):
+            raise Exception(str(tokenIndex) + " not in 0.." + str(len(self.tokens) - 1))
         from custom_antlr4.Lexer import Lexer
         prevOnChannel = self.previousTokenOnChannel(tokenIndex - 1, Lexer.DEFAULT_TOKEN_CHANNEL)
         if prevOnChannel == tokenIndex - 1:
             return None
         # if none on channel to left, prevOnChannel=-1 then from=0
-        from_ = prevOnChannel+1
-        to = tokenIndex-1
+        from_ = prevOnChannel + 1
+        to = tokenIndex - 1
         return self.filterForChannel(from_, to, channel)
-
 
     def filterForChannel(self, left, right, channel):
         hidden = []
-        for i in range(left, right+1):
+        for i in range(left, right + 1):
             t = self.tokens[i]
-            if channel==-1:
+            if channel == -1:
                 from custom_antlr4.Lexer import Lexer
-                if t.channel!= Lexer.DEFAULT_TOKEN_CHANNEL:
+                if t.channel != Lexer.DEFAULT_TOKEN_CHANNEL:
                     hidden.append(t)
-            elif t.channel==channel:
-                    hidden.append(t)
-        if len(hidden)==0:
+            elif t.channel == channel:
+                hidden.append(t)
+        if len(hidden) == 0:
             return None
         return hidden
 
@@ -302,28 +298,27 @@ class BufferedTokenStream(TokenStream):
         self.lazyInit()
         self.fill()
         if interval is None:
-            interval = (0, len(self.tokens)-1)
+            interval = (0, len(self.tokens) - 1)
         start = interval[0]
         if isinstance(start, Token):
             start = start.tokenIndex
         stop = interval[1]
         if isinstance(stop, Token):
             stop = stop.tokenIndex
-        if start is None or stop is None or start<0 or stop<0:
+        if start is None or stop is None or start < 0 or stop < 0:
             return ""
         if stop >= len(self.tokens):
-            stop = len(self.tokens)-1
+            stop = len(self.tokens) - 1
         with StringIO() as buf:
-            for i in range(start, stop+1):
+            for i in range(start, stop + 1):
                 t = self.tokens[i]
-                if t.type==Token.EOF:
+                if t.type == Token.EOF:
                     break
                 buf.write(t.text)
             return buf.getvalue()
 
-
     # Get all tokens from lexer until EOF#/
     def fill(self):
         self.lazyInit()
-        while self.fetch(1000)==1000:
+        while self.fetch(1000) == 1000:
             pass

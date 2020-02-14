@@ -2,15 +2,15 @@
 # from builtins import str
 # from builtins import range
 # from builtins import object
-import sys
-from littledarwin.JavaParser import JavaParser
-from littledarwin.JavaParse import JavaParse
 import copy
+import sys
+from math import log10
+from random import shuffle
 
 from custom_antlr4 import Token
 from custom_antlr4.tree.Tree import TerminalNodeImpl
-from random import shuffle
-from math import log10
+from littledarwin.JavaParse import JavaParse
+from littledarwin.JavaParser import JavaParser
 
 sys.setrecursionlimit(50000)
 
@@ -1261,7 +1261,6 @@ class JavaMutate(object):
                     self.mutantsPerLine[node.start.line] += 1
                 else:
                     self.mutantsPerLine[node.start.line] = 1
-
 
             return mutatedTreesTexts
 

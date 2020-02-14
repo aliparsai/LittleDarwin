@@ -2,7 +2,7 @@
 # from builtins import object
 class Chunk(object):
 
-   def __str__(self):
+    def __str__(self):
         return str(self)
 
 
@@ -18,6 +18,7 @@ class TagChunk(Chunk):
         else:
             return self.label + ":" + self.tag
 
+
 class TextChunk(Chunk):
 
     def __init__(self, text):
@@ -25,4 +26,3 @@ class TextChunk(Chunk):
 
     def __unicode__(self):
         return "'" + self.text + "'"
-

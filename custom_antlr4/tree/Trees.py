@@ -35,13 +35,15 @@
 # from builtins import range
 # from builtins import object
 from io import StringIO
+
 from custom_antlr4.Token import Token
 from custom_antlr4.Utils import escapeWhitespace
 from custom_antlr4.tree.Tree import RuleNode, ErrorNode, TerminalNode
 
+
 class Trees(object):
 
-     # Print out a whole tree in LISP form. {@link #getNodeText} is used on the
+    # Print out a whole tree in LISP form. {@link #getNodeText} is used on the
     #  node payloads to get the text for the nodes.  Detect
     #  parse trees and extract data appropriately.
     @classmethod
@@ -49,7 +51,7 @@ class Trees(object):
         if recog is not None:
             ruleNames = recog.ruleNames
         s = escapeWhitespace(cls.getNodeText(t, ruleNames), False)
-        if t.getChildCount()==0:
+        if t.getChildCount() == 0:
             return s
         with StringIO() as buf:
             buf.write(u"(")
@@ -69,22 +71,21 @@ class Trees(object):
         if ruleNames is not None:
             if isinstance(t, RuleNode):
                 return ruleNames[t.getRuleContext().getRuleIndex()]
-            elif isinstance( t, ErrorNode):
+            elif isinstance(t, ErrorNode):
                 return str(t)
             elif isinstance(t, TerminalNode):
                 if t.symbol is not None:
                     return t.symbol.text
         # no recog for rule names
         payload = t.getPayload()
-        if isinstance(payload, Token ):
+        if isinstance(payload, Token):
             return payload.text
         return str(t.getPayload())
-
 
     # Return ordered list of all children of this node
     @classmethod
     def getChildren(cls, t):
-        return [ t.getChild(i) for i in range(0, t.getChildCount()) ]
+        return [t.getChild(i) for i in range(0, t.getChildCount())]
 
     # Return a list of all ancestors of this node.  The first node of
     #  list is the root and the last is the parent of this node.
@@ -94,7 +95,7 @@ class Trees(object):
         ancestors = []
         t = t.getParent()
         while t is not None:
-            ancestors.append(0, t) # insert at start
+            ancestors.append(0, t)  # insert at start
             t = t.getParent()
         return ancestors
 
@@ -117,7 +118,7 @@ class Trees(object):
         from custom_antlr4.ParserRuleContext import ParserRuleContext
         # check this node (the root) first
         if findTokens and isinstance(t, TerminalNode):
-            if t.symbol.type==index:
+            if t.symbol.type == index:
                 nodes.append(t)
         elif not findTokens and isinstance(t, ParserRuleContext):
             if t.ruleIndex == index:

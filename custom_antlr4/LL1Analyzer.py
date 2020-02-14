@@ -27,28 +27,29 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 # from builtins import range
 # from builtins import object
 from custom_antlr4.IntervalSet import IntervalSet, Interval
+from custom_antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, \
+    PredictionContextFromRuleContext
 from custom_antlr4.Token import Token
-from custom_antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext
 from custom_antlr4.atn.ATNConfig import ATNConfig
-from custom_antlr4.atn.ATNState import ATNState, RuleStopState
-from custom_antlr4.atn.Transition import WildcardTransition, NotSetTransition, AbstractPredicateTransition, RuleTransition
+from custom_antlr4.atn.ATNState import RuleStopState
+from custom_antlr4.atn.Transition import WildcardTransition, NotSetTransition, AbstractPredicateTransition, \
+    RuleTransition
 
 
-class LL1Analyzer (object):
-    
-    #* Special value added to the lookahead sets to indicate that we hit
+class LL1Analyzer(object):
+    # * Special value added to the lookahead sets to indicate that we hit
     #  a predicate during analysis if {@code seeThruPreds==false}.
-    #/
+    # /
     HIT_PRED = Token.INVALID_TYPE
 
     def __init__(self, atn):
         self.atn = atn
 
-    #*
+    # *
     # Calculates the SLL(1) expected lookahead set for each outgoing transition
     # of an {@link ATNState}. The returned array has one element for each
     # outgoing transition in {@code s}. If the closure from transition
@@ -57,7 +58,7 @@ class LL1Analyzer (object):
     #
     # @param s the ATN state
     # @return the expected symbols for each outgoing transition of {@code s}.
-    #/
+    # /
     def getDecisionLookahead(self, s):
         if s is None:
             return None
@@ -67,16 +68,16 @@ class LL1Analyzer (object):
         for alt in range(0, count):
             look[alt] = set()
             lookBusy = set()
-            seeThruPreds = False # fail to get lookahead upon pred
+            seeThruPreds = False  # fail to get lookahead upon pred
             self._LOOK(s.transition(alt).target, None, PredictionContext.EMPTY, \
-                  look[alt], lookBusy, set(), seeThruPreds, False)
+                       look[alt], lookBusy, set(), seeThruPreds, False)
             # Wipe out lookahead for this alternative if we found nothing
             # or we had a predicate when we !seeThruPreds
-            if len(look[alt])==0 or self.HIT_PRED in look[alt]:
+            if len(look[alt]) == 0 or self.HIT_PRED in look[alt]:
                 look[alt] = None
         return look
 
-    #*
+    # *
     # Compute set of tokens that can follow {@code s} in the ATN in the
     # specified {@code ctx}.
     #
@@ -93,15 +94,15 @@ class LL1Analyzer (object):
     #
     # @return The set of tokens that can follow {@code s} in the ATN in the
     # specified {@code ctx}.
-    #/
+    # /
     def LOOK(self, s, stopState=None, ctx=None):
         r = IntervalSet()
-        seeThruPreds = True # ignore preds; get all lookahead
+        seeThruPreds = True  # ignore preds; get all lookahead
         lookContext = PredictionContextFromRuleContext(s.atn, ctx) if ctx is not None else None
         self._LOOK(s, stopState, lookContext, r, set(), set(), seeThruPreds, True)
         return r
 
-    #*
+    # *
     # Compute set of tokens that can follow {@code s} in the ATN in the
     # specified {@code ctx}.
     #
@@ -130,9 +131,9 @@ class LL1Analyzer (object):
     # @param addEOF Add {@link Token#EOF} to the result if the end of the
     # outermost context is reached. This parameter has no effect if {@code ctx}
     # is {@code null}.
-    #/
-    def _LOOK(self, s, stopState , ctx, look, lookBusy, \
-                     calledRuleStack, seeThruPreds, addEOF):
+    # /
+    def _LOOK(self, s, stopState, ctx, look, lookBusy, \
+              calledRuleStack, seeThruPreds, addEOF):
         c = ATNConfig(s, 0, ctx)
 
         if c in lookBusy:
@@ -147,7 +148,7 @@ class LL1Analyzer (object):
                 look.addOne(Token.EOF)
                 return
 
-        if isinstance(s, RuleStopState ):
+        if isinstance(s, RuleStopState):
             if ctx is None:
                 look.addOne(Token.EPSILON)
                 return
@@ -162,7 +163,8 @@ class LL1Analyzer (object):
                     removed = returnState.ruleIndex in calledRuleStack
                     try:
                         calledRuleStack.discard(returnState.ruleIndex)
-                        self._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
+                        self._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack,
+                                   seeThruPreds, addEOF)
                     finally:
                         if removed:
                             calledRuleStack.add(returnState.ruleIndex)
@@ -180,7 +182,7 @@ class LL1Analyzer (object):
                     self._LOOK(t.target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
                 finally:
                     calledRuleStack.remove(t.target.ruleIndex)
-            elif isinstance(t, AbstractPredicateTransition ):
+            elif isinstance(t, AbstractPredicateTransition):
                 if seeThruPreds:
                     self._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
                 else:
@@ -188,7 +190,7 @@ class LL1Analyzer (object):
             elif t.isEpsilon:
                 self._LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
             elif type(t) == WildcardTransition:
-                look.addRange( Interval(Token.MIN_USER_TOKEN_TYPE, self.atn.maxTokenType + 1) )
+                look.addRange(Interval(Token.MIN_USER_TOKEN_TYPE, self.atn.maxTokenType + 1))
             else:
                 set = t.label
                 if set is not None:

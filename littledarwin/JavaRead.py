@@ -5,7 +5,6 @@ import fnmatch
 import io
 import os
 import shutil
-import unicodedata
 
 
 class JavaRead(object):
@@ -54,7 +53,7 @@ class JavaRead(object):
         elif mode == "blacklist":
             self.fileList = list(set(self.fileList) - set(alteredList))
 
-    def listFiles(self, targetPath=None, buildPath = None, filterList=None, filterType="blacklist", desiredType="*.java"):
+    def listFiles(self, targetPath=None, buildPath=None, filterList=None, filterType="blacklist", desiredType="*.java"):
         # print targetPath, desiredType
         self.sourceDirectory = targetPath
         self.targetDirectory = os.path.abspath(os.path.join(buildPath, "LittleDarwinResults"))
@@ -79,7 +78,8 @@ class JavaRead(object):
             mutantsPerLine = dict()
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
-        targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory), originalFileName)
+        targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory),
+                                 originalFileName)
 
         if not os.path.exists(targetDir):
             os.makedirs(targetDir)

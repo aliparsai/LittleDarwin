@@ -32,15 +32,17 @@
 # Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
 # info about the set, with support for combining similar configurations using a
 # graph-structured stack.
-#/
+# /
 # from builtins import str
 # from builtins import object
 from io import StringIO
-from custom_antlr4.PredictionContext import PredictionContext, merge
+
+from custom_antlr4.PredictionContext import merge
 from custom_antlr4.Utils import str_list
 from custom_antlr4.atn.ATN import ATN
 from custom_antlr4.atn.SemanticContext import SemanticContext
 from custom_antlr4.error.Errors import UnsupportedOperationException, IllegalStateException
+
 
 class ATNConfigSet(object):
     #
@@ -90,7 +92,7 @@ class ATNConfigSet(object):
     #
     # <p>This method updates {@link #dipsIntoOuterContext} and
     # {@link #hasSemanticContext} when necessary.</p>
-    #/
+    # /
     def add(self, config, mergeCache=None):
         if self.readonly:
             raise Exception("This set is readonly")
@@ -110,12 +112,12 @@ class ATNConfigSet(object):
         # since only way to create new graphs is "call rule" and here. We
         # cache at both places.
         existing.reachesIntoOuterContext = max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext)
-        existing.context = merged # replace context; no need to alt mapping
+        existing.context = merged  # replace context; no need to alt mapping
         return True
 
     def getOrAdd(self, config):
         for c in self.configLookup:
-            if c==config:
+            if c == config:
                 return c
         self.configLookup.add(config)
         return config
@@ -129,7 +131,7 @@ class ATNConfigSet(object):
     def getPredicates(self):
         preds = list()
         for c in self.configs:
-            if c.semanticContext!=SemanticContext.NONE:
+            if c.semanticContext != SemanticContext.NONE:
                 preds.append(c.semanticContext)
         return preds
 
@@ -139,7 +141,7 @@ class ATNConfigSet(object):
     def optimizeConfigs(self, interpreter):
         if self.readonly:
             raise IllegalStateException("This set is readonly")
-        if len(self.configLookup)==0:
+        if len(self.configLookup) == 0:
             return
         for config in self.configs:
             config.context = interpreter.getCachedContext(config.context)
@@ -156,12 +158,12 @@ class ATNConfigSet(object):
             return False
 
         same = self.configs is not None and \
-            self.configs==other.configs and \
-            self.fullCtx == other.fullCtx and \
-            self.uniqueAlt == other.uniqueAlt and \
-            self.conflictingAlts == other.conflictingAlts and \
-            self.hasSemanticContext == other.hasSemanticContext and \
-            self.dipsIntoOuterContext == other.dipsIntoOuterContext
+               self.configs == other.configs and \
+               self.fullCtx == other.fullCtx and \
+               self.uniqueAlt == other.uniqueAlt and \
+               self.conflictingAlts == other.conflictingAlts and \
+               self.hasSemanticContext == other.hasSemanticContext and \
+               self.dipsIntoOuterContext == other.dipsIntoOuterContext
 
         return same
 
@@ -182,7 +184,7 @@ class ATNConfigSet(object):
         return len(self.configs)
 
     def isEmpty(self):
-        return len(self.configs)==0
+        return len(self.configs) == 0
 
     def __contains__(self, item):
         if self.configLookup is None:
@@ -194,7 +196,6 @@ class ATNConfigSet(object):
             raise UnsupportedOperationException("This method is not implemented for readonly sets.")
         return self.configLookup.containsFast(obj)
 
-
     def clear(self):
         if self.readonly:
             raise IllegalStateException("This set is readonly")
@@ -204,9 +205,7 @@ class ATNConfigSet(object):
 
     def setReadonly(self, readonly):
         self.readonly = readonly
-        self.configLookup = None # can't mod, no need for lookup cache
-
-
+        self.configLookup = None  # can't mod, no need for lookup cache
 
     def __unicode__(self):
         with StringIO() as buf:
@@ -214,7 +213,7 @@ class ATNConfigSet(object):
             if self.hasSemanticContext:
                 buf.write(u",hasSemanticContext=")
                 buf.write(str(self.hasSemanticContext))
-            if self.uniqueAlt!=ATN.INVALID_ALT_NUMBER:
+            if self.uniqueAlt != ATN.INVALID_ALT_NUMBER:
                 buf.write(u",uniqueAlt=")
                 buf.write(str(self.uniqueAlt))
             if self.conflictingAlts is not None:
@@ -230,6 +229,3 @@ class OrderedATNConfigSet(ATNConfigSet):
     def __init__(self):
         super(OrderedATNConfigSet, self).__init__()
         # self.configLookup = set()
-
-
-

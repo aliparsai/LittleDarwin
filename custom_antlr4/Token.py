@@ -1,4 +1,4 @@
-#[The "BSD license"]
+# [The "BSD license"]
 # Copyright (c) 2012 Terence Parr
 # Copyright (c) 2012 Sam Harwell
 # Copyright (c) 2014 Eric Vergnaud
@@ -36,8 +36,7 @@
 from io import StringIO
 
 
-class Token (object):
-
+class Token(object):
     INVALID_TYPE = 0
 
     # During lookahead operations, this "token" signifies we hit rule end ATN state
@@ -61,14 +60,14 @@ class Token (object):
 
     def __init__(self):
         self.source = None
-        self.type = None # token type of the token
-        self.channel = None # The parser ignores everything not on DEFAULT_CHANNEL
-        self.start = None # optional; return -1 if not implemented.
+        self.type = None  # token type of the token
+        self.channel = None  # The parser ignores everything not on DEFAULT_CHANNEL
+        self.start = None  # optional; return -1 if not implemented.
         self.stop = None  # optional; return -1 if not implemented.
-        self.tokenIndex = None # from 0..n-1 of the token object in the input stream
-        self.line = None # line=1..n of the 1st character
-        self.column = None # beginning of the line at which it occurs, 0..n-1
-        self._text = None # text of the token.
+        self.tokenIndex = None  # from 0..n-1 of the token object in the input stream
+        self.line = None  # line=1..n of the 1st character
+        self.column = None  # beginning of the line at which it occurs, 0..n-1
+        self._text = None  # text of the token.
 
     @property
     def text(self):
@@ -86,7 +85,6 @@ class Token (object):
     def text(self, text):
         self._text = text
 
-
     def getTokenSource(self):
         return self.source[0]
 
@@ -94,16 +92,12 @@ class Token (object):
         return self.source[1]
 
 
-
-
 class CommonToken(Token):
-
-
     # An empty {@link Pair} which is used as the default value of
     # {@link #source} for tokens that do not have a source.
     EMPTY_SOURCE = (None, None)
 
-    def __init__(self, source = EMPTY_SOURCE, type = None, channel=Token.DEFAULT_CHANNEL, start=-1, stop=-1):
+    def __init__(self, source=EMPTY_SOURCE, type=None, channel=Token.DEFAULT_CHANNEL, start=-1, stop=-1):
         super(CommonToken, self).__init__()
         self.source = source
         self.type = type
@@ -128,7 +122,7 @@ class CommonToken(Token):
     # {@link Token#getInputStream}.</p>
     #
     # @param oldToken The token to copy.
-     #
+    #
     def clone(self):
         t = CommonToken(self.source, self.type, self.channel, self.start, self.stop)
         t.tokenIndex = self.tokenIndex
@@ -165,9 +159,9 @@ class CommonToken(Token):
             buf.write(u"='")
             txt = self.text
             if txt is not None:
-                txt = txt.replace(u"\n",u"\\n")
-                txt = txt.replace(u"\r",u"\\r")
-                txt = txt.replace(u"\t",u"\\t")
+                txt = txt.replace(u"\n", u"\\n")
+                txt = txt.replace(u"\r", u"\\r")
+                txt = txt.replace(u"\t", u"\\t")
             else:
                 txt = u"<no text>"
             buf.write(txt)

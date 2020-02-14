@@ -42,6 +42,7 @@ from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
 from custom_antlr4.atn.ATNState import RuleStopState
 from custom_antlr4.atn.SemanticContext import SemanticContext
 
+
 class PredictionMode(object):
     #
     # The SLL(*) prediction mode. This prediction mode ignores the current
@@ -102,7 +103,6 @@ class PredictionMode(object):
     # behavior for syntactically-incorrect inputs.</p>
     #
     LL_EXACT_AMBIG_DETECTION = 2
-
 
     #
     # Computes the SLL prediction termination condition.
@@ -215,7 +215,7 @@ class PredictionMode(object):
                 # dup configs, tossing out semantic predicates
                 dup = ATNConfigSet()
                 for c in configs:
-                    c = ATNConfig(c,SemanticContext.NONE)
+                    c = ATNConfig(c, SemanticContext.NONE)
                     dup.add(c)
                 configs = dup
             # now we have combined contexts for configs with dissimilar preds
@@ -422,7 +422,7 @@ class PredictionMode(object):
     @classmethod
     def hasNonConflictingAltSet(cls, altsets):
         for alts in altsets:
-            if len(alts)==1:
+            if len(alts) == 1:
                 return True
         return False
 
@@ -437,7 +437,7 @@ class PredictionMode(object):
     @classmethod
     def hasConflictingAltSet(cls, altsets):
         for alts in altsets:
-            if len(alts)>1:
+            if len(alts) > 1:
                 return True
         return False
 
@@ -454,7 +454,7 @@ class PredictionMode(object):
         for alts in altsets:
             if first is None:
                 first = alts
-            elif not alts==first:
+            elif not alts == first:
                 return False
         return True
 
@@ -468,7 +468,7 @@ class PredictionMode(object):
     @classmethod
     def getUniqueAlt(cls, altsets):
         all = cls.getAlts(altsets)
-        if len(all)==1:
+        if len(all) == 1:
             return all[0]
         else:
             return ATN.INVALID_ALT_NUMBER
@@ -531,7 +531,7 @@ class PredictionMode(object):
     def hasStateAssociatedWithOneAlt(cls, configs):
         x = cls.getStateToAltMap(configs)
         for alts in list(x.values()):
-            if len(alts)==1:
+            if len(alts) == 1:
                 return True
         return False
 
@@ -541,6 +541,6 @@ class PredictionMode(object):
         for alts in altsets:
             minAlt = min(alts)
             viableAlts.add(minAlt);
-            if len(viableAlts)>1 : # more than 1 viable alt
+            if len(viableAlts) > 1:  # more than 1 viable alt
                 return ATN.INVALID_ALT_NUMBER
         return min(viableAlts)

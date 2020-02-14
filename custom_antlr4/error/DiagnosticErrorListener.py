@@ -51,8 +51,10 @@
 
 # from builtins import str
 from io import StringIO
+
 from custom_antlr4.Utils import str_set
 from custom_antlr4.error.ErrorListener import ErrorListener
+
 
 class DiagnosticErrorListener(ErrorListener):
 
@@ -61,7 +63,7 @@ class DiagnosticErrorListener(ErrorListener):
         self.exactOnly = exactOnly
 
     def reportAmbiguity(self, recognizer, dfa, startIndex,
-                       stopIndex, exact, ambigAlts, configs):
+                        stopIndex, exact, ambigAlts, configs):
         if self.exactOnly and not exact:
             return
 
@@ -75,9 +77,8 @@ class DiagnosticErrorListener(ErrorListener):
             buf.write(u"'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
-
     def reportAttemptingFullContext(self, recognizer, dfa, startIndex,
-                       stopIndex, conflictingAlts, configs):
+                                    stopIndex, conflictingAlts, configs):
         with StringIO() as buf:
             buf.write(u"reportAttemptingFullContext d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
@@ -87,7 +88,7 @@ class DiagnosticErrorListener(ErrorListener):
             recognizer.notifyErrorListeners(buf.getvalue())
 
     def reportContextSensitivity(self, recognizer, dfa, startIndex,
-                       stopIndex, prediction, configs):
+                                 stopIndex, prediction, configs):
         with StringIO() as buf:
             buf.write(u"reportContextSensitivity d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
@@ -105,7 +106,7 @@ class DiagnosticErrorListener(ErrorListener):
             return str(decision)
 
         ruleName = ruleNames[ruleIndex]
-        if ruleName is None or len(ruleName)==0:
+        if ruleName is None or len(ruleName) == 0:
             return str(decision)
 
         return str(decision) + u" (" + ruleName + u")"

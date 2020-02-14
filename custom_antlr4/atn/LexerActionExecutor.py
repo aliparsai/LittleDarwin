@@ -27,7 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#/
+# /
 
 # Represents an executor for a sequence of lexer actions which traversed during
 # the matching operation of a lexer rule (token).
@@ -42,6 +42,7 @@
 # from builtins import object
 from custom_antlr4.atn.LexerAction import LexerIndexedCustomAction
 
+
 class LexerActionExecutor(object):
 
     def __init__(self, lexerActions=list()):
@@ -49,7 +50,6 @@ class LexerActionExecutor(object):
         # Caches the result of {@link #hashCode} since the hash code is an element
         # of the performance-critical {@link LexerATNConfig#hashCode} operation.
         self.hashCode = hash("".join([str(la) for la in lexerActions]))
-
 
     # Creates a {@link LexerActionExecutor} which executes the actions for
     # the input {@code lexerActionExecutor} followed by a specified
@@ -67,9 +67,9 @@ class LexerActionExecutor(object):
     @staticmethod
     def append(lexerActionExecutor, lexerAction):
         if lexerActionExecutor is None:
-            return LexerActionExecutor([ lexerAction ])
+            return LexerActionExecutor([lexerAction])
 
-        lexerActions = lexerActionExecutor.lexerActions + [ lexerAction ]
+        lexerActions = lexerActionExecutor.lexerActions + [lexerAction]
         return LexerActionExecutor(lexerActions)
 
     # Creates a {@link LexerActionExecutor} which encodes the current offset
@@ -99,20 +99,20 @@ class LexerActionExecutor(object):
     #
     # @return A {@link LexerActionExecutor} which stores input stream offsets
     # for all position-dependent lexer actions.
-    #/
+    # /
     def fixOffsetBeforeMatch(self, offset):
         updatedLexerActions = None
         for i in range(0, len(self.lexerActions)):
-            if self.lexerActions[i].isPositionDependent and not isinstance(self.lexerActions[i], LexerIndexedCustomAction):
+            if self.lexerActions[i].isPositionDependent and not isinstance(self.lexerActions[i],
+                                                                           LexerIndexedCustomAction):
                 if updatedLexerActions is None:
-                    updatedLexerActions = [ la for la in self.lexerActions ]
+                    updatedLexerActions = [la for la in self.lexerActions]
                 updatedLexerActions[i] = LexerIndexedCustomAction(offset, self.lexerActions[i])
 
         if updatedLexerActions is None:
             return self
         else:
             return LexerActionExecutor(updatedLexerActions)
-
 
     # Execute the actions encapsulated by this executor within the context of a
     # particular {@link Lexer}.
@@ -131,7 +131,7 @@ class LexerActionExecutor(object):
     # @param startIndex The token start index. This value may be passed to
     # {@link IntStream#seek} to set the {@code input} position to the beginning
     # of the token.
-    #/
+    # /
     def execute(self, lexer, input, startIndex):
         requiresSeek = False
         stopIndex = input.index
@@ -160,4 +160,4 @@ class LexerActionExecutor(object):
             return False
         else:
             return self.hashCode == other.hashCode \
-                and self.lexerActions == other.lexerActions
+                   and self.lexerActions == other.lexerActions

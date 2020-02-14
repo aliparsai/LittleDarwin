@@ -2,10 +2,9 @@
 # from __future__ import print_function
 # from builtins import chr
 # from builtins import str
-from custom_antlr4 import *
-from io import StringIO
-
 import unicodedata
+
+from custom_antlr4 import *
 
 
 # def serializedATN():
@@ -511,7 +510,6 @@ import unicodedata
 #     buf.write(u"\u0367\u036b\u0371\u037e\u03ff\u0408\u0410\u041b\u0425")
 #     buf.write(u"\u0433\3\b\2\2")
 #     return buf.getvalue()
-
 
 
 class JavaLexer(Lexer):

@@ -36,9 +36,10 @@
 # from builtins import object
 from custom_antlr4.Token import CommonToken
 
-class TokenFactory(object):
 
+class TokenFactory(object):
     pass
+
 
 class CommonTokenFactory(TokenFactory):
     #
@@ -74,12 +75,13 @@ class CommonTokenFactory(TokenFactory):
         if text is not None:
             t.text = text
         elif self.copyText and source[1] is not None:
-            t.text = source[1].getText(start,stop)
+            t.text = source[1].getText(start, stop)
         return t
 
     def createThin(self, type, text):
         t = CommonToken(type=type)
         t.text = text
         return t
+
 
 CommonTokenFactory.DEFAULT = CommonTokenFactory()

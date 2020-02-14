@@ -1,46 +1,46 @@
 #
- #[The "BSD license"]
- # Copyright (c) 2013 Terence Parr
- # Copyright (c) 2013 Sam Harwell
- # Copyright (c) 2014 Eric Vergnaud
- # All rights reserved.
- #
- # Redistribution and use in source and binary forms, with or without
- # modification, are permitted provided that the following conditions
- # are met:
- #
- # 1. Redistributions of source code must retain the above copyright
- #    notice, this list of conditions and the following disclaimer.
- # 2. Redistributions in binary form must reproduce the above copyright
- #    notice, this list of conditions and the following disclaimer in the
- #    documentation and/or other materials provided with the distribution.
- # 3. The name of the author may not be used to endorse or promote products
- #    derived from this software without specific prior written permission.
- #
- # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- # OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- # IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- # INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- # NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- # DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- #
+# [The "BSD license"]
+# Copyright (c) 2013 Terence Parr
+# Copyright (c) 2013 Sam Harwell
+# Copyright (c) 2014 Eric Vergnaud
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
 # from builtins import str
 # from builtins import object
 class LexerActionType(object):
+    CHANNEL = 0  # The type of a {@link LexerChannelAction} action.
+    CUSTOM = 1  # The type of a {@link LexerCustomAction} action.
+    MODE = 2  # The type of a {@link LexerModeAction} action.
+    MORE = 3  # The type of a {@link LexerMoreAction} action.
+    POP_MODE = 4  # The type of a {@link LexerPopModeAction} action.
+    PUSH_MODE = 5  # The type of a {@link LexerPushModeAction} action.
+    SKIP = 6  # The type of a {@link LexerSkipAction} action.
+    TYPE = 7  # The type of a {@link LexerTypeAction} action.
 
-    CHANNEL = 0     #The type of a {@link LexerChannelAction} action.
-    CUSTOM = 1      #The type of a {@link LexerCustomAction} action.
-    MODE = 2        #The type of a {@link LexerModeAction} action.
-    MORE = 3        #The type of a {@link LexerMoreAction} action.
-    POP_MODE = 4    #The type of a {@link LexerPopModeAction} action.
-    PUSH_MODE = 5   #The type of a {@link LexerPushModeAction} action.
-    SKIP = 6        #The type of a {@link LexerSkipAction} action.
-    TYPE = 7        #The type of a {@link LexerTypeAction} action.
 
 class LexerAction(object):
 
@@ -54,8 +54,6 @@ class LexerAction(object):
     def __eq__(self, other):
         return self is other
 
-
-
     def __unicode__(self):
         return str(super(LexerAction, self))
 
@@ -65,8 +63,7 @@ class LexerAction(object):
 #
 # <p>The {@code skip} command does not have any parameters, so this action is
 # implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
-class LexerSkipAction(LexerAction ):
-
+class LexerSkipAction(LexerAction):
     # Provides a singleton instance of this parameterless lexer action.
     INSTANCE = None
 
@@ -79,7 +76,9 @@ class LexerSkipAction(LexerAction ):
     def __unicode__(self):
         return u"skip"
 
+
 LexerSkipAction.INSTANCE = LexerSkipAction()
+
 
 #  Implements the {@code type} lexer action by calling {@link Lexer#setType}
 # with the assigned type.
@@ -140,7 +139,6 @@ class LexerPushModeAction(LexerAction):
 # <p>The {@code popMode} command does not have any parameters, so this action is
 # implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
 class LexerPopModeAction(LexerAction):
-
     INSTANCE = None
 
     def __init__(self):
@@ -153,14 +151,15 @@ class LexerPopModeAction(LexerAction):
     def __unicode__(self):
         return "popMode"
 
+
 LexerPopModeAction.INSTANCE = LexerPopModeAction()
+
 
 # Implements the {@code more} lexer action by calling {@link Lexer#more}.
 #
 # <p>The {@code more} command does not have any parameters, so this action is
 # implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
 class LexerMoreAction(LexerAction):
-
     INSTANCE = None
 
     def __init__(self):
@@ -173,7 +172,9 @@ class LexerMoreAction(LexerAction):
     def __unicode__(self):
         return "more"
 
+
 LexerMoreAction.INSTANCE = LexerMoreAction()
+
 
 # Implements the {@code mode} lexer action by calling {@link Lexer#mode} with
 # the assigned mode.
@@ -202,6 +203,7 @@ class LexerModeAction(LexerAction):
     def __unicode__(self):
         return u"mode(" + str(self.mode) + u")"
 
+
 # Executes a custom lexer action by calling {@link Recognizer#action} with the
 # rule and action indexes assigned to the custom action. The implementation of
 # a custom action is added to the generated code for the lexer in an override
@@ -220,7 +222,7 @@ class LexerCustomAction(LexerAction):
     # {@link Recognizer#action}.
     # @param actionIndex The action index to use for calls to
     # {@link Recognizer#action}.
-    #/
+    # /
     def __init__(self, ruleIndex, actionIndex):
         super(LexerCustomAction, self).__init__(LexerActionType.CUSTOM)
         self.ruleIndex = ruleIndex
@@ -242,6 +244,7 @@ class LexerCustomAction(LexerAction):
             return False
         else:
             return self.ruleIndex == other.ruleIndex and self.actionIndex == other.actionIndex
+
 
 # Implements the {@code channel} lexer action by calling
 # {@link Lexer#setChannel} with the assigned channel.
@@ -271,6 +274,7 @@ class LexerChannelAction(LexerAction):
 
     def __unicode__(self):
         return u"channel(" + str(self.channel) + u")"
+
 
 # This implementation of {@link LexerAction} is used for tracking input offsets
 # for position-dependent actions within a {@link LexerActionExecutor}.

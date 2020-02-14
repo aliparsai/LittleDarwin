@@ -85,10 +85,10 @@ class ParseTreeMatch(object):
     #
     def get(self, label):
         parseTrees = self.labels.get(label, None)
-        if parseTrees is None or len(parseTrees)==0:
+        if parseTrees is None or len(parseTrees) == 0:
             return None
         else:
-            return parseTrees[len(parseTrees)-1]
+            return parseTrees[len(parseTrees) - 1]
 
     #
     # Return all nodes matching a rule or token tag with the specified label.
@@ -120,7 +120,6 @@ class ParseTreeMatch(object):
         else:
             return nodes
 
-
     #
     # Gets a value indicating whether the match operation succeeded.
     #
@@ -133,8 +132,6 @@ class ParseTreeMatch(object):
     #
     # {@inheritDoc}
     #
-
-
 
     def __unicode__(self):
         with StringIO() as buf:

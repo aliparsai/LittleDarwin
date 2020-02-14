@@ -27,7 +27,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#* A rule invocation record for parsing.
+# * A rule invocation record for parsing.
 #
 #  Contains all of the information about the current rule not stored in the
 #  RuleContext. It handles parse tree children list, Any ATN state
@@ -53,17 +53,17 @@
 from custom_antlr4.RuleContext import RuleContext
 from custom_antlr4.tree.Tree import TerminalNodeImpl, ErrorNodeImpl, TerminalNode, INVALID_INTERVAL
 
+
 class ParserRuleContext(RuleContext):
 
-
-    def __init__(self, parent = None, invokingStateNumber = None ):
+    def __init__(self, parent=None, invokingStateNumber=None):
         super(ParserRuleContext, self).__init__(parent, invokingStateNumber)
-        #* If we are debugging or building a parse tree for a visitor,
+        # * If we are debugging or building a parse tree for a visitor,
         #  we need to track all of the tokens and rule invocations associated
         #  with this rule's context. This is empty for parsing w/o tree constr.
         #  operation because we don't the need to track the details about
         #  how we parse this rule.
-        #/
+        # /
         self.children = None
         self.start = None
         self.stop = None
@@ -71,7 +71,7 @@ class ParserRuleContext(RuleContext):
         # completed, this is {@code null}.
         self.exception = None
 
-    #* COPY a ctx (I'm deliberately not using copy constructor)#/
+    # * COPY a ctx (I'm deliberately not using copy constructor)#/
     def copyFrom(self, ctx):
         # from RuleContext
         self.parentCtx = ctx.parentCtx
@@ -87,20 +87,20 @@ class ParserRuleContext(RuleContext):
     def exitRule(self, listener):
         pass
 
-    #* Does not set parent link; other add methods do that#/
+    # * Does not set parent link; other add methods do that#/
     def addChild(self, child):
         if self.children is None:
             self.children = []
         self.children.append(child)
         return child
 
-    #* Used by enterOuterAlt to toss out a RuleContext previously added as
+    # * Used by enterOuterAlt to toss out a RuleContext previously added as
     #  we entered a rule. If we have # label, we will need to remove
     #  generic ruleContext object.
-    #/
+    # /
     def removeLastChild(self):
         if self.children is not None:
-            del self.children[len(self.children)-1]
+            del self.children[len(self.children) - 1]
 
     def addTokenNode(self, token):
         node = TerminalNodeImpl(token)
@@ -114,14 +114,14 @@ class ParserRuleContext(RuleContext):
         node.parentCtx = self
         return node
 
-    def getChild(self, i, type = None):
+    def getChild(self, i, type=None):
         if type is None:
-            return self.children[i] if len(self.children)>=i else None
+            return self.children[i] if len(self.children) >= i else None
         else:
             for child in self.getChildren():
                 if not isinstance(child, type):
                     continue
-                if i==0:
+                if i == 0:
                     return child
                 i -= 1
             return None
@@ -137,12 +137,12 @@ class ParserRuleContext(RuleContext):
                 continue
             if child.symbol.type != ttype:
                 continue
-            if i==0:
+            if i == 0:
                 return child
             i -= 1
         return None
 
-    def getTokens(self, ttype ):
+    def getTokens(self, ttype):
         if self.getChildren() is None:
             return []
         tokens = []
@@ -179,6 +179,7 @@ class ParserRuleContext(RuleContext):
 
 
 RuleContext.EMPTY = ParserRuleContext()
+
 
 class InterpreterRuleContext(ParserRuleContext):
 

@@ -1,4 +1,4 @@
-#[The "BSD license"]
+# [The "BSD license"]
 # Copyright (c) 2012 Terence Parr
 # Copyright (c) 2012 Sam Harwell
 # Copyright (c) 2014 Eric Vergnaud
@@ -31,6 +31,7 @@
 # from builtins import str
 from io import StringIO
 
+
 def str_collection(val, begin, end):
     with StringIO() as buf:
         buf.write(begin)
@@ -43,22 +44,25 @@ def str_collection(val, begin, end):
         buf.write(end)
         return buf.getvalue()
 
+
 def str_list(val):
     return str_collection(val, u'[', u']')
+
 
 def str_set(val):
     return str_collection(val, u'{', u'}')
 
+
 def escapeWhitespace(s, escapeSpaces):
     with StringIO() as buf:
         for c in s:
-            if c==' ' and escapeSpaces:
+            if c == ' ' and escapeSpaces:
                 buf.write(u'\u00B7')
-            elif c=='\t':
+            elif c == '\t':
                 buf.write(u"\\t")
-            elif c=='\n':
+            elif c == '\n':
                 buf.write(u"\\n")
-            elif c=='\r':
+            elif c == '\r':
                 buf.write(u"\\r")
             else:
                 buf.write(str(c))

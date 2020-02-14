@@ -44,13 +44,13 @@
 #
 # from builtins import str
 from custom_antlr4 import PredictionContextCache
-from custom_antlr4.dfa.DFA import DFA
 from custom_antlr4.Parser import Parser
 from custom_antlr4.ParserRuleContext import InterpreterRuleContext
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.ATNState import StarLoopEntryState, ATNState, LoopEndState
 from custom_antlr4.atn.ParserATNSimulator import ParserATNSimulator
 from custom_antlr4.atn.Transition import Transition
+from custom_antlr4.dfa.DFA import DFA
 from custom_antlr4.error.Errors import RecognitionException, UnsupportedOperationException, FailedPredicateException
 
 
@@ -62,7 +62,7 @@ class ParserInterpreter(Parser):
         self.atn = atn
         self.tokenNames = tokenNames
         self.ruleNames = ruleNames
-        self.decisionToDFA = [ DFA(state) for state in atn.decisionToState ]
+        self.decisionToDFA = [DFA(state) for state in atn.decisionToState]
         self.sharedContextCache = PredictionContextCache()
         self._parentContextStack = list()
         # identify the ATN states where pushNewRecursionContext must be called
@@ -85,9 +85,9 @@ class ParserInterpreter(Parser):
             self.enterRule(rootContext, startRuleStartState.stateNumber, startRuleIndex)
         while True:
             p = self.getATNState()
-            if p.stateType==ATNState.RULE_STOP :
+            if p.stateType == ATNState.RULE_STOP:
                 # pop; return from rule
-                if len(self._ctx)==0:
+                if len(self._ctx) == 0:
                     if startRuleStartState.isPrecedenceRule:
                         result = self._ctx
                         parentContext = self._parentContextStack.pop()
@@ -124,28 +124,29 @@ class ParserInterpreter(Parser):
 
         transition = p.transitions[edge - 1]
         tt = transition.serializationType
-        if tt==Transition.EPSILON:
+        if tt == Transition.EPSILON:
 
             if self.pushRecursionContextStates[p.stateNumber] and not isinstance(transition.target, LoopEndState):
                 t = self._parentContextStack[-1]
                 ctx = InterpreterRuleContext(t[0], t[1], self._ctx.ruleIndex)
-                self.pushNewRecursionContext(ctx, self.atn.ruleToStartState[p.ruleIndex].stateNumber, self._ctx.ruleIndex)
+                self.pushNewRecursionContext(ctx, self.atn.ruleToStartState[p.ruleIndex].stateNumber,
+                                             self._ctx.ruleIndex)
 
-        elif tt==Transition.ATOM:
+        elif tt == Transition.ATOM:
 
             self.match(transition.label)
 
-        elif tt in [ Transition.RANGE, Transition.SET, Transition.NOT_SET]:
+        elif tt in [Transition.RANGE, Transition.SET, Transition.NOT_SET]:
 
             if not transition.matches(self._input.LA(1), Token.MIN_USER_TOKEN_TYPE, 0xFFFF):
                 self._errHandler.recoverInline(self)
             self.matchWildcard()
 
-        elif tt==Transition.WILDCARD:
+        elif tt == Transition.WILDCARD:
 
             self.matchWildcard()
 
-        elif tt==Transition.RULE:
+        elif tt == Transition.RULE:
 
             ruleStartState = transition.target
             ruleIndex = ruleStartState.ruleIndex
@@ -155,16 +156,16 @@ class ParserInterpreter(Parser):
             else:
                 self.enterRule(ctx, transition.target.stateNumber, ruleIndex)
 
-        elif tt==Transition.PREDICATE:
+        elif tt == Transition.PREDICATE:
 
             if not self.sempred(self._ctx, transition.ruleIndex, transition.predIndex):
                 raise FailedPredicateException(self)
 
-        elif tt==Transition.ACTION:
+        elif tt == Transition.ACTION:
 
             self.action(self._ctx, transition.ruleIndex, transition.actionIndex)
 
-        elif tt==Transition.PRECEDENCE:
+        elif tt == Transition.PRECEDENCE:
 
             if not self.precpred(self._ctx, transition.precedence):
                 msg = "precpred(_ctx, " + str(transition.precedence) + ")"

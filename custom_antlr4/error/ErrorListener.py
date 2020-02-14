@@ -37,6 +37,7 @@
 # from builtins import object
 import sys
 
+
 class ErrorListener(object):
 
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
@@ -50,6 +51,7 @@ class ErrorListener(object):
 
     def reportContextSensitivity(self, recognizer, dfa, startIndex, stopIndex, prediction, configs):
         pass
+
 
 class ConsoleErrorListener(ErrorListener):
     #
@@ -72,7 +74,9 @@ class ConsoleErrorListener(ErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         print("line " + str(line) + ":" + str(column) + " " + msg, file=sys.stderr)
 
+
 ConsoleErrorListener.INSTANCE = ConsoleErrorListener()
+
 
 class ProxyErrorListener(ErrorListener):
 

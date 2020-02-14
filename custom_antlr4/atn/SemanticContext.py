@@ -100,6 +100,7 @@ def andContext(a, b):
     else:
         return result
 
+
 def orContext(a, b):
     if a is None:
         return b
@@ -112,6 +113,7 @@ def orContext(a, b):
         return result.opnds[0]
     else:
         return result
+
 
 def filterPrecedencePredicates(collection):
     result = []
@@ -128,7 +130,7 @@ class Predicate(SemanticContext):
     def __init__(self, ruleIndex=-1, predIndex=-1, isCtxDependent=False):
         self.ruleIndex = ruleIndex
         self.predIndex = predIndex
-        self.isCtxDependent = isCtxDependent # e.g., $i ref in pred
+        self.isCtxDependent = isCtxDependent  # e.g., $i ref in pred
 
     def eval(self, parser, outerContext):
         localctx = outerContext if self.isCtxDependent else None
@@ -184,6 +186,7 @@ class PrecedencePredicate(SemanticContext):
         else:
             return self.precedence == other.precedence
 
+
 # A semantic context which is true whenever none of the contained contexts
 # is false.
 #
@@ -191,24 +194,24 @@ class AND(SemanticContext):
 
     def __init__(self, a, b):
         operands = set()
-        if isinstance( a, AND):
+        if isinstance(a, AND):
             for o in a.opnds:
                 operands.add(o)
         else:
             operands.add(a)
-        if isinstance( b, AND):
+        if isinstance(b, AND):
             for o in b.opnds:
                 operands.add(o)
         else:
             operands.add(b)
 
         precedencePredicates = filterPrecedencePredicates(operands)
-        if len(precedencePredicates)>0:
+        if len(precedencePredicates) > 0:
             # interested in the transition with the lowest precedence
             reduced = min(precedencePredicates)
             operands.add(reduced)
 
-        self.opnds = [ o for o in operands ]
+        self.opnds = [o for o in operands]
 
     def __eq__(self, other):
         if self is other:
@@ -219,7 +222,7 @@ class AND(SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+ "/AND")
+        return hash(str(self.opnds) + "/AND")
 
     #
     # {@inheritDoc}
@@ -250,7 +253,7 @@ class AND(SemanticContext):
         if not differs:
             return self
 
-        if len(operands)==0:
+        if len(operands) == 0:
             # all elements were true, so the AND context is true
             return SemanticContext.NONE
 
@@ -270,33 +273,34 @@ class AND(SemanticContext):
                 first = False
             return buf.getvalue()
 
+
 #
 # A semantic context which is true whenever at least one of the contained
 # contexts is true.
 #
-class OR (SemanticContext):
+class OR(SemanticContext):
 
     def __init__(self, a, b):
         operands = set()
-        if isinstance( a, OR):
+        if isinstance(a, OR):
             for o in a.opnds:
                 operands.add(o)
         else:
             operands.add(a)
-        if isinstance( b, OR):
+        if isinstance(b, OR):
             for o in b.opnds:
                 operands.add(o)
         else:
             operands.add(b)
 
         precedencePredicates = filterPrecedencePredicates(operands)
-        if len(precedencePredicates)>0:
+        if len(precedencePredicates) > 0:
             # interested in the transition with the highest precedence
             s = sorted(precedencePredicates)
-            reduced = s[len(s)-1]
+            reduced = s[len(s) - 1]
             operands.add(reduced)
 
-        self.opnds = [ o for o in operands ]
+        self.opnds = [o for o in operands]
 
     def __eq__(self, other):
         if self is other:
@@ -307,7 +311,7 @@ class OR (SemanticContext):
             return self.opnds == other.opnds
 
     def __hash__(self):
-        return hash(str(self.opnds)+"/OR")
+        return hash(str(self.opnds) + "/OR")
 
     # <p>
     # The evaluation of predicates by this context is short-circuiting, but
@@ -335,7 +339,7 @@ class OR (SemanticContext):
         if not differs:
             return self
 
-        if len(operands)==0:
+        if len(operands) == 0:
             # all elements were false, so the OR context is false
             return None
 

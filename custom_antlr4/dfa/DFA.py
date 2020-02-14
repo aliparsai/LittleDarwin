@@ -50,7 +50,6 @@ class DFA(object):
         # {@link #setPrecedenceDfa}.
         self.precedenceDfa = False
 
-
     # Get the start state for a specific precedence value.
     #
     # @param precedence The current precedence.
@@ -92,6 +91,7 @@ class DFA(object):
             ext = [None] * (precedence + 1 - len(self.s0.edges))
             self.s0.edges.extend(ext)
         self.s0.edges[precedence] = startState
+
     #
     # Sets whether this is a precedence DFA. If the specified value differs
     # from the current DFA configuration, the following actions are taken;
@@ -130,8 +130,6 @@ class DFA(object):
     def sortedStates(self):
         return sorted(list(self._states.keys()), key=lambda state: state.stateNumber)
 
-
-
     def __unicode__(self):
         return self.toString(None)
 
@@ -139,7 +137,7 @@ class DFA(object):
         if self.s0 is None:
             return ""
         from custom_antlr4.dfa.DFASerializer import DFASerializer
-        serializer = DFASerializer(self,tokenNames)
+        serializer = DFASerializer(self, tokenNames)
         return str(serializer)
 
     def toLexerString(self):
@@ -148,4 +146,3 @@ class DFA(object):
         from custom_antlr4.dfa.DFASerializer import LexerDFASerializer
         serializer = LexerDFASerializer(self)
         return str(serializer)
-

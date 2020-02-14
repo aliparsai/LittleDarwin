@@ -48,7 +48,7 @@ class ParseTreePattern(object):
     # tree pattern.
     # @param patternTree The tree pattern in {@link ParseTree} form.
     #
-    def __init__(self, matcher, pattern, patternRuleIndex , patternTree):
+    def __init__(self, matcher, pattern, patternRuleIndex, patternTree):
         self.matcher = matcher
         self.patternRuleIndex = patternRuleIndex
         self.pattern = pattern

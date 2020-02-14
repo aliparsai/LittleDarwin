@@ -2,15 +2,16 @@
 # from __future__ import absolute_import
 # from builtins import str
 # from builtins import object
-from .JavaListener import JavaListener
-from custom_antlr4.InputStream import InputStream
 from custom_antlr4 import *
-from .JavaLexer import JavaLexer
-from .JavaParser import JavaParser
+from custom_antlr4.InputStream import InputStream
 from custom_antlr4.tree.Tree import TerminalNodeImpl
+from .JavaLexer import JavaLexer
+from .JavaListener import JavaListener
+from .JavaParser import JavaParser
 
 try:
     import graphviz
+
     noGraphviz = False
 
 except ImportError as e:
@@ -30,7 +31,7 @@ class JavaParse(object):
     # antlr-based parser
 
     def parse(self, file_content):
-        inputS = InputStream.InputStream(file_content)
+        inputS = InputStream(file_content)
         lexer = JavaLexer(inputS)
         stream = CommonTokenStream(lexer)
         parser = JavaParser(stream)

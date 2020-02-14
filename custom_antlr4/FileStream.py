@@ -36,6 +36,7 @@
 
 import codecs
 import unittest
+
 from custom_antlr4.InputStream import InputStream
 
 
@@ -54,4 +55,4 @@ class TestFileStream(unittest.TestCase):
 
     def testStream(self):
         stream = FileStream("FileStream.py")
-        self.assertTrue(stream.size>0)
+        self.assertTrue(stream.size > 0)
