@@ -86,9 +86,9 @@
 # {@link #setDelimiters}. You must escape both start and stop strings
 # {@code \<} and {@code \>}.</p>
 #
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from custom_antlr4 import CommonTokenStream, ParserRuleContext
 from custom_antlr4.InputStream import InputStream
 from custom_antlr4.ListTokenSource import ListTokenSource

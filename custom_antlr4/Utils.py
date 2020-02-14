@@ -28,7 +28,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from builtins import str
+# from builtins import str
 from io import StringIO
 
 def str_collection(val, begin, end):

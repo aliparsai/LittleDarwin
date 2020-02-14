@@ -30,10 +30,10 @@
 #/
 
 # A DFA walker that knows how to dump them to serialized strings.#/
-from builtins import chr
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import chr
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from io import StringIO
 from custom_antlr4.Utils import str_list
 

@@ -1,5 +1,5 @@
-from builtins import range
-from builtins import object
+# from builtins import range
+# from builtins import object
 from io import StringIO
 import unittest
 from custom_antlr4.Token import Token

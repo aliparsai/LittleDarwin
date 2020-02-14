@@ -1,4 +1,4 @@
-#[The "BSD license"]
+# [The "BSD license"]
 # Copyright (c) 2013 Terence Parr
 # Copyright (c) 2013 Sam Harwell
 # Copyright (c) 2014 Eric Vergnaud
@@ -27,21 +27,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from builtins import object
+# from builtins import object
 class ATNDeserializationOptions(object):
-
     defaultOptions = None
 
-    def __init__(self, copyFrom = None):
+    def __init__(self, copyFrom=None):
         self.readOnly = False
         self.verifyATN = True if copyFrom is None else copyFrom.verifyATN
         self.generateRuleBypassTransitions = False if copyFrom is None else copyFrom.generateRuleBypassTransitions
 
     def __setattr__(self, key, value):
-        if key!="readOnly" and self.readOnly:
+        if key != "readOnly" and self.readOnly:
             raise Exception("The object is read only.")
-        super(type(self), self).__setattr__(key,value)
+        super(type(self), self).__setattr__(key, value)
+
 
 ATNDeserializationOptions.defaultOptions = ATNDeserializationOptions()
 ATNDeserializationOptions.defaultOptions.readOnly = True
-

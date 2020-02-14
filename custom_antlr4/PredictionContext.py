@@ -28,9 +28,9 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from io import StringIO
 from custom_antlr4.RuleContext import RuleContext
 from custom_antlr4.atn.ATNState import ATNState

@@ -30,8 +30,8 @@
 #/
 
 # Map a predicate to a predicted alternative.#/
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 from io import StringIO
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
 

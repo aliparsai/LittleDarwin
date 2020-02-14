@@ -36,8 +36,8 @@
 #  the tree of semantic predicates encountered before reaching
 #  an ATN state.
 #/
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 from io import StringIO
 from custom_antlr4.atn.ATNState import ATNState, DecisionState
 from custom_antlr4.atn.SemanticContext import SemanticContext

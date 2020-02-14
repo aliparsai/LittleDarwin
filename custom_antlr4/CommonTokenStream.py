@@ -54,7 +54,7 @@
 # channel.</p>
 #/
 
-from builtins import range
+# from builtins import range
 from custom_antlr4.BufferedTokenStream import BufferedTokenStream
 from custom_antlr4.Token import Token
 

@@ -29,8 +29,8 @@
  # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #
 
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 class LexerActionType(object):
 
     CHANNEL = 0     #The type of a {@link LexerChannelAction} action.

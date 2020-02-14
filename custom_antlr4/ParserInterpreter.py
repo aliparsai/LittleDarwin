@@ -42,7 +42,7 @@
 #
 #  See TestParserInterpreter for examples.
 #
-from builtins import str
+# from builtins import str
 from custom_antlr4 import PredictionContextCache
 from custom_antlr4.dfa.DFA import DFA
 from custom_antlr4.Parser import Parser

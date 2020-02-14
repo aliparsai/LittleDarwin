@@ -256,9 +256,9 @@
 # both SLL and LL parsing. Erroneous input will therefore require 2 passes over
 # the input.</p>
 #
-from __future__ import print_function
-from builtins import str
-from builtins import range
+# from __future__ import print_function
+# from builtins import str
+# from builtins import range
 import sys
 from custom_antlr4.PredictionContext import PredictionContext, SingletonPredictionContext, PredictionContextFromRuleContext
 from custom_antlr4.ParserRuleContext import ParserRuleContext

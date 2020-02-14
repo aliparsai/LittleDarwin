@@ -29,13 +29,13 @@ from __future__ import print_function
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import zip
-from builtins import range
-from builtins import object
-from builtins import str
+# from future import standard_library
+# standard_library.install_aliases()
+# from builtins import str
+# from builtins import zip
+# from builtins import range
+# from builtins import object
+# from builtins import str
 from custom_antlr4.Token import Token
 from custom_antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 

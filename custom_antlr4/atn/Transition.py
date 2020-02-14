@@ -41,12 +41,12 @@
 #  the states. We'll use the term Edge for the DFA to distinguish them from
 #  ATN transitions.</p>
 #
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import chr
-from builtins import object
-from builtins import str
+# from future import standard_library
+# standard_library.install_aliases()
+# from builtins import str
+# from builtins import chr
+# from builtins import object
+# from builtins import str
 from custom_antlr4.IntervalSet import IntervalSet, Interval
 from custom_antlr4.Token import Token
 from custom_antlr4.atn.SemanticContext import Predicate, PrecedencePredicate

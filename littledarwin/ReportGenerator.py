@@ -1,10 +1,10 @@
 import os
 import shelve
-from builtins import object
-from builtins import range
-from builtins import str
 
 
+# from builtins import object
+# from builtins import range
+# from builtins import str
 
 
 class ReportGenerator(object):

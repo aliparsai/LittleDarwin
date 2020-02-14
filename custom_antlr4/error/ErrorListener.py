@@ -32,9 +32,9 @@
 # default implementation of each method does nothing, but can be overridden as
 # necessary.
 
-from __future__ import print_function
-from builtins import str
-from builtins import object
+# from __future__ import print_function
+# from builtins import str
+# from builtins import object
 import sys
 
 class ErrorListener(object):

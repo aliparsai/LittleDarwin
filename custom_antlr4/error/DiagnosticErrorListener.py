@@ -49,7 +49,7 @@
 # this situation occurs.</li>
 # </ul>
 
-from builtins import str
+# from builtins import str
 from io import StringIO
 from custom_antlr4.Utils import str_set
 from custom_antlr4.error.ErrorListener import ErrorListener

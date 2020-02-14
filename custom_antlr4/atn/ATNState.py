@@ -89,8 +89,8 @@
 # <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
 #
 
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 INITIAL_NUM_TRANSITIONS = 4
 
 class ATNState(object):

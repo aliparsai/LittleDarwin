@@ -1,4 +1,3 @@
-from __future__ import print_function
 #
 # [The "BSD license"]
 #  Copyright (c) 2012 Terence Parr
@@ -45,10 +44,10 @@ from __future__ import print_function
 #  then the ATN does the accept and the DFA simulator that invoked it
 #  can simply return the predicted token type.</p>
 #/
-from builtins import chr
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import chr
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from custom_antlr4 import Lexer
 from custom_antlr4.PredictionContext import SingletonPredictionContext, PredictionContext
 from custom_antlr4.Token import Token

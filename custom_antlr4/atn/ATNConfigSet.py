@@ -33,8 +33,8 @@
 # info about the set, with support for combining similar configurations using a
 # graph-structured stack.
 #/
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 from io import StringIO
 from custom_antlr4.PredictionContext import PredictionContext, merge
 from custom_antlr4.Utils import str_list

@@ -34,8 +34,8 @@
 # ambiguities.
 
 
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 from custom_antlr4.atn.ATN import ATN
 from custom_antlr4.atn.ATNConfig import ATNConfig
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet

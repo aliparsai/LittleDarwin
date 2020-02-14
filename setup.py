@@ -14,8 +14,8 @@ setuptools.setup(
     long_description_content_type="text/plain",
     license='GNU GPLv3',
     packages=setuptools.find_packages(),
-#   packages=['littledarwin', 'custom_antlr4', 'custom_antlr4.atn', 'custom_antlr4.dfa', 'custom_antlr4.tree', 'custom_antlr4.error', 'custom_antlr4.xpath'],
-    install_requires=['future'],
+    # packages=['littledarwin', 'custom_antlr4', 'custom_antlr4.atn', 'custom_antlr4.dfa', 'custom_antlr4.tree', 'custom_antlr4.error', 'custom_antlr4.xpath'],
+    install_requires=[],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",

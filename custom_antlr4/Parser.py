@@ -26,9 +26,9 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  self SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from __future__ import print_function
-from builtins import str
-from builtins import range
+# from __future__ import print_function
+# from builtins import str
+# from builtins import range
 from custom_antlr4.error.ErrorStrategy import DefaultErrorStrategy
 from custom_antlr4.Recognizer import Recognizer
 from custom_antlr4.Token import Token

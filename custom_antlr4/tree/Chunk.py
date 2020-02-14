@@ -1,5 +1,5 @@
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 class Chunk(object):
 
    def __str__(self):

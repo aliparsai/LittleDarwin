@@ -33,8 +33,8 @@
 #
 # Represents the result of matching a {@link ParseTree} against a tree pattern.
 #
-from builtins import str
-from builtins import object
+# from builtins import str
+# from builtins import object
 from io import StringIO
 
 

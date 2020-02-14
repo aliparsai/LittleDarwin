@@ -31,9 +31,9 @@
 
 
 # A set of utility routines useful for all kinds of ANTLR trees.#
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from io import StringIO
 from custom_antlr4.Token import Token
 from custom_antlr4.Utils import escapeWhitespace

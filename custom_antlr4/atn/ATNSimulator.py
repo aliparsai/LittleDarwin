@@ -28,7 +28,7 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
-from builtins import object
+# from builtins import object
 from custom_antlr4.PredictionContext import getCachedPredictionContext
 from custom_antlr4.atn.ATNConfigSet import ATNConfigSet
 from custom_antlr4.dfa.DFAState import DFAState

@@ -24,9 +24,9 @@
 ##                                                                                                      ##
 ##########################################################################################################
 
-
-from __future__ import print_function
-from __future__ import division
+#
+# from __future__ import print_function
+# from __future__ import division
 import io
 import sys
 import platform
@@ -40,8 +40,8 @@ import signal
 import time
 import subprocess
 
-from builtins import str
-from past.utils import old_div
+# from builtins import str
+# from past.utils import old_div
 
 ### DEBUG ###
 
@@ -264,7 +264,8 @@ def buildPhase(options):
         commandString = options.buildCommand.split(',')
     else:
         commandString = options.initialBuildCommand.split(',')
-    print("Initial build... ", )
+    print("Initial build...", end=" ", flush=True)
+
     try:
         processKilled, processExitCode, initialOutput = timeoutAlternative(commandString,
                                                                            workingDirectory=buildDir,
@@ -286,8 +287,7 @@ def buildPhase(options):
             contentFile.write(str(initialOutput))
 
         print("failed.\n")
-        print(
-            "Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
+        print("Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
                 os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened.")
         sys.exit(1)
     totalMutantCount = 0
@@ -373,16 +373,12 @@ def buildPhase(options):
 
             targetTextOutputFile = os.path.splitext(replacementFile)[0] + ".txt"
 
-            # we can't use print, since we like to write on the same line again.
-            sys.stdout.write(
-                "elapsed: " + str(datetime.timedelta(seconds=int(time.time() - startTime))) + " remaining: " + str(
-                    datetime.timedelta(
-                        seconds=int((old_div(float(time.time() - startTime), totalMutantCounter)) * float(
+            print("elapsed: " + str(datetime.timedelta(seconds=int(time.time() - startTime))) + " remaining: " + str(
+                    datetime.timedelta(seconds=int((float(time.time() - startTime) / totalMutantCounter) * float(
                             totalMutantCount - totalMutantCounter)))) + " total: " + str(
                     totalMutantCounter) + "/" + str(totalMutantCount) + " current: " + str(
                     mutantCounter) + "/" + str(mutantCount) + " *** survived: " + str(
-                    len(successList)) + " - killed: " + str(len(failureList)) + "         \r")
-            sys.stdout.flush()
+                    len(successList)) + " - killed: " + str(len(failureList)) + "         \r", end="\r", flush=True)
 
             # writing the build output to disk.
             with open(targetTextOutputFile, 'w') as contentFile:

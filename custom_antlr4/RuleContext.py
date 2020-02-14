@@ -49,7 +49,7 @@
 #
 #  @see ParserRuleContext
 #/
-from builtins import str
+# from builtins import str
 from io import StringIO
 from custom_antlr4.tree.Tree import RuleNode, INVALID_INTERVAL, TerminalNodeImpl
 from custom_antlr4.tree.Trees import Trees

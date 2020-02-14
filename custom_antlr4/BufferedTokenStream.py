@@ -38,9 +38,9 @@
 # channel, such as {@link Token#DEFAULT_CHANNEL} or
 # {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
 # {@link CommonTokenStream}.</p>
-from builtins import str
-from builtins import range
-from builtins import object
+# from builtins import str
+# from builtins import range
+# from builtins import object
 from io import StringIO
 from custom_antlr4.Token import Token
 from custom_antlr4.error.Errors import IllegalStateException
