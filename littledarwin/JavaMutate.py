@@ -467,6 +467,39 @@ class TraditionalMutationOperator(MutationOperator):
 
         return True
 
+    def filterCriteriaUnaryExpression(self, node: JavaParser.ExpressionContext, symbolList: List[str]):
+        """
+
+        """
+        assert isinstance(node, JavaParser.ExpressionContext)
+
+        try:
+            if not (isinstance(node.children[0], TerminalNodeImpl)
+                    and isinstance(node.children[1], JavaParser.ExpressionContext)):
+                return False
+        except Exception as e:
+            return False
+
+        if node.children[0].symbol.text not in symbolList:
+            return False
+
+        return True
+
+    def generateMutantsUnaryExpression(self, node: JavaParser.ExpressionContext, symbolDict: Dict[str:str], id: int):
+        """
+
+        """
+        replacementText = symbolDict[node.children[0].symbol.text]
+
+        mutation = Mutation(startPos=node.children[0].symbol.start, endPos=node.children[0].symbol.stop,
+                            lineNumber=node.start.line, nodeID=node.nodeIndex,
+                            mutatorType=self.mutatorType, replacementText=replacementText)
+
+        mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+        mutant.mutateCode()
+
+        return mutant
+
     def generateMutantsBinaryExpression(self, node: JavaParser.ExpressionContext, symbolDict: Dict[str:str], id: int):
         """
 
@@ -634,6 +667,209 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
                                                                  '%=': '/=', '&=': '|=', '|=': '^=', '^=': '&=',
                                                                  '<<=': '>>=', '>>=': '>>>=', '>>>=': '>>='}, id)
             self.mutants.append(mutant)
+
+
+class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ArithmeticOperatorReplacementUnary"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaUnaryExpression(node, ['+', '-']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsUnaryExpression(node, {'+': '-', '-': '+'}, id)
+            self.mutants.append(mutant)
+
+
+class ConditionalOperatorDeletion(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ConditionalOperatorDeletion"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaUnaryExpression(node, ['!']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsUnaryExpression(node, {'!': ' '}, id)
+            self.mutants.append(mutant)
+
+
+class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ArithmeticOperatorReplacementShortcut"
+        self.terminalChild = dict()
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            assert isinstance(node, JavaParser.ExpressionContext)
+
+            try:
+                if (isinstance(node.children[0], TerminalNodeImpl)
+                        and isinstance(node.children[1], JavaParser.ExpressionContext)):
+                    self.terminalChild[node] = 0
+                elif (isinstance(node.children[1], TerminalNodeImpl)
+                        and isinstance(node.children[0], JavaParser.ExpressionContext)):
+                    self.terminalChild[node] = 1
+                else:
+                    continue  # not a shortcut expression
+            except Exception as e:
+                continue
+
+            if node.children[self.terminalChild[node]].symbol.text not in ["++", "--"]:
+                continue  # not an arithmetic operator
+
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            replacementText = ""
+            if node.children[self.terminalChild[node]].symbol.text == "++":
+                replacementText = "--"
+            elif node.children[self.terminalChild[node]].symbol.text == "--":
+                replacementText = "++"
+
+            mutation = Mutation(startPos=node.children[self.terminalChild[node]].symbol.start,
+                                endPos=node.children[self.terminalChild[node]].symbol.stop, lineNumber=node.start.line,
+                                nodeID=node.nodeIndex, mutatorType=self.mutatorType, replacementText=replacementText)
+
+            mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+            mutant.mutateCode()
+            self.mutants.append(mutant)
+
+
+class ShiftOperatorReplacement(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ShiftOperatorReplacement"
+        self.threeTerminals = dict()
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            assert isinstance(node, JavaParser.ExpressionContext)
+
+            try:
+                if (isinstance(node.children[0], JavaParser.ExpressionContext)
+                        and isinstance(node.children[1], TerminalNodeImpl)
+                        and isinstance(node.children[2], TerminalNodeImpl)
+                        and isinstance(node.children[3], JavaParser.ExpressionContext)):
+                    self.threeTerminals[node] = False
+
+                elif (isinstance(node.children[0], JavaParser.ExpressionContext)
+                      and isinstance(node.children[1], TerminalNodeImpl)
+                      and isinstance(node.children[2], TerminalNodeImpl)
+                      and isinstance(node.children[3], TerminalNodeImpl)
+                      and isinstance(node.children[4], JavaParser.ExpressionContext)):
+                    self.threeTerminals[node] = True
+                else:
+                    continue  # not a binary shift expression
+
+            except Exception as e:
+                continue
+
+            try:
+                if not self.threeTerminals[node] \
+                        and ((node.children[1].symbol.text == u"<" and node.children[2].symbol.text == u"<")
+                             or (node.children[1].symbol.text == u">" and node.children[2].symbol.text == u">")):
+                    pass
+
+                elif self.threeTerminals[node] \
+                        and (node.children[1].symbol.text == u">"
+                             and node.children[2].symbol.text == u">"
+                             and node.children[3].symbol.text == u">"):
+                    pass
+
+                else:
+                    continue  # not a shift operator
+
+            except Exception as e:
+                continue
+
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            if self.threeTerminals[node]:
+                replacementText = ">>"
+                mutation = Mutation(startPos=node.children[1].symbol.start,
+                                    endPos=node.children[3].symbol.stop, lineNumber=node.start.line,
+                                    nodeID=node.nodeIndex, mutatorType=self.mutatorType,
+                                    replacementText=replacementText)
+
+            else:
+                replacementText = ">>" if node.children[1].symbol.text == '<' else "<<"
+                mutation = Mutation(startPos=node.children[1].symbol.start,
+                                    endPos=node.children[2].symbol.stop, lineNumber=node.start.line,
+                                    nodeID=node.nodeIndex, mutatorType=self.mutatorType,
+                                    replacementText=replacementText)
+
+            mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+            mutant.mutateCode()
+            self.mutants.append(mutant)
+
 
 
 
