@@ -59,11 +59,12 @@ from .JavaMutate import JavaMutate
 littleDarwinVersion = "0.5.2"
 
 
+
 def main():
     print("""
     __     _  __   __   __       ____                          _
    / /    (_)/ /_ / /_ / /___   / __ \\ ____ _ _____ _      __ (_)____
-  / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \\
+  / /    / // __// __// // _ \\ / / / // __ `// ___/| | /| / // // __ \\
  / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /
 /_____//_/ \\__/ \\__//_/ \\___//_____/ \\__,_//_/     |__/|__//_//_/ /_/
 
@@ -123,9 +124,9 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     # creating a database for generated mutants. the format of this database is different on different platforms,
     # so it cannot be simply copied from a platform to another.
     databasePath = os.path.join(javaRead.targetDirectory, "mutationdatabase")
-    print("source dir: ", javaRead.sourceDirectory)
-    print("target dir: ", javaRead.targetDirectory)
-    print("creating mutation database: ", databasePath)
+    print("Source Path: ", javaRead.sourceDirectory)
+    print("Target Path: ", javaRead.targetDirectory)
+    print("Creating Mutation Database: ", databasePath)
     mutationDatabase = shelve.open(databasePath, "c")
     mutantTypeDatabase = dict()
 

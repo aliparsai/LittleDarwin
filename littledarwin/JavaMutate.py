@@ -6,69 +6,234 @@ import copy
 import sys
 from math import log10
 from random import shuffle
+from typing import List, Tuple
 
 from custom_antlr4 import Token
+from custom_antlr4.tree import Tree
 from custom_antlr4.tree.Tree import TerminalNodeImpl
 from littledarwin.JavaParse import JavaParse
 from littledarwin.JavaParser import JavaParser
 
-sys.setrecursionlimit(50000)
+sys.setrecursionlimit(100000)
 
 
-# TODO: Every mutation operator must be implemented using this class in the future
-# ---------------------------------------------------------------------------------------
+class CodeObject(object):
+    def __init__(self, codeText: str, codeTree: Tree):
+        self.codeText = codeText
+        self.codeTree = codeTree
+
+
+class Mutation(object):
+    def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
+                 replacementText: str):
+        self.startPos = startPos
+        self.endPos = endPos
+        self.lineNumber = lineNumber
+        self.nodeID = nodeID
+        self.mutatorType = mutatorType
+        self.replacementText = replacementText
+
+    def applyMutation(self, sourceCode: str) -> str:
+        return sourceCode[:self.startPos] + self.replacementText + sourceCode[self.endPos + 1:]
+
+
+class Mutant(object):
+    def __init__(self, mutantID: int, mutationList: List[Mutation], sourceCode: str):
+        """
+        :param mutantID: the ID of mutant
+        :type mutantID: int
+        :param mutationList: The list containing all Mutation objects
+        :type mutationList: list
+        :param sourceCode: The source code for the current file
+        :type sourceCode: str
+        """
+        self.mutantID = mutantID
+        self.sourceCode = sourceCode
+        self.mutatedCode = None
+
+        for mutation in mutationList:
+            assert isinstance(mutation, Mutation)
+
+        self.mutationList = mutationList
+
+    def getLine(self, lineNumber: int, code: str = None) -> str:
+        """
+        :returns the referenced line from source code.
+        :param lineNumber: Desired line number.
+        :param code: The code from which the line is taken. Defaults to original source code.
+        """
+        if code is None:
+            code = self.sourceCode
+
+        return code.splitlines(keepends=False)[lineNumber - 1]
+
+    def mutateCode(self):
+        code = self.sourceCode
+
+        for mutation in self.mutationList:
+            mutation.applyMutation(code)
+
+        self.mutatedCode = self.stub + code
+
+    @property
+    def stub(self):
+        assert len(self.mutationList) > 0
+        assert self.mutatedCode is not None
+
+        textStub = "/* LittleDarwin generated order-{0} mutant\n".format(str(len(self.mutationList)))  # type: str
+
+        for mutation in self.mutationList:
+            textStub += "mutant type: " + mutation.mutatorType + \
+                        "\n----> before: " + self.getLine(mutation.lineNumber) + \
+                        "\n----> after: " + self.getLine(mutation.lineNumber, code=self.mutatedCode) + \
+                        "\n----> line number in original file: " + str(mutation.lineNumber) + \
+                        "\n----> mutated node: " + str(mutation.nodeID) + "\n\n"
+
+        textStub += "*/\n\n"
+
+        return textStub
+
+
 class MutationOperator(object):
-    def __init__(self):
-        self.nodeIndexes = list()
-        self.originalNodes = dict()
-        self.mutatedNodes = dict()
-        self.type = None
-        self.tree = None
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        self.sourceTree = sourceTree
+        self.sourceCode = sourceCode
+        self.mutatorType = "GenericMutationOperator"
+        self.allNodes = list()  # populated by findNodes
+        self.mutableNodes = list()  # populated by filterCriteria
+        self.mutants = list()  # populated by generateMutants
+        self.javaParseObject = javaParseObject
 
-    def seekNodes(self):
+    def findNodes(self):
+        """
+        Finds all nodes that match the search criteria
+        """
         pass
 
-    def filterNodes(self):
+    def filterCriteria(self):
+        """
+        Filters out the nodes that do not match the input critera
+        """
         pass
 
-    def mutateNode(self, nodeIndex):
+    def generateMutants(self):
+        """
+        Generates the mutants
+        """
         pass
 
-    def unmutateNode(self, nodeIndex):
-        pass
-
-    def getTree(self):
-        assert isinstance(self.tree, JavaParser.CompilationUnitContext)
-        return self.tree
-
-    def getTexts(self):
-        assert isinstance(self.tree, JavaParser.CompilationUnitContext)
-
-        mutatedCode = list()
-
-        for nodeIndex in self.nodeIndexes:
-            mutationBefore = "----> before: " + self.originalNodes[nodeIndex].getText()
-            mutationAfter = "----> after: " + self.mutatedNodes[nodeIndex].getText()
-
-            self.mutateNode(nodeIndex)
-            mutatedCode.append((
-                    "/* LittleDarwin generated mutant \nmutant type: " + self.type + "\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
-                self.mutatedNodes[nodeIndex].start.line) + "\n----> mutated nodes: " + str(nodeIndex) + "\n*/ \n\n" + (
-                        " ".join(self.tree.getText().rsplit("<EOF>", 1)))))
-            self.unmutateNode(nodeIndex)
-
-        return mutatedCode
-
-    def getNodes(self):
-        return self.nodeIndexes
-
-    def setTree(self, tree):
-        assert isinstance(tree, JavaParser.CompilationUnitContext)
-        self.tree = tree
+#################################################
+#           Mutation Operators                  #
+#################################################
 
 
-# ---------------------------------------------------------------------------------------
+class RemoveNullCheck(MutationOperator):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str):
+        super().__init__(sourceTree, sourceCode)
+        self.mutatorType = "RemoveNullCheck"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
 
+    def findNodes(self):
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ExpressionContext)
+
+    def filterCriteria(self):
+        for node in self.allNodes:
+            assert isinstance(node, JavaParser.ExpressionContext)
+
+            try:
+                if not (isinstance(node.children[0], JavaParser.ExpressionContext) and
+                        isinstance(node.children[1], TerminalNodeImpl) and
+                        isinstance(node.children[2], JavaParser.ExpressionContext)):
+                    continue  # not a binary expression
+
+            except Exception as e:
+                continue
+
+            if not (node.children[1].symbol.text == "!=" or node.children[1].symbol.text == "=="):
+                continue  # not a relational operator
+
+            if 'null' not in node.getText():
+                continue  # not a null check
+
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            replacementText = ""
+            if node.children[1].symbol.text == "!=":
+                replacementText = "true"
+            elif node.children[1].symbol.text == "==":
+                replacementText = "false"
+
+            mutation = Mutation(startPos=node.start.start, endPos=node.stop.stop, lineNumber=node.start.line,
+                                nodeID=node.nodeIndex, mutatorType=self.mutatorType, replacementText=replacementText)
+
+            mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+            mutant.mutateCode()
+            self.mutants.append(mutant)
+
+
+class NullifyObjectInitialization(MutationOperator):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str):
+        super().__init__(sourceTree, sourceCode)
+        self.mutatorType = "NullifyObjectInitialization"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def findNodes(self):
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.CreatorContext)
+
+    def filterCriteria(self):
+        for node in self.allNodes:
+            assert isinstance(node, JavaParser.CreatorContext)
+
+            try:
+                newStatement = node.parentCtx.getChild(0, TerminalNodeImpl)
+                argumentsStatement = node.children[-1].children[-1]
+
+                if newStatement.symbol.text != u'new':
+                    continue
+
+                if not isinstance(argumentsStatement, JavaParser.ArgumentsContext):
+                    continue
+
+                if argumentsStatement.children[-1].symbol.text != u')':
+                    continue
+
+            except:
+                continue
+
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            replacementText = "null"
+            newStatement = node.parentCtx.getChild(0, TerminalNodeImpl)
+            argumentsStatement = node.children[-1].children[-1]
+
+            mutation = Mutation(startPos=(newStatement.symbol.stop+2), endPos=argumentsStatement.stop.stop,
+                                lineNumber=node.parentCtx.start.line, nodeID=node.nodeIndex,
+                                mutatorType=self.mutatorType, replacementText=replacementText)
+
+            mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+            mutant.mutateCode()
+            self.mutants.append(mutant)
+
+
+
+
+
+
+
+
+#################################################
 
 class JavaMutate(object):
     def __init__(self, javaParseObjectInput=None, verbose=False):
@@ -342,7 +507,7 @@ class JavaMutate(object):
             mutatedTrees.extend(resultNullifyObjectInitialization)
             mutationTypeCount["NullifyObjectInitialization"] = len(resultNullifyObjectInitialization)
 
-            # if type == "null-check":
+            # if mutatorType == "null-check":
             resultRemoveNullCheck = self.removeNullCheck(tree)
             mutatedTrees.extend(resultRemoveNullCheck)
             mutationTypeCount["RemoveNullCheck"] = len(resultRemoveNullCheck)
@@ -407,7 +572,7 @@ class JavaMutate(object):
 
                 mutatedTreesTexts.append((
                     (
-                            "/* LittleDarwin generated mutant\nmutant type: removeNullCheck\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                            "/* LittleDarwin generated mutant\nmutant mutatorType: removeNullCheck\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                         node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                                 " ".join(tree.getText().rsplit("<EOF>", 1))))))  # create compilable, readable code
 
@@ -419,60 +584,6 @@ class JavaMutate(object):
                     self.mutantsPerLine[node.start.line] = 1
 
             return mutatedTreesTexts
-
-    # def removeNullCheck(self, tree, mode="return_text", nodeIndex=None):
-    #     assert isinstance(tree, JavaParser.CompilationUnitContext)
-    #
-    #     if mode == "return_text":
-    #
-    #         mutatedTreesTexts = list()
-    #         expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
-    #
-    #         while len(expressionList) > 0:
-    #             # tmpTree = copy.deepcopy(tree)
-    #             expressionIndex = expressionList.pop()
-    #
-    #             node = self.javaParseObject.getNode(tree, expressionIndex)
-    #             assert isinstance(node, JavaParser.ParExpressionContext)
-    #             assert isinstance(node.children[0], TerminalNodeImpl)
-    #             assert isinstance(node.children[2], TerminalNodeImpl)
-    #
-    #             if u'null' not in node.getText():
-    #                 continue
-    #
-    #             if u'==' in node.getText():
-    #                 replacementText = u'false'
-    #             elif u'!=' in node.getText():
-    #                 replacementText = u'true'
-    #             else:
-    #                 continue
-    #
-    #             mutationBefore = "----> before: " + node.getText()
-    #             if self.verbose:
-    #                 print mutationBefore
-    #             originalText0 = copy.deepcopy(node.children[0].symbol.text)
-    #             node.children[0].symbol.text = u"(" + replacementText + u" /* "
-    #             originalText2 = copy.deepcopy(node.children[2].symbol.text)
-    #             node.children[2].symbol.text = u" */ )"
-    #             mutationAfter = "----> after: " + node.getText().split(u'/*')[0]
-    #             if self.verbose:
-    #                 print mutationAfter
-    #             mutatedTreesTexts.append((
-    #                 "/* LittleDarwin generated mutant\nmutant type: removeNullCheck\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
-    #                     node.start.line) + "\n*/ \n\n" + (
-    #                     " ".join(tree.getText().rsplit("<EOF>", 1)))))
-    #             # mutatedTreesTexts.append(tree.getText())
-    #             node.children[0].symbol.text = copy.deepcopy(originalText0)
-    #             node.children[2].symbol.text = copy.deepcopy(originalText2)
-    #
-    #         return mutatedTreesTexts
-
-    # elif mode == "return_nodes":
-    #     nodeList = list()
-    #     expressionList = self.javaParseObject.seek(tree, JavaParser.ParExpressionContext)
-    #
-    #     for exp in expressionList:
-    #         nodeList.append([exp, "negateConditionalsMutator"])
 
     def nullifyObjectInitialization(self, tree, mode="return_text", nodeIndex=None):
         assert isinstance(tree, JavaParser.CompilationUnitContext)
@@ -516,7 +627,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: nullifyObjectInitialization\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: nullifyObjectInitialization\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.parentCtx.start.line) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))
                 # mutatedTreesTexts.append(tree.getText())
@@ -577,7 +688,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: nullifyReturnValue\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: nullifyReturnValue\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.getParent().start.line) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))
                 # mutatedTreesTexts.append(tree.getText())
@@ -648,7 +759,7 @@ class JavaMutate(object):
                     if self.verbose:
                         print(mutationAfter)
                     mutatedTreesTexts.append((
-                            "/* LittleDarwin generated mutant\nmutant type: nullifyInputVariable\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                            "/* LittleDarwin generated mutant\nmutant mutatorType: nullifyInputVariable\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                         node.parentCtx.start.line) + "\n----> mutated nodes: " + str(var) + "\n*/ \n\n" + (
                                 " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -727,7 +838,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: arithmeticOperatorReplacementBinary\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: arithmeticOperatorReplacementBinary\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -858,7 +969,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: arithmeticOperatorReplacementUnary\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: arithmeticOperatorReplacementUnary\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -975,7 +1086,7 @@ class JavaMutate(object):
                     print(mutationAfter)
 
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: arithmeticOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: arithmeticOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -1123,7 +1234,7 @@ class JavaMutate(object):
 
                 mutatedTreesTexts.append((
                     (
-                            "/* LittleDarwin generated mutant\nmutant type: relationalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                            "/* LittleDarwin generated mutant\nmutant mutatorType: relationalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                         node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                                 " ".join(tree.getText().rsplit("<EOF>", 1))))))  # create compilable, readable code
 
@@ -1251,7 +1362,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: conditionalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: conditionalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -1361,7 +1472,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: conditionalOperatorDeletion\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: conditionalOperatorDeletion\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -1509,7 +1620,7 @@ class JavaMutate(object):
                     print(mutationAfter)
 
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: shiftOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: shiftOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -1691,7 +1802,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: logicalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: logicalOperatorReplacement\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 
@@ -1835,7 +1946,7 @@ class JavaMutate(object):
                 if self.verbose:
                     print(mutationAfter)
                 mutatedTreesTexts.append((
-                        "/* LittleDarwin generated mutant\nmutant type: assignmentOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
+                        "/* LittleDarwin generated mutant\nmutant mutatorType: assignmentOperatorReplacementShortcut\n" + mutationBefore + "\n" + mutationAfter + "\n----> line number in original file: " + str(
                     node.start.line) + "\n----> mutated nodes: " + str(expressionIndex) + "\n*/ \n\n" + (
                             " ".join(tree.getText().rsplit("<EOF>", 1)))))  # create compilable, readable code
 

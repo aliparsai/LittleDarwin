@@ -58,6 +58,21 @@ class JavaParse(object):
         except AttributeError:
             print("Index: ", tree.nodeIndex, "Text: ", tree.getText())
 
+    def seekAllNodes(self, subTree, nodeType):
+        seekList = list()
+
+        if isinstance(subTree, nodeType):
+            seekList.append(subTree)
+
+        try:
+            for child in subTree.getChildren():
+                seekList.extend(self.seekAllNodes(child, nodeType))
+        except AttributeError:
+            pass
+
+        return seekList
+
+    ## Deprecated
     def seek(self, myTree, type):
         seekList = list()
 

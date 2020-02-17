@@ -1,13 +1,14 @@
 import setuptools
+import littledarwin
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='littledarwin',
-    version='0.5.2',
-    url='https://littledarwin.parsai.net',
-    author="Ali Parsai",
+    version=littledarwin.__version__,
+    url=littledarwin.__url__,
+    author=littledarwin.__author__,
     author_email="ali.parsai@live.com",
     description="LittleDarwin Mutation Analysis Framework",
     long_description=long_description,
@@ -21,6 +22,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.3',
+    python_requires='>=3.5',
 )
 
