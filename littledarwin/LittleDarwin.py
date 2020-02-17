@@ -61,6 +61,9 @@ littleDarwinVersion = "0.5.2"
 
 
 def main():
+    """
+
+    """
     print("""
     __     _  __   __   __       ____                          _
    / /    (_)/ /_ / /_ / /___   / __ \\ ____ _ _____ _      __ (_)____
@@ -106,6 +109,17 @@ def main():
 
 
 def mutationPhase(options, filterType, filterList, higherOrder):
+    """
+
+    :param options:
+    :type options:
+    :param filterType:
+    :type filterType:
+    :param filterList:
+    :type filterList:
+    :param higherOrder:
+    :type higherOrder:
+    """
     # creating our module objects.
     javaRead = JavaRead(options.isVerboseActive)
     javaParse = JavaParse(options.isVerboseActive)
@@ -188,6 +202,11 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
 
 def buildPhase(options):
+    """
+
+    :param options:
+    :type options:
+    """
     # let's tell the user upfront that this may corrupt the source code.
     print("\n\n!!! CAUTION !!!")
     print("Code can be changed accidentally. Create a backup first.\n")
@@ -423,6 +442,13 @@ def buildPhase(options):
 
 
 def parseCmdArgs(optionParser: OptionParser) -> object:
+    """
+
+    :param optionParser:
+    :type optionParser:
+    :return:
+    :rtype:
+    """
     # parsing input options
     optionParser.add_option("-m", "--mutate", action="store_true", dest="isMutationActive", default=False,
                             help="Activate the mutation phase.")
@@ -508,7 +534,11 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     # this method is run in another thread when the timeout is expired to kill the process.
     def killProcess(pipe):
+        """
 
+        :param pipe:
+        :type pipe:
+        """
         assert isinstance(pipe, subprocess.Popen)
 
         # there is no support for os.killpg on windows, neither does it have SIGKILL.

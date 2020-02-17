@@ -6,7 +6,7 @@ import copy
 import sys
 from math import log10
 from random import shuffle
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from custom_antlr4 import Token
 from custom_antlr4.tree import Tree
@@ -18,12 +18,18 @@ sys.setrecursionlimit(100000)
 
 
 class CodeObject(object):
+    """
+
+    """
     def __init__(self, codeText: str, codeTree: Tree):
         self.codeText = codeText
         self.codeTree = codeTree
 
 
 class Mutation(object):
+    """
+
+    """
     def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
                  replacementText: str):
         self.startPos = startPos
@@ -34,10 +40,20 @@ class Mutation(object):
         self.replacementText = replacementText
 
     def applyMutation(self, sourceCode: str) -> str:
+        """
+
+        :param sourceCode:
+        :type sourceCode:
+        :return:
+        :rtype:
+        """
         return sourceCode[:self.startPos] + self.replacementText + sourceCode[self.endPos + 1:]
 
 
 class Mutant(object):
+    """
+
+    """
     def __init__(self, mutantID: int, mutationList: List[Mutation], sourceCode: str):
         """
         :param mutantID: the ID of mutant
@@ -68,15 +84,23 @@ class Mutant(object):
         return code.splitlines(keepends=False)[lineNumber - 1]
 
     def mutateCode(self):
+        """
+
+        """
         code = self.sourceCode
 
         for mutation in self.mutationList:
             mutation.applyMutation(code)
 
-        self.mutatedCode = self.stub + code
+        self.mutatedCode = code
 
     @property
     def stub(self):
+        """
+
+        :return:
+        :rtype:
+        """
         assert len(self.mutationList) > 0
         assert self.mutatedCode is not None
 
@@ -93,8 +117,30 @@ class Mutant(object):
 
         return textStub
 
+    def __add__(self, other):
+        if isinstance(other, Mutant):
+            if self.sourceCode == other.sourceCode:
+                newMutationList = list()
+                newMutationList.extend(self.mutationList)
+                newMutationList.extend(other.mutationList)
+                newMutant = Mutant(-1*self.mutantID*other.mutantID, newMutationList, self.sourceCode)
+                newMutant.mutateCode()
+                return newMutant
+            else:
+                raise ValueError("Only Mutant objects of the same source code can be added.")
+        else:
+            raise ValueError("Only Mutant objects can be added.")
+
+    def __str__(self):
+        self.mutateCode()
+        return self.stub + self.mutatedCode
+
+
 
 class MutationOperator(object):
+    """
+
+    """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
@@ -128,6 +174,9 @@ class MutationOperator(object):
 
 
 class RemoveNullCheck(MutationOperator):
+    """
+
+    """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveNullCheck"
@@ -136,9 +185,15 @@ class RemoveNullCheck(MutationOperator):
         self.generateMutants()
 
     def findNodes(self):
+        """
+
+        """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ExpressionContext)
 
     def filterCriteria(self):
+        """
+
+        """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.ExpressionContext)
 
@@ -160,6 +215,9 @@ class RemoveNullCheck(MutationOperator):
             self.mutableNodes.append(node)
 
     def generateMutants(self):
+        """
+
+        """
         id = 0
         for node in self.mutableNodes:
             id += 1
@@ -178,6 +236,9 @@ class RemoveNullCheck(MutationOperator):
 
 
 class NullifyObjectInitialization(MutationOperator):
+    """
+
+    """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyObjectInitialization"
@@ -186,9 +247,15 @@ class NullifyObjectInitialization(MutationOperator):
         self.generateMutants()
 
     def findNodes(self):
+        """
+
+        """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.CreatorContext)
 
     def filterCriteria(self):
+        """
+
+        """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.CreatorContext)
 
@@ -211,6 +278,9 @@ class NullifyObjectInitialization(MutationOperator):
             self.mutableNodes.append(node)
 
     def generateMutants(self):
+        """
+
+        """
         id = 0
         for node in self.mutableNodes:
             id += 1
@@ -228,6 +298,9 @@ class NullifyObjectInitialization(MutationOperator):
 
 
 class NullifyReturnValue(MutationOperator):
+    """
+
+    """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyReturnValue"
@@ -236,9 +309,15 @@ class NullifyReturnValue(MutationOperator):
         self.generateMutants()
 
     def findNodes(self):
+        """
+
+        """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, TerminalNodeImpl)
 
     def filterCriteria(self):
+        """
+
+        """
         for node in self.allNodes:
             assert isinstance(node, TerminalNodeImpl)
 
@@ -264,6 +343,9 @@ class NullifyReturnValue(MutationOperator):
             self.mutableNodes.append(node)
 
     def generateMutants(self):
+        """
+
+        """
         id = 0
         for node in self.mutableNodes:
             assert isinstance(node.symbol, Token)
@@ -280,6 +362,9 @@ class NullifyReturnValue(MutationOperator):
 
 
 class NullifyInputVariable(MutationOperator):
+    """
+
+    """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyInputVariable"
@@ -288,9 +373,15 @@ class NullifyInputVariable(MutationOperator):
         self.generateMutants()
 
     def findNodes(self):
+        """
+
+        """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodDeclarationContext)
 
     def filterCriteria(self):
+        """
+
+        """
         self.replacementTextDict = dict()
 
         for methodDeclaration in self.allNodes:
@@ -320,6 +411,9 @@ class NullifyInputVariable(MutationOperator):
             self.mutableNodes.append(node)
 
     def generateMutants(self):
+        """
+
+        """
         id = 0
         for node in self.mutableNodes:
             for replacementText in self.replacementTextDict[node]:
@@ -339,12 +433,217 @@ class NullifyInputVariable(MutationOperator):
 #      Traditional Mutation Operators           #
 #################################################
 
+class TraditionalMutationOperator(MutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "GenericTraditionalMutationOperator"
+
+    def findNodes(self):
+        """
+
+        """
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ExpressionContext)
+
+    def filterCriteriaBinaryExpression(self, node: JavaParser.ExpressionContext, symbolList: List[str]):
+        """
+
+        """
+        assert isinstance(node, JavaParser.ExpressionContext)
+
+        try:
+            if not (isinstance(node.children[0], JavaParser.ExpressionContext)
+                    and isinstance(node.children[1], TerminalNodeImpl)
+                    and isinstance(node.children[2], JavaParser.ExpressionContext)):
+                return False
+
+        except Exception as e:
+            return False
+
+        if node.children[1].symbol.text not in symbolList:
+            return False
+
+        return True
+
+    def generateMutantsBinaryExpression(self, node: JavaParser.ExpressionContext, symbolDict: Dict[str:str], id: int):
+        """
+
+        """
+        replacementText = symbolDict[node.children[1].symbol.text]
+
+        mutation = Mutation(startPos=node.children[1].symbol.start, endPos=node.children[1].symbol.stop,
+                            lineNumber=node.start.line, nodeID=node.nodeIndex,
+                            mutatorType=self.mutatorType, replacementText=replacementText)
+
+        mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+        mutant.mutateCode()
+
+        return mutant
+
+
+class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ArithmeticOperatorReplacementBinary"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if (self.filterCriteriaBinaryExpression(node, ['+', '-', '*', '/', '%'])
+                    and node.children[0].getText()[0] != '\"' and node.children[2].getText()[0] != '\"'):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsBinaryExpression(node, {'+': '-', '-': '+', '/': '*', '*': '/', '%': '/'}, id)
+            self.mutants.append(mutant)
+
+
+class RelationalOperatorReplacement(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "RelationalOperatorReplacement"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaBinaryExpression(node, ['>', '>=', '<', '<=', '==', '!=']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsBinaryExpression(node, {'>': '<=', '<': '>=', '>=': '<', '<=': '>', '!=': '==', '==': '!='}, id)
+            self.mutants.append(mutant)
+
+
+class ConditionalOperatorReplacement(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "ConditionalOperatorReplacement"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaBinaryExpression(node, ['&&', '||']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsBinaryExpression(node, {'&&': '||', '||': '&&'}, id)
+            self.mutants.append(mutant)
+
+
+class LogicalOperatorReplacement(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "LogicalOperatorReplacement"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaBinaryExpression(node, ['&', '|', '^']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsBinaryExpression(node, {'&': '|', '|': '^', '^': '&'}, id)
+            self.mutants.append(mutant)
+
+
+class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
+    """
+
+    """
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "AssignmentOperatorReplacementShortcut"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            if self.filterCriteriaBinaryExpression(node, ['+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=', '>>>=']):
+                self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node in self.mutableNodes:
+            id += 1
+            mutant = self.generateMutantsBinaryExpression(node, {'+=': '-=', '-=': '+=', '*=': '/=', '/=': '*=',
+                                                                 '%=': '/=', '&=': '|=', '|=': '^=', '^=': '&=',
+                                                                 '<<=': '>>=', '>>=': '>>>=', '>>>=': '>>='}, id)
+            self.mutants.append(mutant)
+
 
 
 
 #################################################
 
 class JavaMutate(object):
+    """
+
+    """
     def __init__(self, javaParseObjectInput=None, verbose=False):
         self.verbose = verbose
         self.mutantsPerLine = dict()
@@ -355,6 +654,11 @@ class JavaMutate(object):
             self.javaParseObject = JavaParse(self.verbose)
 
     def returnNodeToOriginalState(self, node):
+        """
+
+        :param node:
+        :type node:
+        """
         assert isinstance(node, TerminalNodeImpl)
 
         try:
@@ -364,6 +668,11 @@ class JavaMutate(object):
             pass
 
     def returnTreeToOriginalState(self, tree):
+        """
+
+        :param tree:
+        :type tree:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         stack = list()
@@ -379,6 +688,13 @@ class JavaMutate(object):
                 stack.extend(currentNode.children)
 
     def findMutableNodes(self, tree):
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         mutableNodes = list()
@@ -395,6 +711,15 @@ class JavaMutate(object):
         return mutableNodes
 
     def runHigherOrderProcedure(self, tree, nodeGroup):
+        """
+
+        :param tree:
+        :type tree:
+        :param nodeGroup:
+        :type nodeGroup:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         assert isinstance(nodeGroup, list)
         steps = len(nodeGroup)
@@ -449,6 +774,15 @@ class JavaMutate(object):
         return mutatedText
 
     def applyHigherOrderMutatorsBasedOnDistance(self, tree, higherOrderDirective):
+        """
+
+        :param tree:
+        :type tree:
+        :param higherOrderDirective:
+        :type higherOrderDirective:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         print("Finding mutable nodes in AST")
         # Find all mutable nodes
@@ -485,6 +819,15 @@ class JavaMutate(object):
         return mutatedTreeTexts
 
     def applyHigherOrderMutators(self, tree, higherOrderDirective):
+        """
+
+        :param tree:
+        :type tree:
+        :param higherOrderDirective:
+        :type higherOrderDirective:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         print("Finding mutable nodes in AST")
         # Find all mutable nodes
@@ -521,6 +864,17 @@ class JavaMutate(object):
         return mutatedTreeTexts
 
     def applyMutators(self, tree, higherOrder, type):
+        """
+
+        :param tree:
+        :type tree:
+        :param higherOrder:
+        :type higherOrder:
+        :param type:
+        :type type:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         mutationTypeCount = dict()
@@ -634,6 +988,17 @@ class JavaMutate(object):
     """
 
     def removeNullCheck(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -695,6 +1060,17 @@ class JavaMutate(object):
             return mutatedTreesTexts
 
     def nullifyObjectInitialization(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -751,6 +1127,17 @@ class JavaMutate(object):
             return mutatedTreesTexts
 
     def nullifyReturnValue(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -819,6 +1206,17 @@ class JavaMutate(object):
             #         nodeList.append([exp, "negateConditionalsMutator"])
 
     def nullifyInputVariable(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -889,6 +1287,17 @@ class JavaMutate(object):
             pass
 
     def arithmeticOperatorReplacementBinary(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1038,6 +1447,17 @@ class JavaMutate(object):
             return tree
 
     def arithmeticOperatorReplacementUnary(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1148,6 +1568,17 @@ class JavaMutate(object):
             return tree
 
     def arithmeticOperatorReplacementShortcut(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1289,6 +1720,17 @@ class JavaMutate(object):
 
     def relationalOperatorReplacement(self, tree, mode="return_text",
                                       nodeIndex=None):  # executionCount by negateConditionals
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1429,6 +1871,17 @@ class JavaMutate(object):
             return tree
 
     def conditionalOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1543,6 +1996,17 @@ class JavaMutate(object):
 
     def conditionalOperatorDeletion(self, tree, mode="return_text",
                                     nodeIndex=None):  # executionCount by negateConditionals
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1649,6 +2113,17 @@ class JavaMutate(object):
     #     pass
 
     def shiftOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1867,6 +2342,17 @@ class JavaMutate(object):
             return tree
 
     def logicalOperatorReplacement(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":
@@ -1991,6 +2477,17 @@ class JavaMutate(object):
     #     pass
 
     def assignmentOperatorReplacementShortcut(self, tree, mode="return_text", nodeIndex=None):
+        """
+
+        :param tree:
+        :type tree:
+        :param mode:
+        :type mode:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
         if mode == "return_text":

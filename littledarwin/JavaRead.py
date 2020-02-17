@@ -8,6 +8,9 @@ import shutil
 
 
 class JavaRead(object):
+    """
+
+    """
     def __init__(self, verbose=False):
         self.verbose = False
         self.sourceDirectory = None
@@ -15,6 +18,15 @@ class JavaRead(object):
         self.fileList = list()
 
     def filterFiles(self, mode="blacklist", filterList=None):
+        """
+
+        :param mode:
+        :type mode:
+        :param filterList:
+        :type filterList:
+        :return:
+        :rtype:
+        """
         if filterList is None:
             return
 
@@ -54,6 +66,19 @@ class JavaRead(object):
             self.fileList = list(set(self.fileList) - set(alteredList))
 
     def listFiles(self, targetPath=None, buildPath=None, filterList=None, filterType="blacklist", desiredType="*.java"):
+        """
+
+        :param targetPath:
+        :type targetPath:
+        :param buildPath:
+        :type buildPath:
+        :param filterList:
+        :type filterList:
+        :param filterType:
+        :type filterType:
+        :param desiredType:
+        :type desiredType:
+        """
         # print targetPath, desiredType
         self.sourceDirectory = targetPath
         self.targetDirectory = os.path.abspath(os.path.join(buildPath, "LittleDarwinResults"))
@@ -68,12 +93,30 @@ class JavaRead(object):
             os.makedirs(self.targetDirectory)
 
     def getFileContent(self, filePath=None):
+        """
+
+        :param filePath:
+        :type filePath:
+        :return:
+        :rtype:
+        """
         with io.open(filePath, mode='r', errors='replace') as contentFile:
             file_data = contentFile.read()
         normalizedData = str(file_data)
         return normalizedData
 
     def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None):
+        """
+
+        :param originalFile:
+        :type originalFile:
+        :param fileData:
+        :type fileData:
+        :param mutantsPerLine:
+        :type mutantsPerLine:
+        :return:
+        :rtype:
+        """
         if mutantsPerLine is None:
             mutantsPerLine = dict()
         originalFileRoot, originalFileName = os.path.split(originalFile)

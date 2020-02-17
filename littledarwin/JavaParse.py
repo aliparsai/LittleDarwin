@@ -19,11 +19,17 @@ except ImportError as e:
 
 
 class JavaListen(JavaListener):
+    """
+
+    """
     def __init__(self):
         JavaListener.__init__(self)
 
 
 class JavaParse(object):
+    """
+
+    """
     def __init__(self, verbose=False):
         self.verbose = verbose
         self.lookupTable = dict()
@@ -31,6 +37,13 @@ class JavaParse(object):
     # antlr-based parser
 
     def parse(self, file_content):
+        """
+
+        :param file_content:
+        :type file_content:
+        :return:
+        :rtype:
+        """
         inputS = InputStream(file_content)
         lexer = JavaLexer(inputS)
         stream = CommonTokenStream(lexer)
@@ -41,6 +54,11 @@ class JavaParse(object):
         return tree
 
     def numerify(self, tree):
+        """
+
+        :param tree:
+        :type tree:
+        """
         numerifyCounter = 1
         stack = list()
         stack.append(tree)
@@ -52,6 +70,11 @@ class JavaParse(object):
                 stack.extend(tmp.children)
 
     def toString(self, tree):
+        """
+
+        :param tree:
+        :type tree:
+        """
         try:
             for child in tree.getChildren():
                 self.toString(child)
@@ -59,6 +82,15 @@ class JavaParse(object):
             print("Index: ", tree.nodeIndex, "Text: ", tree.getText())
 
     def seekAllNodes(self, subTree, nodeType):
+        """
+
+        :param subTree:
+        :type subTree:
+        :param nodeType:
+        :type nodeType:
+        :return:
+        :rtype:
+        """
         seekList = list()
 
         if isinstance(subTree, nodeType):
@@ -74,6 +106,15 @@ class JavaParse(object):
 
     ## Deprecated
     def seek(self, myTree, type):
+        """
+
+        :param myTree:
+        :type myTree:
+        :param type:
+        :type type:
+        :return:
+        :rtype:
+        """
         seekList = list()
 
         if isinstance(myTree, type):
@@ -88,6 +129,15 @@ class JavaParse(object):
         return seekList
 
     def seekFirstMatchingParent(self, node, type):
+        """
+
+        :param node:
+        :type node:
+        :param type:
+        :type type:
+        :return:
+        :rtype:
+        """
         try:
             parent = node.parentCtx
         except:
@@ -99,7 +149,15 @@ class JavaParse(object):
         return self.seekFirstMatchingParent(parent, type)
 
     def seekNode(self, myTree, nodeIndex):
+        """
 
+        :param myTree:
+        :type myTree:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
         if myTree.nodeIndex == nodeIndex:
             return 0
 
@@ -114,6 +172,15 @@ class JavaParse(object):
         return None
 
     def getNode(self, myTree, index):
+        """
+
+        :param myTree:
+        :type myTree:
+        :param index:
+        :type index:
+        :return:
+        :rtype:
+        """
         if index in self.lookupTable:
             return self.lookupTable[index]
 
@@ -134,6 +201,15 @@ class JavaParse(object):
         return None
 
     def setNode(self, myTree, index, node):
+        """
+
+        :param myTree:
+        :type myTree:
+        :param index:
+        :type index:
+        :param node:
+        :type node:
+        """
         if myTree.nodeIndex == index:
             myTree = node
 
@@ -143,6 +219,17 @@ class JavaParse(object):
                 self.setNode(child, index, node)
 
     def distance(self, myTree, node1, node2):
+        """
+
+        :param myTree:
+        :type myTree:
+        :param node1:
+        :type node1:
+        :param node2:
+        :type node2:
+        :return:
+        :rtype:
+        """
         rootDistance1 = self.seekNode(myTree, node1)
         rootDistance2 = self.seekNode(myTree, node2)
 
@@ -158,6 +245,13 @@ class JavaParse(object):
         return distance if distance is not None else -1
 
     def tree2DOT(self, tree):
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
         if noGraphviz:
             return
 

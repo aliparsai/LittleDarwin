@@ -8,14 +8,31 @@ import shelve
 
 
 class ReportGenerator(object):
+    """
+
+    """
     def __init__(self, littleDarwinVersion=None):
         self.database = None
         self.littleDarwinVersion = littleDarwinVersion
 
     def initiateDatabase(self, databasePath):
+        """
+
+        :param databasePath:
+        :type databasePath:
+        """
         self.database = shelve.open(databasePath, "c")
 
     def generateHTMLFinalReport(self, resultData, reportPath):
+        """
+
+        :param resultData:
+        :type resultData:
+        :param reportPath:
+        :type reportPath:
+        :return:
+        :rtype:
+        """
         reportBeginning = """
             <html>
             <head>
@@ -156,7 +173,27 @@ class ReportGenerator(object):
         return '\n'.join(reportOutput)
 
     def generateHTMLReportPerFile(self, filePath, reportPath, survived, killed):
+        """
+
+        :param filePath:
+        :type filePath:
+        :param reportPath:
+        :type reportPath:
+        :param survived:
+        :type survived:
+        :param killed:
+        :type killed:
+        :return:
+        :rtype:
+        """
         def xstr(inputVar):
+            """
+
+            :param inputVar:
+            :type inputVar:
+            :return:
+            :rtype:
+            """
             if inputVar is None:
                 return ''
             else:
