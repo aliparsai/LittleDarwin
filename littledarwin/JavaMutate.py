@@ -123,13 +123,13 @@ class MutationOperator(object):
         pass
 
 #################################################
-#           Mutation Operators                  #
+#          Null Mutation Operators              #
 #################################################
 
 
 class RemoveNullCheck(MutationOperator):
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str):
-        super().__init__(sourceTree, sourceCode)
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveNullCheck"
         self.findNodes()
         self.filterCriteria()
@@ -178,8 +178,8 @@ class RemoveNullCheck(MutationOperator):
 
 
 class NullifyObjectInitialization(MutationOperator):
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str):
-        super().__init__(sourceTree, sourceCode)
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyObjectInitialization"
         self.findNodes()
         self.filterCriteria()
@@ -227,8 +227,117 @@ class NullifyObjectInitialization(MutationOperator):
             self.mutants.append(mutant)
 
 
+class NullifyReturnValue(MutationOperator):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "NullifyReturnValue"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def findNodes(self):
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, TerminalNodeImpl)
+
+    def filterCriteria(self):
+        for node in self.allNodes:
+            assert isinstance(node, TerminalNodeImpl)
+
+            if node.symbol.text != u'return':
+                continue
+
+            if not isinstance(node.getParent().getChild(1), JavaParser.ExpressionContext):
+                continue
+
+            parentMethod = self.javaParseObject.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+            if parentMethod is None:
+                continue
+
+            assert isinstance(parentMethod, JavaParser.MethodDeclarationContext)
+
+            parentType = parentMethod.getChild(0, JavaParser.JTypeContext)
+            if not isinstance(parentType, JavaParser.JTypeContext):
+                continue
+
+            if parentType.getChild(0, JavaParser.PrimitiveTypeContext) is not None:
+                continue  # primitive typed method
+
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        id = 0
+        for node in self.mutableNodes:
+            assert isinstance(node.symbol, Token)
+            id += 1
+            replacementText = "return null;"
+
+            mutation = Mutation(startPos=node.symbol.start, endPos=node.getParent().getChild(2).symbol.stop,
+                                lineNumber=node.getParent().start.line, nodeID=node.getParent().nodeIndex,
+                                mutatorType=self.mutatorType, replacementText=replacementText)
+
+            mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+            mutant.mutateCode()
+            self.mutants.append(mutant)
 
 
+class NullifyInputVariable(MutationOperator):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "NullifyInputVariable"
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def findNodes(self):
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodDeclarationContext)
+
+    def filterCriteria(self):
+        self.replacementTextDict = dict()
+
+        for methodDeclaration in self.allNodes:
+            try:
+                variableList = self.javaParseObject.seekAllNodes(methodDeclaration.formalParameters(),
+                                                                 JavaParser.VariableDeclaratorIdContext)
+
+                if len(variableList) == 0:
+                    continue  # no variables in this declaration
+
+                # can fail on methods with no body
+                node = methodDeclaration.methodBody().block().getChild(0, TerminalNodeImpl)
+
+            except Exception as e:
+                continue
+
+            variablesPerNodeReplacementTextList = list()
+            for variablesPerNode in variableList:
+                assert isinstance(variablesPerNode, JavaParser.VariableDeclaratorIdContext)
+
+                if variablesPerNode.parentCtx.getChild(0, JavaParser.JTypeContext).getChild(0, JavaParser.PrimitiveTypeContext) is not None:
+                    continue  # primitive typed variable
+
+                variablesPerNodeReplacementTextList.append('{ ' + variablesPerNode.getText() + ' = null;')
+
+            self.replacementTextDict[node] = variablesPerNodeReplacementTextList
+            self.mutableNodes.append(node)
+
+    def generateMutants(self):
+        id = 0
+        for node in self.mutableNodes:
+            for replacementText in self.replacementTextDict[node]:
+                id += 1
+
+                mutation = Mutation(startPos=node.symbol.start, endPos=node.symbol.stop,
+                                    lineNumber=node.parentCtx.start.line, nodeID=node.nodeIndex,
+                                    mutatorType=self.mutatorType, replacementText=replacementText)
+
+                mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+                mutant.mutateCode()
+                self.mutants.append(mutant)
+
+
+
+#################################################
+#      Traditional Mutation Operators           #
+#################################################
 
 
 
