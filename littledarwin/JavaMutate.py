@@ -17,8 +17,9 @@ class Mutation(object):
     """
 
     """
-    def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
-                 replacementText: str):
+    def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str, replacementText: str):
+        assert endPos >= startPos
+
         self.startPos = startPos
         self.endPos = endPos
         self.lineNumber = lineNumber
@@ -26,15 +27,27 @@ class Mutation(object):
         self.mutatorType = mutatorType
         self.replacementText = replacementText
 
-    def applyMutation(self, sourceCode: str) -> str:
+    def applyMutation(self, sourceCode: str, byteOffset: int = 0) -> str:
         """
 
+        :param byteOffset:
+        :type byteOffset:
         :param sourceCode:
         :type sourceCode:
         :return:
         :rtype:
         """
-        return sourceCode[:self.startPos] + self.replacementText + sourceCode[self.endPos + 1:]
+        return sourceCode[:self.startPos + byteOffset] + self.replacementText + sourceCode[self.endPos + byteOffset + 1:]
+
+    @property
+    def byteOffset(self) -> int:
+        """
+        Returns the byte offset introduced by the mutation
+
+        :return:  byte offset introduced by the mutation
+        :rtype: int
+        """
+        return len(self.replacementText) - (self.endPos - self.startPos + 1)
 
 
 class Mutant(object):
@@ -75,9 +88,17 @@ class Mutant(object):
 
         """
         code = self.sourceCode
+        byteOffsetDict = dict()
 
         for mutation in self.mutationList:
-            code = mutation.applyMutation(code)
+            byteOffsetDict[mutation.startPos] = mutation.byteOffset
+            for pos in sorted(byteOffsetDict.keys()):
+                if pos < mutation.startPos:
+                    byteOffsetDict[mutation.startPos] = byteOffsetDict[pos] + mutation.byteOffset
+                elif pos > mutation.startPos:
+                    byteOffsetDict[pos] += mutation.byteOffset
+
+            code = mutation.applyMutation(code, byteOffsetDict[mutation.startPos] - mutation.byteOffset)
 
         self.mutatedCode = code
 
@@ -96,7 +117,8 @@ class Mutant(object):
         for mutation in self.mutationList:
             textStub += "mutant type: " + mutation.mutatorType + \
                         "\n----> before: " + self.getLine(mutation.lineNumber) + \
-                        "\n----> after: " + self.getLine(mutation.lineNumber, code=self.mutatedCode) + \
+                        "\n----> after: " + self.getLine(mutation.lineNumber,
+                                                         code=mutation.applyMutation(self.sourceCode)) + \
                         "\n----> line number in original file: " + str(mutation.lineNumber) + \
                         "\n----> mutated node: " + str(mutation.nodeID) + "\n\n"
 
@@ -944,11 +966,8 @@ class JavaMutate(object):
 
         # find all mutation operators and instantiate them
         self.mutationOperators = list()
-        self.allMutants = list()
         for MO in getAllInstantiableSubclasses(MutationOperator):
-            mO = MO(sourceTree, sourceCode, javaParseObject)
-            self.mutationOperators.append(mO)
-            self.allMutants.extend(mO.mutants)
+            self.mutationOperators.append(MO(sourceTree, sourceCode, javaParseObject))
 
     def gatherMutants(self, metaType: str = "Traditional"):
         """
@@ -983,7 +1002,11 @@ class JavaMutate(object):
         :return: mutated source code for each mutant, number of types of mutants
         :rtype: Tuple[List, Dict]
         """
-        selectedMutants = [m for m in self.allMutants if m.metaType == metaType]
+        selectedMutants = list()
+        for mO in self.mutationOperators:
+            if metaType == mO.metaType or metaType == "All":
+                selectedMutants.extend(mO.mutants)
+
         higherOrder = max(int(log10(len(selectedMutants))) if higherOrderDirective == -1 else higherOrderDirective, 1)
         shuffle(selectedMutants)
         mutantTexts = list()
