@@ -1,7 +1,3 @@
-# Generated from java-escape by ANTLR 4.4
-# from __future__ import print_function
-# from builtins import chr
-# from builtins import str
 import unicodedata
 
 from custom_antlr4 import *

@@ -6,9 +6,7 @@ from custom_antlr4 import *
 from custom_antlr4.InputStream import InputStream
 from custom_antlr4.tree.Tree import TerminalNodeImpl
 from .JavaLexer import JavaLexer
-from .JavaListener import JavaListener
 from .JavaParser import JavaParser
-
 try:
     import graphviz
 
@@ -16,14 +14,6 @@ try:
 
 except ImportError as e:
     noGraphviz = True
-
-
-class JavaListen(JavaListener):
-    """
-
-    """
-    def __init__(self):
-        JavaListener.__init__(self)
 
 
 class JavaParse(object):

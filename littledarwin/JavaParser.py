@@ -1,7 +1,3 @@
-# # Generated from java-escape by ANTLR 4.4
-# from __future__ import print_function
-# from __future__ import absolute_import
-# from builtins import str
 from custom_antlr4 import *
 from custom_antlr4.error.Errors import FailedPredicateException
 

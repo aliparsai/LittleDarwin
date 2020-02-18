@@ -1,7 +1,3 @@
-# from __future__ import print_function
-# from builtins import str
-# from builtins import range
-# from builtins import object
 import copy
 import sys
 from math import log10
@@ -15,15 +11,6 @@ from littledarwin.JavaParse import JavaParse
 from littledarwin.JavaParser import JavaParser
 
 sys.setrecursionlimit(100000)
-
-
-class CodeObject(object):
-    """
-
-    """
-    def __init__(self, codeText: str, codeTree: Tree):
-        self.codeText = codeText
-        self.codeTree = codeTree
 
 
 class Mutation(object):
@@ -118,6 +105,8 @@ class Mutant(object):
         return textStub
 
     def __add__(self, other):
+        if other is None:
+            return copy.deepcopy(self)
         if isinstance(other, Mutant):
             if self.sourceCode == other.sourceCode:
                 newMutationList = list()
@@ -130,6 +119,9 @@ class Mutant(object):
                 raise ValueError("Only Mutant objects of the same source code can be added.")
         else:
             raise ValueError("Only Mutant objects can be added.")
+
+    def __radd__(self, other):
+        return self.__add__(other)
 
     def __str__(self):
         if self.mutatedCode is None:
@@ -914,25 +906,30 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
             self.mutants.append(mutant)
 
 
-
-
-
 #################################################
 
+
 def getAllInstantiableSubclasses(parentClass):
-    allInstantiableSubclasses = list()
+    """
+
+    :param parentClass: the class that all its subclasses must be returned
+    :type parentClass: Type[MutationOperator]
+    :return: set of MutationOperator instantiable subclasses
+    :rtype: set
+    """
+    allInstantiableSubclasses = set()
 
     for subClass in parentClass.__subclasses__():
         if subClass.instantiable:
-            allInstantiableSubclasses.append(subClass)
-        allInstantiableSubclasses.extend(getAllInstantiableSubclasses(subClass))
+            allInstantiableSubclasses.add(subClass)
+        allInstantiableSubclasses.update(getAllInstantiableSubclasses(subClass))
 
     return allInstantiableSubclasses
 
 
 class JavaMutate(object):
     """
-
+    Main entry point for mutation of a Java source file.
     """
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse, verbose: bool = False):
         self.verbose = verbose
@@ -947,24 +944,23 @@ class JavaMutate(object):
 
         # find all mutation operators and instantiate them
         self.mutationOperators = list()
-        for mO in getAllInstantiableSubclasses(MutationOperator):
-            self.mutationOperators.append(mO(sourceTree, sourceCode, javaParseObject))
+        self.allMutants = list()
+        for MO in getAllInstantiableSubclasses(MutationOperator):
+            mO = MO(sourceTree, sourceCode, javaParseObject)
+            self.mutationOperators.append(mO)
+            self.allMutants.extend(mO.mutants)
 
     def gatherMutants(self, metaType: str = "Traditional"):
         """
+        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
 
-        :param metaType:
-        :type metaType:
-        :return:
-        :rtype:
+        :param metaType: type of mutation operators to use
+        :type metaType: str
+        :return: mutated source code for each mutant, number of types of mutants
+        :rtype: Tuple[List, Dict]
         """
         mutationTypeCount = dict()
         mutantTexts = list()
-
-        # if higherOrder > 1 or higherOrder == -1:
-        #     mutationTypeCount["Higher-Order"] = len(treeTexts)
-        #
-        #     return treeTexts, mutationTypeCount
 
         for mO in self.mutationOperators:
             if metaType == mO.metaType or metaType == "All":
@@ -973,6 +969,37 @@ class JavaMutate(object):
                     mutantTexts.append(str(mutant))
                     for mutation in mutant.mutationList:
                         self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
+
+        return mutantTexts, mutationTypeCount
+
+    def gatherHigherOrderMutants(self, higherOrderDirective: int, metaType: str = "Traditional"):
+        """
+        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
+
+        :param higherOrderDirective: The requested higher-order order
+        :type higherOrderDirective: int
+        :param metaType: type of mutation operators to use
+        :type metaType: str
+        :return: mutated source code for each mutant, number of types of mutants
+        :rtype: Tuple[List, Dict]
+        """
+        selectedMutants = [m for m in self.allMutants if m.metaType == metaType]
+        higherOrder = max(int(log10(len(selectedMutants))) if higherOrderDirective == -1 else higherOrderDirective, 1)
+        shuffle(selectedMutants)
+        mutantTexts = list()
+
+        while len(selectedMutants) > 0:
+            higherOrderMutant = None
+            for mutant in selectedMutants[:higherOrder]:
+                higherOrderMutant += mutant
+
+            mutantTexts.append(str(higherOrderMutant))
+            for mutation in higherOrderMutant.mutationList:
+                self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
+
+            selectedMutants = selectedMutants[higherOrder:]
+
+        mutationTypeCount = {"Higher-Order": len(mutantTexts)}
 
         return mutantTexts, mutationTypeCount
 

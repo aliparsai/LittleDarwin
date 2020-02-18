@@ -1,33 +1,30 @@
-##########################################################################################################
-##                                                                                                      ##
-##     __     _  __   __   __       ____                          _                                     ##
-##    / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____                                ##
-##   / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \                               ##
-##  / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##
-## /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##
-##                                                                                                      ##
-## Copyright (c) 2014-2020 Ali Parsai                                                                   ##
-##                                                                                                      ##
-## This program is free software: you can redistribute it and/or modify it under the terms of           ##
-## the GNU General Public License as published by the Free Software Foundation, either version 3        ##
-## of the License, or (at your option) any later version.                                               ##
-##                                                                                                      ##
-## This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;            ##
-## without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            ##
-## See the GNU General Public License for more details.                                                 ##
-##                                                                                                      ##
-## You should have received a copy of the GNU General Public License along with this program.           ##
-## If not, see <https://www.gnu.org/licenses/>.                                                         ##
-##                                                                                                      ##
-## Find me at:                                                                                          ##
-## https://www.parsai.net                                                                               ##
-##                                                                                                      ##
-##########################################################################################################
+################################################################################################################
+##                                                                                                            ##
+##           __     _  __   __   __       ____                          _                                     ##
+##          / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____                                ##
+##         / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \                               ##
+##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##
+##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##
+##                                                                                                            ##
+##       Copyright (c) 2014-2020 Ali Parsai                                                                   ##
+##                                                                                                            ##
+##       This program is free software: you can redistribute it and/or modify it under the terms of           ##
+##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##
+##       of the License, or (at your option) any later version.                                               ##
+##                                                                                                            ##
+##       This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;            ##
+##       without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            ##
+##       See the GNU General Public License for more details.                                                 ##
+##                                                                                                            ##
+##       You should have received a copy of the GNU General Public License along with this program.           ##
+##       If not, see <https://www.gnu.org/licenses/>.                                                         ##
+##                                                                                                            ##
+##       Find me at:                                                                                          ##
+##       https://www.parsai.net                                                                               ##
+##                                                                                                            ##
+################################################################################################################
 
 import datetime
-#
-# from __future__ import print_function
-# from __future__ import division
 import io
 import os
 import platform
@@ -42,13 +39,13 @@ from optparse import OptionParser
 
 # LittleDarwin modules
 from .JavaParse import JavaParse
-from .JavaRead import JavaRead
+from .JavaIO import JavaIO
 from .ReportGenerator import ReportGenerator
 from littledarwin import License
 from .JavaMutate import JavaMutate
+from .MutantDensityGenerator import MutantDensityGenerator
 
-# from builtins import str
-# from past.utils import old_div
+
 ### DEBUG ###
 # def trace(frame, event, arg):
 #     print("%s, %s:%d" % (event, frame.f_code.co_filename, frame.f_lineno))
@@ -56,13 +53,12 @@ from .JavaMutate import JavaMutate
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = "0.5.2"
-
+littleDarwinVersion = '0.6.0'
 
 
 def main():
     """
-
+    Main LittleDarwin Function
     """
     print("""
     __     _  __   __   __       ____                          _
@@ -85,6 +81,7 @@ def main():
 
 
     """ % littleDarwinVersion)
+
     optionParser = OptionParser(prog="LittleDarwin")
     options, filterType, filterList, higherOrder = parseCmdArgs(optionParser)
 
@@ -121,13 +118,14 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     :type higherOrder:
     """
     # creating our module objects.
-    javaRead = JavaRead(options.isVerboseActive)
+    javaRead = JavaIO(options.isVerboseActive)
     javaParse = JavaParse(options.isVerboseActive)
+    mutantDensityGenerator = MutantDensityGenerator()
     totalMutantCount = 0
     try:
         assert os.path.isdir(options.sourcePath)
     except AssertionError as exception:
-        print("source path must be a directory.")
+        print("Source path must be a directory.")
         sys.exit(1)
     # getting the list of files.
     javaRead.listFiles(targetPath=os.path.abspath(options.sourcePath), buildPath=os.path.abspath(options.buildPath),
@@ -137,15 +135,17 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     # creating a database for generated mutants. the format of this database is different on different platforms,
     # so it cannot be simply copied from a platform to another.
     databasePath = os.path.join(javaRead.targetDirectory, "mutationdatabase")
+    densityResultsPath = os.path.join(javaRead.targetDirectory, "densityreport.csv")
     print("Source Path: ", javaRead.sourceDirectory)
     print("Target Path: ", javaRead.targetDirectory)
     print("Creating Mutation Database: ", databasePath)
     mutationDatabase = shelve.open(databasePath, "c")
     mutantTypeDatabase = dict()
+    averageDensityDict = dict()
 
     # go through each file, parse it, calculate all mutations, and generate files accordingly.
     for srcFile in javaRead.fileList:
-        print("(" + str(fileCounter + 1) + "/" + str(fileCount) + ") source file: ", srcFile)
+        print("\n(" + str(fileCounter + 1) + "/" + str(fileCount) + ") Source file: ", srcFile)
         targetList = list()
 
         try:
@@ -173,12 +173,15 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
         # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
         # list of which operators created how many mutants.
-        # javaMutate.mutantsPerLine = dict()
 
         javaMutate = JavaMutate(tree, sourceCode, javaParse, options.isVerboseActive)
-        mutated, mutantTypes = javaMutate.gatherMutants(enabledMutators)
 
-        print("\n--> Mutations found: ", len(mutated))
+        if higherOrder == 1:
+            mutated, mutantTypes = javaMutate.gatherMutants(enabledMutators)
+        else:
+            mutated, mutantTypes = javaMutate.gatherHigherOrderMutants(higherOrder, enabledMutators)
+
+        print("--> Mutations found: ", len(mutated))
 
         # go through all mutant types, and add them in total. also output the info to the user.
         for mutantType in mutantTypes.keys():
@@ -188,17 +191,24 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         totalMutantCount += len(mutated)
 
         # for each mutant, generate the file, and add it to the list.
+        fileRelativePath = os.path.relpath(srcFile, javaRead.sourceDirectory)
+        densityReport, averageDensityDict[fileRelativePath] = mutantDensityGenerator.highlightFile(sourceCode, javaMutate.mutantsPerLine)
+
         for mutatedFile in mutated:
-            targetList.append(javaRead.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine))
+            targetList.append(javaRead.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine, densityReport))
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:
-            mutationDatabase[os.path.relpath(srcFile, javaRead.sourceDirectory)] = targetList
+            mutationDatabase[fileRelativePath] = targetList
 
         del javaMutate
 
     mutationDatabase.close()
     print("\nTotal mutations found: ", totalMutantCount)
+
+    with open(densityResultsPath, 'w') as densityReportHandle:
+        for key in averageDensityDict.keys():
+            densityReportHandle.write(key + ',' + str(averageDensityDict[key]) + '\n')
 
     for mutantType in list(mutantTypeDatabase.keys()):
         if mutantTypeDatabase[mutantType] > 0:

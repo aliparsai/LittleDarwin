@@ -1,13 +1,9 @@
-# from __future__ import print_function
-# from builtins import str
-# from builtins import object
 import fnmatch
 import io
 import os
 import shutil
 
-
-class JavaRead(object):
+class JavaIO(object):
     """
 
     """
@@ -105,9 +101,11 @@ class JavaRead(object):
         normalizedData = str(file_data)
         return normalizedData
 
-    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None):
+    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, densityReport=None):
         """
 
+        :param densityReport:
+        :type densityReport:
         :param originalFile:
         :type originalFile:
         :param fileData:
@@ -117,8 +115,6 @@ class JavaRead(object):
         :return:
         :rtype:
         """
-        if mutantsPerLine is None:
-            mutantsPerLine = dict()
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
         targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory),
@@ -129,11 +125,18 @@ class JavaRead(object):
         if not os.path.isfile(os.path.join(targetDir, "original.java")):
             shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
 
-        if mutantsPerLine:
-            densityFile = os.path.abspath(os.path.join(targetDir, "density.csv"))
-            with open(densityFile, 'w') as densityFileHandle:
-                for key in sorted(mutantsPerLine.keys()):
-                    densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
+        if mutantsPerLine is not None and densityReport is not None:
+            densityCSVFile = os.path.abspath(os.path.join(targetDir, "density.csv"))
+            densityReportFile = os.path.abspath(os.path.join(targetDir, "original.html"))
+
+            if not os.path.isfile(densityCSVFile) or not os.path.isfile(densityReportFile):
+                with open(densityCSVFile, 'w') as densityFileHandle:
+                    for key in sorted(mutantsPerLine.keys()):
+                        densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
+
+                with open(densityReportFile, 'w') as densityFileHandle:
+                    densityFileHandle.write(densityReport)
+
 
         counter = 1
         while os.path.isfile(os.path.join(targetDir, str(counter) + ".java")):
