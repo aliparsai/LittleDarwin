@@ -14,7 +14,6 @@ class JavaParser(Parser):
     """
     grammarFileName = "java-escape"
 
-    @staticmethod
     def atnData():
         """
 

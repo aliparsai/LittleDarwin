@@ -123,7 +123,6 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     # creating our module objects.
     javaRead = JavaRead(options.isVerboseActive)
     javaParse = JavaParse(options.isVerboseActive)
-    javaMutate = JavaMutate(javaParse, options.isVerboseActive)
     totalMutantCount = 0
     try:
         assert os.path.isdir(options.sourcePath)
@@ -151,7 +150,8 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
         try:
             # parsing the source file into a tree.
-            tree = javaParse.parse(javaRead.getFileContent(srcFile))
+            sourceCode = javaRead.getFileContent(srcFile)
+            tree = javaParse.parse(sourceCode)
 
             # assigning a number to each node to be able to identify it uniquely.
             javaParse.numerify(tree)
@@ -165,21 +165,23 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         fileCounter += 1
 
         if options.isAll:
-            enabledMutators = "all"
+            enabledMutators = "All"
         elif options.isNullCheck:
-            enabledMutators = "null-check"
+            enabledMutators = "Null"
         else:
-            enabledMutators = "classical"
+            enabledMutators = "Traditional"
 
         # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
         # list of which operators created how many mutants.
-        javaMutate.mutantsPerLine = dict()
-        mutated, mutantTypes = javaMutate.applyMutators(tree, higherOrder, enabledMutators)
+        # javaMutate.mutantsPerLine = dict()
 
-        print("--> mutations found: ", len(mutated))
+        javaMutate = JavaMutate(tree, sourceCode, javaParse, options.isVerboseActive)
+        mutated, mutantTypes = javaMutate.gatherMutants(enabledMutators)
+
+        print("\n--> Mutations found: ", len(mutated))
 
         # go through all mutant types, and add them in total. also output the info to the user.
-        for mutantType in list(mutantTypes.keys()):
+        for mutantType in mutantTypes.keys():
             if mutantTypes[mutantType] > 0:
                 print("---->", mutantType, ":", mutantTypes[mutantType])
             mutantTypeDatabase[mutantType] = mutantTypes[mutantType] + mutantTypeDatabase.get(mutantType, 0)
@@ -193,12 +195,14 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         if len(targetList) != 0:
             mutationDatabase[os.path.relpath(srcFile, javaRead.sourceDirectory)] = targetList
 
+        del javaMutate
+
     mutationDatabase.close()
-    print("total mutations found: ", totalMutantCount)
+    print("\nTotal mutations found: ", totalMutantCount)
 
     for mutantType in list(mutantTypeDatabase.keys()):
         if mutantTypeDatabase[mutantType] > 0:
-            print("-->", mutantType, ":", mutantTypeDatabase[mutantType])
+            print("-->", mutantType + ":", mutantTypeDatabase[mutantType])
 
 
 def buildPhase(options):
