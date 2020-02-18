@@ -82,7 +82,7 @@ def main():
 
     """ % littleDarwinVersion)
 
-    optionParser = OptionParser(prog="LittleDarwin")
+    optionParser = OptionParser(prog="littledarwin")
     options, filterType, filterList, higherOrder = parseCmdArgs(optionParser)
 
     # *****************************************************************************************************************
