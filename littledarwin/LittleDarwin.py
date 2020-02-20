@@ -243,7 +243,7 @@ def buildPhase(options):
             buildDir = os.path.abspath(options.buildPath)
 
     except AssertionError as exception:
-        print("build system working directory should be a directory.")
+        print("Build system working directory should be a directory.")
     # check if we have separate test-suite
     if options.testCommand != "***dummy***":
         separateTestSuite = True
@@ -315,9 +315,9 @@ def buildPhase(options):
             contentFile.write(str(initialOutput))
 
         print("failed.\n")
-        print(
-            "Initial build failed. Try building the system manually first to make sure it can be built. Take a look at " + os.path.abspath(
-                os.path.join(mutantsPath, "initialbuild.txt")) + " to find out why this happened.")
+        print("Initial build failed. Try building the system manually first to make sure it can be built. " +
+              "Take a look at " + os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt"))
+              + " to find out why this happened.")
         sys.exit(1)
     totalMutantCount = 0
     totalMutantCounter = 0
