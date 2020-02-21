@@ -154,7 +154,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
             tree = javaParse.parse(sourceCode)
 
             # assigning a number to each node to be able to identify it uniquely.
-            javaParse.numerify(tree)
+            # javaParse.numerify(tree)
             # javaParse.tree2DOT(tree)
 
         except Exception as e:

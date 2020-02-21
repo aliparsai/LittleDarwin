@@ -40,7 +40,7 @@ class JavaParse(object):
         parser = JavaParser(stream)
         tree = parser.compilationUnit()
         self.lookupTable = dict()
-        # tree.getText()
+        self.numerify(tree)
         return tree
 
     def numerify(self, tree):
