@@ -72,11 +72,12 @@ class MutantDensityGenerator(object):
         distance = maxVal - minVal + 1
         colorList = list()
 
-        for i in range(0, 255, (256 // (distance - 1))):
-            hexVal = str(hex(i)[2:])
-            if len(hexVal) == 1:
-                hexVal = '0' + hexVal
-            colorList.append("#ff" + hexVal + hexVal)
+        if distance > 1:
+            for i in range(0, 255, (256 // (distance - 1))):
+                hexVal = str(hex(i)[2:])
+                if len(hexVal) == 1:
+                    hexVal = '0' + hexVal
+                colorList.append("#ff" + hexVal + hexVal)
 
         colorList.append("#ffffff")
         colorList.reverse()

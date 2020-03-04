@@ -35,6 +35,7 @@ import subprocess
 import sys
 import threading
 import time
+from distutils.spawn import find_executable
 from optparse import OptionParser
 
 # LittleDarwin modules
@@ -53,7 +54,7 @@ from .MutantDensityGenerator import MutantDensityGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.6.0'
+littleDarwinVersion = '0.6.1'
 
 
 def main():
@@ -259,7 +260,7 @@ def buildPhase(options):
                     testDir = os.path.abspath(options.testPath)
 
             except AssertionError as exception:
-                print("test project build system working directory should be a directory.")
+                print("Test project build system working directory should be a directory.")
 
     else:
         separateTestSuite = False
@@ -268,7 +269,7 @@ def buildPhase(options):
         mutationDatabase = shelve.open(databasePath, "r")
     except:
         print(
-            "cannot open mutation database. it may be corrupted or unavailable. delete all generated files and run the mutant generation phase again.")
+            "Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.")
         sys.exit(1)
     databaseKeys = list(mutationDatabase.keys())
     assert isinstance(databaseKeys, list)
@@ -573,6 +574,16 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     # timeout must be int, otherwise problems arise.
     assert isinstance(timeout, int)
+
+    reliableCommandString = find_executable(os.path.abspath(commandString[0]))
+    reliableCommandString = find_executable(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
+                                                   if reliableCommandString is None else reliableCommandString
+
+    if reliableCommandString is None:
+        print("\nBuild command not correct. Cannot find the executable: " + commandString[0])
+        sys.exit(1)
+
+    commandString[0] = reliableCommandString
 
     # starting the process with the given parameters.
     if platform.system() != "Windows":
