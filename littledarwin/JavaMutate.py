@@ -17,7 +17,11 @@ class Mutation(object):
     """
 
     """
-    def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str, replacementText: str):
+    def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
+                 replacementText: str, color: str = "#FFFFFF"):
+        """
+
+        """
         assert endPos >= startPos
 
         self.startPos = startPos
@@ -26,6 +30,13 @@ class Mutation(object):
         self.nodeID = nodeID
         self.mutatorType = mutatorType
         self.replacementText = replacementText
+        self.color = color
+
+    def __str__(self):
+        text = "Mutated Text: {} \n".format(self.replacementText)
+        text += "Mutation Operator Type: {} \n".format(self.mutatorType)
+        text += "Node ID: {}".format(self.nodeID)
+        return text
 
     def applyMutation(self, sourceCode: str, byteOffset: int = 0) -> str:
         """
@@ -103,11 +114,12 @@ class Mutant(object):
         self.mutatedCode = code
 
     @property
-    def stub(self):
+    def stub(self) -> str:
         """
+        Generates the text stub that goes in the beginning of each mutant file.
 
-        :return:
-        :rtype:
+        :return: Returns text stub on top of each mutant
+        :rtype: str
         """
         assert len(self.mutationList) > 0
         assert self.mutatedCode is not None
@@ -160,7 +172,8 @@ class MutationOperator(object):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
-        self.metaType = "Generic"
+        self.color = "#FFFFF0"
+        self.metaTypes = ["Generic"]
         self.mutatorType = "GenericMutationOperator"
         self.allNodes = list()  # populated by findNodes
         self.mutableNodes = list()  # populated by filterCriteria
@@ -185,10 +198,20 @@ class MutationOperator(object):
         """
         pass
 
+    @property
+    def cssClass(self):
+        """
+        Returns CSS Class for the mutation operator
+
+        :return: CSS Class
+        :rtype: str
+        """
+
+        return ".{classname} {{ background: {color}; }} ".format(classname=self.mutatorType, color=self.color)
+
 #################################################
 #          Null Mutation Operators              #
 #################################################
-
 
 class RemoveNullCheck(MutationOperator):
     """
@@ -199,7 +222,8 @@ class RemoveNullCheck(MutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveNullCheck"
-        self.metaType = "Null"
+        self.metaTypes = ["Null", "All"]
+        self.color = "#ADD8E6"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -264,7 +288,8 @@ class NullifyObjectInitialization(MutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyObjectInitialization"
-        self.metaType = "Null"
+        self.metaTypes = ["Null", "All"]
+        self.color = "#F08080"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -329,7 +354,8 @@ class NullifyReturnValue(MutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyReturnValue"
-        self.metaType = "Null"
+        self.metaTypes = ["Null", "All"]
+        self.color = "#E0FFFF"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -396,7 +422,8 @@ class NullifyInputVariable(MutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyInputVariable"
-        self.metaType = "Null"
+        self.metaTypes = ["Null", "All"]
+        self.color = "#90EE90"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -456,8 +483,6 @@ class NullifyInputVariable(MutationOperator):
                 mutant.mutateCode()
                 self.mutants.append(mutant)
 
-
-
 #################################################
 #      Traditional Mutation Operators           #
 #################################################
@@ -469,6 +494,7 @@ class TraditionalMutationOperator(MutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "GenericTraditionalMutationOperator"
+        self.metaTypes = ["Traditional", "All"]
 
     def findNodes(self):
         """
@@ -522,7 +548,7 @@ class TraditionalMutationOperator(MutationOperator):
 
         mutation = Mutation(startPos=node.children[0].symbol.start, endPos=node.children[0].symbol.stop,
                             lineNumber=node.start.line, nodeID=node.nodeIndex,
-                            mutatorType=self.mutatorType, replacementText=replacementText)
+                            mutatorType=self.mutatorType, replacementText=replacementText, color=self.color)
 
         mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
         mutant.mutateCode()
@@ -536,8 +562,8 @@ class TraditionalMutationOperator(MutationOperator):
         replacementText = symbolDict[node.children[1].symbol.text]
 
         mutation = Mutation(startPos=node.children[1].symbol.start, endPos=node.children[1].symbol.stop,
-                            lineNumber=node.start.line, nodeID=node.nodeIndex,
-                            mutatorType=self.mutatorType, replacementText=replacementText)
+                            lineNumber=node.start.line, nodeID=node.nodeIndex, mutatorType=self.mutatorType,
+                            replacementText=replacementText, color=self.color)
 
         mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
         mutant.mutateCode()
@@ -554,7 +580,7 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementBinary"
-        self.metaType = "Traditional"
+        self.color = "#FFB6C1"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -588,7 +614,7 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RelationalOperatorReplacement"
-        self.metaType = "Traditional"
+        self.color = "#FFA07A"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -621,7 +647,7 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ConditionalOperatorReplacement"
-        self.metaType = "Traditional"
+        self.color = "#87CEFA"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -654,7 +680,7 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "LogicalOperatorReplacement"
-        self.metaType = "Traditional"
+        self.color = "#F0E68C"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -687,7 +713,7 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "AssignmentOperatorReplacementShortcut"
-        self.metaType = "Traditional"
+        self.color = "#B0C4DE"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -723,7 +749,7 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementUnary"
-        self.metaType = "Traditional"
+        self.color = "#DDA0DD"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -756,7 +782,7 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ConditionalOperatorDeletion"
-        self.metaType = "Traditional"
+        self.color = "#FFD700"
         self.findNodes()
         self.filterCriteria()
         self.generateMutants()
@@ -789,7 +815,7 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementShortcut"
-        self.metaType = "Traditional"
+        self.color = "#FF00FF"
         self.terminalChild = dict()
         self.findNodes()
         self.filterCriteria()
@@ -834,7 +860,8 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
 
             mutation = Mutation(startPos=node.children[self.terminalChild[node]].symbol.start,
                                 endPos=node.children[self.terminalChild[node]].symbol.stop, lineNumber=node.start.line,
-                                nodeID=node.nodeIndex, mutatorType=self.mutatorType, replacementText=replacementText)
+                                nodeID=node.nodeIndex, mutatorType=self.mutatorType, replacementText=replacementText,
+                                color=self.color)
 
             mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
             mutant.mutateCode()
@@ -850,7 +877,7 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ShiftOperatorReplacement"
-        self.metaType = "Traditional"
+        self.color = "#9ACD32"
         self.threeTerminals = dict()
         self.findNodes()
         self.filterCriteria()
@@ -921,7 +948,7 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
                 mutation = Mutation(startPos=node.children[1].symbol.start,
                                     endPos=node.children[2].symbol.stop, lineNumber=node.start.line,
                                     nodeID=node.nodeIndex, mutatorType=self.mutatorType,
-                                    replacementText=replacementText)
+                                    replacementText=replacementText, color=self.color)
 
             mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
             mutant.mutateCode()
@@ -958,6 +985,8 @@ class JavaMutate(object):
         self.sourceCode = sourceCode
         self.sourceTree = sourceTree
         self.mutantsPerLine = dict()
+        self.averageDensity = -1
+        self.mutants = list()
 
         if isinstance(javaParseObject, JavaParse):
             self.javaParseObject = javaParseObject
@@ -968,6 +997,8 @@ class JavaMutate(object):
         self.mutationOperators = list()
         for MO in getAllInstantiableSubclasses(MutationOperator):
             self.mutationOperators.append(MO(sourceTree, sourceCode, javaParseObject))
+
+        self.inMethodLines = self.javaParseObject.getInMethodLines(self.sourceTree)
 
     def gatherMutants(self, metaType: str = "Traditional"):
         """
@@ -982,12 +1013,15 @@ class JavaMutate(object):
         mutantTexts = list()
 
         for mO in self.mutationOperators:
-            if metaType == mO.metaType or metaType == "All":
+            if metaType in mO.metaTypes:
                 mutationTypeCount[mO.mutatorType] = len(mO.mutants)
                 for mutant in mO.mutants:
+                    self.mutants.append(mutant)
                     mutantTexts.append(str(mutant))
                     for mutation in mutant.mutationList:
                         self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
+
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines)
 
         return mutantTexts, mutationTypeCount
 
@@ -1004,7 +1038,7 @@ class JavaMutate(object):
         """
         selectedMutants = list()
         for mO in self.mutationOperators:
-            if metaType == mO.metaType or metaType == "All":
+            if metaType in mO.metaTypes:
                 selectedMutants.extend(mO.mutants)
 
         higherOrder = max(int(log10(len(selectedMutants))) if higherOrderDirective == -1 else higherOrderDirective, 1)
@@ -1017,6 +1051,7 @@ class JavaMutate(object):
                 higherOrderMutant += mutant
 
             mutantTexts.append(str(higherOrderMutant))
+            self.mutants.append(higherOrderMutant)
             for mutation in higherOrderMutant.mutationList:
                 self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
 
@@ -1025,5 +1060,99 @@ class JavaMutate(object):
         mutationTypeCount = {"Higher-Order": len(mutantTexts)}
 
         return mutantTexts, mutationTypeCount
+
+    @property
+    def cssStyle(self):
+        """
+        Returns CSS Style for the aggregate report
+
+        :return: CSS Style
+        :rtype: str
+        """
+        style = """ body { font-family: "Carlito", "Calibri", "Helvetica Neue", sans-serif;}
+                    .code { font-family: monospace; font-size: medium; }
+                    .methodLine { background: white; }
+                    .outsideLine { background: lightgray; } 
+                    .tooltip { position: relative; display: inline-block; }
+                    .tooltip .tooltiptext { visibility: hidden; display: block;
+                        background-color: #006400; color: #ffffff; text-align: left;
+                        border-radius: 0.3em; padding: 0.5em 0.5em; position: absolute; top: 125%; z-index: 200;}
+                    .tooltip:hover .tooltiptext { visibility: visible; } """
+
+        for mo in self.mutationOperators:
+            assert isinstance(mo, MutationOperator)
+            style += mo.cssClass
+
+        return style
+
+    def aggregateReport(self, littleDarwinVersion: str):
+        """
+
+        :param littleDarwinVersion: LittleDarwin Version
+        :type littleDarwinVersion: str
+        :return: Aggregate report on all mutations for a file
+        :rtype: str
+        """
+        lineNumber = 1
+        col = 0
+        maxLineLength = 0
+        for l in self.sourceCode.expandtabs().splitlines(keepends=False):
+            if len(l) > maxLineLength:
+                maxLineLength = len(l)
+
+        output = "<!DOCTYPE html><head><title>LittleDarwin Aggregate Mutation Report</title> <style type='text/css'>"
+        output += self.cssStyle + "</style></head><body><h1>LittleDarwin Aggregate Mutation Report</h1>"
+        output += "<p>Average Density: {:.2f}".format(self.averageDensity) + "</p><div><pre class=\"code\">"
+        output += "<span class=\"{}\"><i>{:04d}</i> ".format(
+                    "methodLine" if lineNumber in self.inMethodLines else "outsideLine", lineNumber)
+
+        mutationStartDict = dict()
+        mutationEndList = list()
+        for mutant in self.mutants:
+            assert isinstance(mutant, Mutant)
+            for mutation in mutant.mutationList:
+                mutationStartDict[mutation.startPos] = (mutation.mutatorType, str(mutation))
+                mutationEndList.append(mutation.endPos)
+
+        for i in range(0, len(self.sourceCode)):
+            colRemainder = 0
+            if self.sourceCode[i] == "\t":
+                colRemainder = 8 - (col % 8)
+                col += colRemainder
+            else:
+                col += 1
+
+            if i in mutationStartDict.keys():
+                mutatorType, tooltipText = mutationStartDict[i]
+                output += "<span class=\"{} tooltip\">".format(mutatorType)
+                output += "<span class=\"tooltiptext\">{}</span>".format(tooltipText)
+
+            if self.sourceCode[i] == "\n":
+                output += " " * (maxLineLength - col + 1)
+
+            output += self.sourceCode[i] if self.sourceCode[i] != "\t" else " " * colRemainder
+
+            if i in mutationEndList:
+                output += "</span>"
+
+            if self.sourceCode[i] == "\n":
+                lineNumber += 1
+                col = 0
+                output += "</span><span class=\"{}\"><i>{:04d}</i> ".format(
+                    "methodLine" if lineNumber in self.inMethodLines else "outsideLine", lineNumber)
+
+        output += " " * (maxLineLength - col)
+        output += """</pre></div><footer><p style=\"font-size: small\">Report generated by LittleDarwin %s </p> 
+                     </footer></body></html>""" % littleDarwinVersion
+
+        return output
+
+
+
+
+
+
+
+
 
 

@@ -2,6 +2,7 @@
 # from __future__ import absolute_import
 # from builtins import str
 # from builtins import object
+import custom_antlr4
 from custom_antlr4 import *
 from custom_antlr4.InputStream import InputStream
 from custom_antlr4.tree.Tree import TerminalNodeImpl
@@ -26,15 +27,15 @@ class JavaParse(object):
 
     # antlr-based parser
 
-    def parse(self, file_content):
+    def parse(self, fileContent):
         """
 
-        :param file_content:
-        :type file_content:
+        :param fileContent:
+        :type fileContent:
         :return:
         :rtype:
         """
-        inputS = InputStream(file_content)
+        inputS = InputStream(fileContent)
         lexer = JavaLexer(inputS)
         stream = CommonTokenStream(lexer)
         parser = JavaParser(stream)
@@ -233,6 +234,24 @@ class JavaParse(object):
             distance = 0 if node1 == node2 else None
 
         return distance if distance is not None else -1
+
+    def getInMethodLines(self, tree: JavaParser.CompilationUnitContext):
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
+        methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
+        lines = set()
+
+        for methodBody in methodBodyList:
+            terminalNodeList = self.seekAllNodes(methodBody, TerminalNodeImpl)
+            for terminalNode in terminalNodeList:
+                lines.add(terminalNode.symbol.line)
+
+        return sorted(lines)
 
     def tree2DOT(self, tree):
         """

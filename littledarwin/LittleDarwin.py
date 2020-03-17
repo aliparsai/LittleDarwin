@@ -44,7 +44,6 @@ from .JavaIO import JavaIO
 from .ReportGenerator import ReportGenerator
 from littledarwin import License
 from .JavaMutate import JavaMutate
-from .MutantDensityGenerator import MutantDensityGenerator
 
 
 ### DEBUG ###
@@ -54,7 +53,7 @@ from .MutantDensityGenerator import MutantDensityGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.6.1'
+littleDarwinVersion = '0.7.0'
 
 
 def main():
@@ -121,8 +120,8 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     # creating our module objects.
     javaRead = JavaIO(options.isVerboseActive)
     javaParse = JavaParse(options.isVerboseActive)
-    mutantDensityGenerator = MutantDensityGenerator()
     totalMutantCount = 0
+
     try:
         assert os.path.isdir(options.sourcePath)
     except AssertionError as exception:
@@ -193,7 +192,8 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
         # for each mutant, generate the file, and add it to the list.
         fileRelativePath = os.path.relpath(srcFile, javaRead.sourceDirectory)
-        densityReport, averageDensityDict[fileRelativePath] = mutantDensityGenerator.highlightFile(sourceCode, javaMutate.mutantsPerLine)
+        densityReport = javaMutate.aggregateReport(littleDarwinVersion)
+        averageDensityDict[fileRelativePath] = javaMutate.averageDensity
 
         for mutatedFile in mutated:
             targetList.append(javaRead.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine, densityReport))
@@ -578,6 +578,7 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
     reliableCommandString = find_executable(os.path.abspath(commandString[0]))
     reliableCommandString = find_executable(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
                                                    if reliableCommandString is None else reliableCommandString
+    reliableCommandString = find_executable(commandString[0]) if reliableCommandString is None else reliableCommandString
 
     if reliableCommandString is None:
         print("\nBuild command not correct. Cannot find the executable: " + commandString[0])
