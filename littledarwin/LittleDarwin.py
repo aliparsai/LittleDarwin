@@ -53,7 +53,7 @@ from .JavaMutate import JavaMutate
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.7.0'
+littleDarwinVersion = '0.7.1'
 
 
 def main():
