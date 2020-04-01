@@ -63,7 +63,7 @@ jobs:
 
     - name: Run PyInstaller
       working-directory: $GITHUB_WORKSPACE
-      run: pyinstaller --onefile --hidden-import='pkg_resources.py2_warn' ./LittleDarwin.py
+      run: python -m PyInstaller --onefile --hidden-import='pkg_resources.py2_warn' ./LittleDarwin.py
 
     - name: Commit Changes
       shell: bash
