@@ -213,6 +213,7 @@ class MutationOperator(object):
 #          Null Mutation Operators              #
 #################################################
 
+
 class RemoveNullCheck(MutationOperator):
     """
 
@@ -1021,7 +1022,7 @@ class JavaMutate(object):
                     for mutation in mutant.mutationList:
                         self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
 
-        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines)
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
 
         return mutantTexts, mutationTypeCount
 
@@ -1058,6 +1059,8 @@ class JavaMutate(object):
             selectedMutants = selectedMutants[higherOrder:]
 
         mutationTypeCount = {"Higher-Order": len(mutantTexts)}
+
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
 
         return mutantTexts, mutationTypeCount
 
