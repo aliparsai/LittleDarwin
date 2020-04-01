@@ -69,6 +69,8 @@ jobs:
       run: |
         mkdir -p binaries/${{ steps.get_version.outputs.VERSION }}
         mv ./dist/LittleDarwin* ./binaries/${{ steps.get_version.outputs.VERSION }}
+        git config user.email "AutomaticBuilder@githubactions.job"
+        git config user.name "AutomaticBuilder"
         git add ./binaries
         git commit -m Adding\ Binary\ Version\ ${{ steps.get_version.outputs.VERSION }}\ ${{ runner.os }}
 
