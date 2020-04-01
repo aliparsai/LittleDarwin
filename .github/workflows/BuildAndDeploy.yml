@@ -47,6 +47,7 @@ jobs:
     steps:
     - name: Get Version
       id: get_version
+      shell: bash
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
 
     - name: Set Up Python 3
