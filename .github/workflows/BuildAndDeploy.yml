@@ -22,7 +22,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: '3.x'
+        python-version: '3.5'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -41,7 +41,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-16.04, windows]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -52,7 +52,7 @@ jobs:
     - name: Set Up Python 3
       uses: actions/setup-python@v1
       with:
-        python-version: '3.x'
+        python-version: '3.5'
 
     - name: Install dependencies
       run: |
@@ -73,6 +73,7 @@ jobs:
         git config user.name "AutomaticBuilder"
         git add ./binaries
         git commit -m Adding\ Binary\ Version\ ${{ steps.get_version.outputs.VERSION }}\ ${{ runner.os }}
+        git pull
 
     - name: Push changes
       uses: ad-m/github-push-action@master
