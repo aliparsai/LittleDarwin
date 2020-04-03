@@ -53,7 +53,7 @@ from .JavaMutate import JavaMutate
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.7.1'
+littleDarwinVersion = '0.7.2'
 
 
 def main():
@@ -118,7 +118,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     :type higherOrder:
     """
     # creating our module objects.
-    javaRead = JavaIO(options.isVerboseActive)
+    javaIO = JavaIO(options.isVerboseActive)
     javaParse = JavaParse(options.isVerboseActive)
     totalMutantCount = 0
 
@@ -128,34 +128,30 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         print("Source path must be a directory.")
         sys.exit(1)
     # getting the list of files.
-    javaRead.listFiles(targetPath=os.path.abspath(options.sourcePath), buildPath=os.path.abspath(options.buildPath),
-                       filterType=filterType, filterList=filterList)
+    javaIO.listFiles(targetPath=os.path.abspath(options.sourcePath), buildPath=os.path.abspath(options.buildPath),
+                     filterType=filterType, filterList=filterList)
     fileCounter = 0
-    fileCount = len(javaRead.fileList)
+    fileCount = len(javaIO.fileList)
     # creating a database for generated mutants. the format of this database is different on different platforms,
     # so it cannot be simply copied from a platform to another.
-    databasePath = os.path.join(javaRead.targetDirectory, "mutationdatabase")
-    densityResultsPath = os.path.join(javaRead.targetDirectory, "densityreport.csv")
-    print("Source Path: ", javaRead.sourceDirectory)
-    print("Target Path: ", javaRead.targetDirectory)
+    databasePath = os.path.join(javaIO.targetDirectory, "mutationdatabase")
+    densityResultsPath = os.path.join(javaIO.targetDirectory, "densityreport.csv")
+    print("Source Path: ", javaIO.sourceDirectory)
+    print("Target Path: ", javaIO.targetDirectory)
     print("Creating Mutation Database: ", databasePath)
     mutationDatabase = shelve.open(databasePath, "c")
     mutantTypeDatabase = dict()
     averageDensityDict = dict()
 
     # go through each file, parse it, calculate all mutations, and generate files accordingly.
-    for srcFile in javaRead.fileList:
+    for srcFile in javaIO.fileList:
         print("\n(" + str(fileCounter + 1) + "/" + str(fileCount) + ") Source file: ", srcFile)
         targetList = list()
 
         try:
             # parsing the source file into a tree.
-            sourceCode = javaRead.getFileContent(srcFile)
+            sourceCode = javaIO.getFileContent(srcFile)
             tree = javaParse.parse(sourceCode)
-
-            # assigning a number to each node to be able to identify it uniquely.
-            # javaParse.numerify(tree)
-            # javaParse.tree2DOT(tree)
 
         except Exception as e:
             print("Error in parsing Java code, skipping the file.")
@@ -191,12 +187,12 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         totalMutantCount += len(mutated)
 
         # for each mutant, generate the file, and add it to the list.
-        fileRelativePath = os.path.relpath(srcFile, javaRead.sourceDirectory)
+        fileRelativePath = os.path.relpath(srcFile, javaIO.sourceDirectory)
         densityReport = javaMutate.aggregateReport(littleDarwinVersion)
         averageDensityDict[fileRelativePath] = javaMutate.averageDensity
 
         for mutatedFile in mutated:
-            targetList.append(javaRead.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine, densityReport))
+            targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine, densityReport))
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:

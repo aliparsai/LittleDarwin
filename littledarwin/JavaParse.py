@@ -35,10 +35,8 @@ class JavaParse(object):
         :return:
         :rtype:
         """
-        inputS = InputStream(fileContent)
-        lexer = JavaLexer(inputS)
-        stream = CommonTokenStream(lexer)
-        parser = JavaParser(stream)
+        lexer = JavaLexer(InputStream(fileContent))
+        parser = JavaParser(CommonTokenStream(lexer))
         tree = parser.compilationUnit()
         self.lookupTable = dict()
         self.numerify(tree)
@@ -72,35 +70,37 @@ class JavaParse(object):
         except AttributeError:
             print("Index: ", tree.nodeIndex, "Text: ", tree.getText())
 
-    def seekAllNodes(self, subTree, nodeType):
+    def seekAllNodes(self, tree, nodeType):
         """
 
-        :param subTree:
-        :type subTree:
+        :param tree:
+        :type tree:
         :param nodeType:
         :type nodeType:
         :return:
         :rtype:
         """
-        seekList = list()
+        resultList = list()
+        seekStack = [tree]
 
-        if isinstance(subTree, nodeType):
-            seekList.append(subTree)
+        while len(seekStack) > 0:
+            node = seekStack.pop()
+            if isinstance(node, nodeType):
+                resultList.append(node)
 
-        try:
-            for child in subTree.getChildren():
-                seekList.extend(self.seekAllNodes(child, nodeType))
-        except AttributeError:
-            pass
+            try:
+                seekStack.extend(node.getChildren())
+            except AttributeError:
+                pass
 
-        return seekList
+        return resultList
 
     ## Deprecated
-    def seek(self, myTree, type):
+    def seek(self, tree, type):
         """
 
-        :param myTree:
-        :type myTree:
+        :param tree:
+        :type tree:
         :param type:
         :type type:
         :return:
@@ -108,11 +108,11 @@ class JavaParse(object):
         """
         seekList = list()
 
-        if isinstance(myTree, type):
-            seekList.append(myTree.nodeIndex)
+        if isinstance(tree, type):
+            seekList.append(tree.nodeIndex)
 
         try:
-            for child in myTree.getChildren():
+            for child in tree.getChildren():
                 seekList.extend(self.seek(child, type))
         except AttributeError:
             pass
@@ -139,21 +139,21 @@ class JavaParse(object):
 
         return self.seekFirstMatchingParent(parent, type)
 
-    def seekNode(self, myTree, nodeIndex):
+    def seekNode(self, tree, nodeIndex):
         """
 
-        :param myTree:
-        :type myTree:
+        :param tree:
+        :type tree:
         :param nodeIndex:
         :type nodeIndex:
         :return:
         :rtype:
         """
-        if myTree.nodeIndex == nodeIndex:
+        if tree.nodeIndex == nodeIndex:
             return 0
 
         try:
-            for child in myTree.getChildren():
+            for child in tree.getChildren():
                 nodeFound = self.seekNode(child, nodeIndex)
                 if nodeFound is not None:
                     return nodeFound + 1
@@ -162,11 +162,11 @@ class JavaParse(object):
 
         return None
 
-    def getNode(self, myTree, index):
+    def getNode(self, tree, index):
         """
 
-        :param myTree:
-        :type myTree:
+        :param tree:
+        :type tree:
         :param index:
         :type index:
         :return:
@@ -176,7 +176,7 @@ class JavaParse(object):
             return self.lookupTable[index]
 
         stack = list()
-        stack.append(myTree)
+        stack.append(tree)
 
         while len(stack) > 0:
             tmp = stack.pop()
@@ -191,29 +191,29 @@ class JavaParse(object):
 
         return None
 
-    def setNode(self, myTree, index, node):
+    def setNode(self, tree, index, node):
         """
 
-        :param myTree:
-        :type myTree:
+        :param tree:
+        :type tree:
         :param index:
         :type index:
         :param node:
         :type node:
         """
-        if myTree.nodeIndex == index:
-            myTree = node
+        if tree.nodeIndex == index:
+            tree = node
 
-        if myTree.getChildCount() != 0:
-            for child in myTree.children:
+        if tree.getChildCount() != 0:
+            for child in tree.children:
                 # print myTree.nodeIndex, child.nodeIndex
                 self.setNode(child, index, node)
 
-    def distance(self, myTree, node1, node2):
+    def distance(self, tree, node1, node2):
         """
 
-        :param myTree:
-        :type myTree:
+        :param tree:
+        :type tree:
         :param node1:
         :type node1:
         :param node2:
@@ -221,14 +221,14 @@ class JavaParse(object):
         :return:
         :rtype:
         """
-        rootDistance1 = self.seekNode(myTree, node1)
-        rootDistance2 = self.seekNode(myTree, node2)
+        rootDistance1 = self.seekNode(tree, node1)
+        rootDistance2 = self.seekNode(tree, node2)
 
         if rootDistance1 > rootDistance2:
-            distance = self.seekNode(self.getNode(myTree, node2), node1)
+            distance = self.seekNode(self.getNode(tree, node2), node1)
 
         elif rootDistance1 < rootDistance2:
-            distance = self.seekNode(self.getNode(myTree, node1), node2)
+            distance = self.seekNode(self.getNode(tree, node1), node2)
 
         else:
             distance = 0 if node1 == node2 else None
