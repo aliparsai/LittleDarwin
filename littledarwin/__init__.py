@@ -2,10 +2,10 @@
 __init__ script for littledarwin package
 """
 
-from littledarwin import LittleDarwin
+from littledarwin.LittleDarwin import littleDarwinVersion
 
-__version__ = LittleDarwin.littleDarwinVersion
+__version__ = littleDarwinVersion
 __author__ = "Ali Parsai"
 __package__ = 'littledarwin'
-__license__ = 'GPLv3'
+__license__ = 'GNU GPLv3'
 __url__ = 'https://littledarwin.parsai.net/'
