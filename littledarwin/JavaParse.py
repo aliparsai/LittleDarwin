@@ -244,6 +244,8 @@ class JavaParse(object):
         :rtype:
         """
         methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
+        methodBodyList.extend(self.seekAllNodes(tree, JavaParser.ConstructorBodyContext))
+
         lines = set()
 
         for methodBody in methodBodyList:
