@@ -2,10 +2,10 @@
 # from __future__ import absolute_import
 # from builtins import str
 # from builtins import object
-import custom_antlr4
-from custom_antlr4 import *
-from custom_antlr4.InputStream import InputStream
-from custom_antlr4.tree.Tree import TerminalNodeImpl
+import antlr4
+from antlr4 import *
+from antlr4.InputStream import InputStream
+from antlr4.tree.Tree import TerminalNodeImpl
 from .JavaLexer import JavaLexer
 from .JavaParser import JavaParser
 try:

@@ -4,9 +4,9 @@ from math import log10
 from random import shuffle
 from typing import List, Tuple, Dict
 
-from custom_antlr4 import Token
-from custom_antlr4.tree import Tree
-from custom_antlr4.tree.Tree import TerminalNodeImpl
+from antlr4 import Token
+from antlr4.tree import Tree
+from antlr4.tree.Tree import TerminalNodeImpl
 from littledarwin.JavaParse import JavaParse
 from littledarwin.JavaParser import JavaParser
 

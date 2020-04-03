@@ -15,7 +15,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     license='GNU GPLv3',
     packages=setuptools.find_packages(),
-    install_requires=['graphviz'],
+    install_requires=['antlr4-python3-runtime', 'graphviz'],
     entry_points={'console_scripts': ['littledarwin=littledarwin.__main__:entryPoint', ], },
     classifiers=[
         "Programming Language :: Python :: 3",

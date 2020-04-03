@@ -40,20 +40,25 @@
  */
 grammar Java;
 options {
-    language=Python2;
+    language=Python3;
 }
 @lexer::header {
+if sys.version_info[1] > 5:
+	from typing import TextIO
+else:
+	from typing.io import TextIO
+
 import unicodedata
 }
 
 @lexer::members {
 def isJavaIdentifierStart(self, codePoint):
-    if 'L' in unicodedata.category(unichr(codePoint)) or unichr(codePoint) is u'$' or unichr(codePoint) is u'_' :
+    if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
         return True
     return False
 	
 def isJavaIdentifierPart(self, codePoint):
-    if 'L' in unicodedata.category(unichr(codePoint)) or 'N' in unicodedata.category(unichr(codePoint)) or unichr(codePoint) is u'$' or unichr(codePoint) is u'_' :
+    if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
         return True
     return False
 	
@@ -120,7 +125,7 @@ typeParameters
     ;
 
 typeParameter
-    :   Identifier ('extends' typeBound)?
+    :   annotation* Identifier ('extends' typeBound)?
     ;
 
 typeBound
@@ -236,7 +241,7 @@ interfaceMethodDeclaration
     :   (jType|'void') Identifier formalParameters ('[' ']')*
         ('throws' qualifiedNameList)?
         ';'
-    |   ('default'|'static') methodDeclaration
+    |   ('default'|'static') typeParameters? methodDeclaration
     ;
 
 genericInterfaceMethodDeclaration
@@ -289,7 +294,11 @@ primitiveType
     ;
 
 typeArguments
-    :   '<' typeArgument (',' typeArgument)* '>'
+    :   '<' typeArgumentAnnotation (',' typeArgumentAnnotation)* '>'
+    ;
+
+typeArgumentAnnotation
+    : annotation? typeArgument
     ;
 
 typeArgument
@@ -579,6 +588,7 @@ expression
     |   lambdaExpression
     |   expression '::' typeArguments? Identifier
     |   expression '::' typeArguments? 'new'
+    |   expression '[' ']' '::' typeArguments? 'new'
     |   <assoc=right> expression
         (   '='
         |   '+='
@@ -964,7 +974,7 @@ OctalEscape
 
 fragment
 UnicodeEscape
-    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    :   '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
     ;
 
 fragment
