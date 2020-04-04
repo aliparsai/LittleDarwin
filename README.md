@@ -1,4 +1,6 @@
-# LittleDarwin
+![](https://github.com/aliparsai/LittleDarwin/workflows/LittleDarwin%20Test%20Suite/badge.svg)
+![](https://github.com/aliparsai/LittleDarwin/workflows/Build%20and%20Deploy/badge.svg)
+# LittleDarwin 
 
 Java Mutation Analysis Framework
 Copyright (C) 2014-2020 Ali Parsai
