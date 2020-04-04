@@ -940,8 +940,35 @@ public class TryWithResourceDemo implements AutoCloseable{
     # def test_parseJava9(self):
     #     parsedTree = self.javaParse.parse(self.java9SourceCode)
 
-
-
+    # Too slow
     # def test_parseManyStrings(self):
     #     parsedTree = self.javaParse.parse(self.manyStringsSourceCode)
     #
+
+    def test_numerifyHelloWorld(self):
+        tree = self.javaParse.parse("class HelloWorld { public static void main( String []args ) { System.out.println( \"Hello World!\" );  } }")
+        self.javaParse.numerify(tree)
+
+        nodeStack = [tree]
+        while len(nodeStack) > 0:
+            node = nodeStack.pop()
+            assert hasattr(node, 'nodeIndex')
+            nodeStack.extend(getattr(node, 'children', []))
+
+    def test_numerifyEmptyTree(self):
+        tree = self.javaParse.parse("")
+        self.javaParse.numerify(tree)
+
+        nodeStack = [tree]
+        while len(nodeStack) > 0:
+            node = nodeStack.pop()
+            assert hasattr(node, 'nodeIndex')
+            nodeStack.extend(getattr(node, 'children', []))
+
+    def test_numerifyWrongTree(self):
+        tree = ['This is the wrong type for a tree']
+        try:
+            self.javaParse.numerify(tree)
+            assert False
+        except AssertionError as e:
+            assert True

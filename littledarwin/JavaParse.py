@@ -1,8 +1,3 @@
-# from __future__ import print_function
-# from __future__ import absolute_import
-# from builtins import str
-# from builtins import object
-import antlr4
 from antlr4 import *
 from antlr4.InputStream import InputStream
 from antlr4.tree.Tree import TerminalNodeImpl
@@ -10,9 +5,7 @@ from .JavaLexer import JavaLexer
 from .JavaParser import JavaParser
 try:
     import graphviz
-
     noGraphviz = False
-
 except ImportError as e:
     noGraphviz = True
 
@@ -26,7 +19,6 @@ class JavaParse(object):
         self.lookupTable = dict()
 
     # antlr-based parser
-
     def parse(self, fileContent):
         """
 
@@ -48,15 +40,16 @@ class JavaParse(object):
         :param tree:
         :type tree:
         """
+        assert isinstance(tree, ParserRuleContext)
+
         numerifyCounter = 1
         stack = list()
         stack.append(tree)
         while len(stack) > 0:
-            tmp = stack.pop()
-            tmp.nodeIndex = numerifyCounter
+            node = stack.pop()
+            node.nodeIndex = numerifyCounter
             numerifyCounter += 1
-            if tmp.getChildCount() > 0:
-                stack.extend(tmp.children)
+            stack.extend(getattr(node, 'children', []))
 
     def toString(self, tree):
         """
