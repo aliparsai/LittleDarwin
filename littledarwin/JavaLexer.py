@@ -706,20 +706,19 @@ class JavaLexer(Lexer):
         self._actions = None
         self._predicates = None
 
-
     def isJavaIdentifierStart(self, codePoint):
-        if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
+        if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) == u'$' or chr(codePoint) == u'_':
             return True
         return False
-    	
-    def isJavaIdentifierPart(self, codePoint):
-        if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
-            return True
-        return False
-    	
-    def toCodePoint(self, high, low):
-        return int(high)*256+int(low)
 
+    def isJavaIdentifierPart(self, codePoint):
+        if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(
+                codePoint) == u'$' or chr(codePoint) == u'_':
+            return True
+        return False
+
+    def toCodePoint(self, high, low):
+        return int(high) * 256 + int(low)
 
     def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
         if self._predicates is None:

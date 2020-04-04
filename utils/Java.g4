@@ -53,17 +53,17 @@ import unicodedata
 
 @lexer::members {
 def isJavaIdentifierStart(self, codePoint):
-    if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
+    if 'L' in unicodedata.category(chr(codePoint)) or chr(codePoint) == u'$' or chr(codePoint) == u'_':
         return True
     return False
 	
 def isJavaIdentifierPart(self, codePoint):
-    if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(codePoint) is u'$' or chr(codePoint) is u'_' :
+    if 'L' in unicodedata.category(chr(codePoint)) or 'N' in unicodedata.category(chr(codePoint)) or chr(codePoint) == u'$' or chr(codePoint) == u'_':
         return True
     return False
 	
 def toCodePoint(self, high, low):
-    return int(high)*256+int(low)
+    return int(high)*256 + int(low)
 }
 
 // starting point for parsing a java file
