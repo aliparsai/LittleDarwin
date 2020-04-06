@@ -53,7 +53,7 @@ from .JavaMutate import JavaMutate
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.8.0'
+littleDarwinVersion = '0.9.0'
 
 
 def main():
@@ -135,7 +135,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     # creating a database for generated mutants. the format of this database is different on different platforms,
     # so it cannot be simply copied from a platform to another.
     databasePath = os.path.join(javaIO.targetDirectory, "mutationdatabase")
-    densityResultsPath = os.path.join(javaIO.targetDirectory, "densityreport.csv")
+    densityResultsPath = os.path.join(javaIO.targetDirectory, "ProjectDensityReport.csv")
     print("Source Path: ", javaIO.sourceDirectory)
     print("Target Path: ", javaIO.targetDirectory)
     print("Creating Mutation Database: ", databasePath)
@@ -192,7 +192,8 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         averageDensityDict[fileRelativePath] = javaMutate.averageDensity
 
         for mutatedFile in mutated:
-            targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine, densityReport))
+            targetList.append(javaIO.generateNewFile(
+                srcFile, mutatedFile, javaMutate.mutantsPerLine, javaMutate.mutantsPerMethod, densityReport))
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:
@@ -434,8 +435,7 @@ def buildPhase(options):
                         os.path.join(options.sourcePath, key))
 
         # generate an HTML report for the file.
-
-        targetHTMLOutputFile = os.path.join(os.path.dirname(replacementFile), "results.html")
+        targetHTMLOutputFile = os.path.join(os.path.dirname(replacementFile), "index.html")
         with open(targetHTMLOutputFile, 'w') as contentFile:
             contentFile.write(
                 reportGenerator.generateHTMLReportPerFile(key, targetHTMLOutputFile, successList, failureList))
@@ -446,8 +446,7 @@ def buildPhase(options):
               'w') as textReportFile:
         textReportFile.writelines(textReportData)
     # write final HTML report.
-    targetHTMLReportFile = os.path.abspath(
-        os.path.join(mutantsPath, "report.html"))
+    targetHTMLReportFile = os.path.abspath(os.path.join(mutantsPath, "index.html"))
     with open(targetHTMLReportFile, 'w') as htmlReportFile:
         htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
 

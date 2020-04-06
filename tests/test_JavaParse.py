@@ -8,6 +8,8 @@ class TestJavaParse(unittest.TestCase):
     def setUpClass(cls):
         cls.javaParse = JavaParse()
 
+
+
         cls.java7SourceCode = """
 // Source: https://en.wikipedia.org/wiki/Java_syntax
 // Source: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/index.html
@@ -936,14 +938,22 @@ public class TryWithResourceDemo implements AutoCloseable{
 
     def test_parseJava8(self):
         parsedTree = self.javaParse.parse(self.java8SourceCode)
-    #
+
     # def test_parseJava9(self):
     #     parsedTree = self.javaParse.parse(self.java9SourceCode)
 
-    # Too slow
+    ## Too slow
     # def test_parseManyStrings(self):
     #     parsedTree = self.javaParse.parse(self.manyStringsSourceCode)
     #
+
+    def test_getMethodRanges(self):
+        parsedTree = self.javaParse.parse(self.java7SourceCode)
+        methodRanges = self.javaParse.getMethodRanges(parsedTree)
+
+        for method in methodRanges.keys():
+            print(method, "-> start: {} stop: {}".format(*methodRanges[method]))
+
 
     def test_numerifyHelloWorld(self):
         tree = self.javaParse.parse("class HelloWorld { public static void main( String []args ) { System.out.println( \"Hello World!\" );  } }")

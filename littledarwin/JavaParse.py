@@ -112,13 +112,13 @@ class JavaParse(object):
 
         return seekList
 
-    def seekFirstMatchingParent(self, node, type):
+    def seekFirstMatchingParent(self, node, nodeType):
         """
 
         :param node:
         :type node:
-        :param type:
-        :type type:
+        :param nodeType:
+        :type nodeType:
         :return:
         :rtype:
         """
@@ -127,10 +127,10 @@ class JavaParse(object):
         except:
             return None
 
-        if isinstance(parent, type):
+        if isinstance(parent, nodeType):
             return parent
 
-        return self.seekFirstMatchingParent(parent, type)
+        return self.seekFirstMatchingParent(parent, nodeType)
 
     def seekNode(self, tree, nodeIndex):
         """
@@ -228,7 +228,7 @@ class JavaParse(object):
 
         return distance if distance is not None else -1
 
-    def getInMethodLines(self, tree: JavaParser.CompilationUnitContext):
+    def getInMethodLines(self, tree: JavaParser.CompilationUnitContext) -> list:
         """
 
         :param tree:
@@ -247,6 +247,87 @@ class JavaParse(object):
                 lines.add(terminalNode.symbol.line)
 
         return sorted(lines)
+
+    def getText(self, tree: RuleContext):
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
+        if tree is None:
+            return None
+
+        resultList = []
+        childQueue = [tree]
+
+        while len(childQueue) > 0:
+            child = childQueue.pop(0)
+
+            if isinstance(child, TerminalNodeImpl):
+                resultList.append(str(child.getText()))
+            try:
+                childQueue[0:0] = child.getChildren()
+            except AttributeError:
+                pass
+
+        return " ".join(resultList)
+
+    def getMethodRanges(self, tree: JavaParser.CompilationUnitContext) -> dict:
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
+        methodDeclarationList = self.seekAllNodes(tree, JavaParser.MethodDeclarationContext)
+        methodDeclarationList.extend(self.seekAllNodes(tree, JavaParser.ConstructorDeclarationContext))
+        resultDict = dict()
+
+        for methodDeclaration in methodDeclarationList:
+            gotName = False
+            gotStartStop = False
+            for index in range(0, len(methodDeclaration.children)):
+                if isinstance(methodDeclaration.children[index], JavaParser.FormalParametersContext):
+                    assert isinstance(methodDeclaration.children[index - 1], TerminalNodeImpl)
+                    methodName = methodDeclaration.children[index - 1].symbol.text + self.getText(methodDeclaration.children[index])
+                    gotName = True
+
+                if isinstance(methodDeclaration.children[index], JavaParser.MethodBodyContext):
+                    methodStartStop = (methodDeclaration.children[index].start.start, methodDeclaration.children[index].stop.stop)
+                    gotStartStop = True
+
+            if gotName and gotStartStop:
+                resultDict[methodName] = methodStartStop
+
+        return resultDict
+
+    def getMethodNameForNode(self, tree: JavaParser.CompilationUnitContext, nodeIndex: int):
+        """
+
+        :param tree:
+        :type tree:
+        :param nodeIndex:
+        :type nodeIndex:
+        :return:
+        :rtype:
+        """
+        node = self.getNode(tree, nodeIndex)
+        methodDeclaration = self.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+        if methodDeclaration is None:
+            methodDeclaration = self.seekFirstMatchingParent(node, JavaParser.ConstructorDeclarationContext)
+        if methodDeclaration is None:
+            return "***not in a method***"
+
+        for index in range(0, len(methodDeclaration.children)):
+            if isinstance(methodDeclaration.children[index], JavaParser.FormalParametersContext):
+                assert isinstance(methodDeclaration.children[index - 1], TerminalNodeImpl)
+                methodName = methodDeclaration.children[index - 1].symbol.text + self.getText(
+                    methodDeclaration.children[index])
+
+        return methodName
 
     def tree2DOT(self, tree):
         """

@@ -56,7 +56,7 @@ class ReportGenerator(object):
             survivedMutantCount += mutationResult[1]
             totalMutantCount += mutationResult[2]
             breakdownFile.append("<tr><td><a href=\"" + os.path.relpath(
-                os.path.join(os.path.dirname(reportPath), mutationResult[0], "results.html"),
+                os.path.join(os.path.dirname(reportPath), mutationResult[0], "index.html"),
                 os.path.dirname(reportPath)) + "\" >" + os.path.relpath(
                 os.path.join(os.path.dirname(reportPath), mutationResult[0]),
                 os.path.dirname(reportPath)) + "</a></td> <td> " +
@@ -124,7 +124,7 @@ class ReportGenerator(object):
              </style></head><body><h1>LittleDarwin Mutation Coverage Report</h1><h2>File Summary</h2><table><thead><tr>
              <th>Number of Mutants</th><th>Mutation Coverage</th></tr></thead><tbody>"""
 
-        reportMiddle = """<tr><td colspan=2 style="text-align:center"><a href="original.html">Aggregate Report</a></td>
+        reportMiddle = """<tr><td colspan=2 style="text-align:center"><a href="aggregate.html">Aggregate Report</a></td>
                           </tr></tbody></table><h2>Detailed List</h2><br><table><thead><tr><th>Survived Mutant</th>
                           <th>Build Output</th><th>Killed Mutant</th><th>Build Output</th></tr></thead><tbody>"""
 
