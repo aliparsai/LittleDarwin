@@ -8,7 +8,26 @@ class TestJavaParse(unittest.TestCase):
     def setUpClass(cls):
         cls.javaParse = JavaParse()
 
+        cls.factorialSourceCode = """
+public class Factorial {
+    public static void main(String[] args) {
+        final int NUM_FACTS = 100;
+        for(int i = 0; i < NUM_FACTS; i++)
+            System.out.println( i + "! is " + factorial(i) );
+        }
 
+    public static int factorial(int n) {
+         int result = 1;
+         for(int i = 2; i <= n; i++)
+            result *= i;
+         return result; 
+    }
+}
+"""
+        cls.emptyInterfaceSourceCode = """
+import java.lang.*;
+public interface EmptyInterface {}
+"""
 
         cls.java7SourceCode = """
 // Source: https://en.wikipedia.org/wiki/Java_syntax
@@ -947,16 +966,23 @@ public class TryWithResourceDemo implements AutoCloseable{
     #     parsedTree = self.javaParse.parse(self.manyStringsSourceCode)
     #
 
+    def test_getMethodNameForNode(self):
+        parsedTree = self.javaParse.parse(self.factorialSourceCode)
+        nodeID = parsedTree.children[0].children[1].children[2].children[2].children[2].children[0].children[3].children[0].children[3].children[0].children[1].nodeIndex
+
+        assert 'factorial' in self.javaParse.getMethodNameForNode(parsedTree, nodeID)
+        assert "***not in a method***" == self.javaParse.getMethodNameForNode(parsedTree, 3)
+
     def test_getMethodRanges(self):
-        parsedTree = self.javaParse.parse(self.java7SourceCode)
+        parsedTree = self.javaParse.parse(self.factorialSourceCode)
         methodRanges = self.javaParse.getMethodRanges(parsedTree)
 
-        for method in methodRanges.keys():
-            print(method, "-> start: {} stop: {}".format(*methodRanges[method]))
-
+        assert len(methodRanges) == 2
+        assert methodRanges['main( String [ ] args )'] == (69, 219)
+        assert methodRanges['factorial( int n )'] == (261, 379)
 
     def test_numerifyHelloWorld(self):
-        tree = self.javaParse.parse("class HelloWorld { public static void main( String []args ) { System.out.println( \"Hello World!\" );  } }")
+        tree = self.javaParse.parse("class HelloWorld { public static void main( String [] args ) { System.out.println( \"Hello World!\" );  } }")
         self.javaParse.numerify(tree)
 
         nodeStack = [tree]

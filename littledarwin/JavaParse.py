@@ -40,16 +40,16 @@ class JavaParse(object):
         :param tree:
         :type tree:
         """
-        assert isinstance(tree, ParserRuleContext)
+        assert isinstance(tree, RuleContext)
 
         numerifyCounter = 1
-        stack = list()
-        stack.append(tree)
-        while len(stack) > 0:
-            node = stack.pop()
+        queue = [tree]
+
+        while len(queue) > 0:
+            node = queue.pop(0)
             node.nodeIndex = numerifyCounter
             numerifyCounter += 1
-            stack.extend(getattr(node, 'children', []))
+            queue.extend(getattr(node, 'children', []))
 
     def toString(self, tree):
         """
