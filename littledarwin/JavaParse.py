@@ -248,6 +248,7 @@ class JavaParse(object):
 
         return sorted(lines)
 
+
     def getText(self, tree: RuleContext):
         """
 
@@ -314,6 +315,7 @@ class JavaParse(object):
         :return:
         :rtype:
         """
+        methodName = None
         node = self.getNode(tree, nodeIndex)
         methodDeclaration = self.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
         if methodDeclaration is None:
@@ -329,6 +331,32 @@ class JavaParse(object):
 
         return methodName
 
+    def getMethodTypeForNode(self, node):
+        """
+
+        :param node:
+        :type node:
+        :return:
+        :rtype:
+        """
+        parentMethod = self.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+        if parentMethod is None:
+            return None
+
+        assert isinstance(parentMethod, JavaParser.MethodDeclarationContext)
+        parentType = parentMethod.getChild(0)
+
+        if isinstance(parentType, JavaParser.JTypeContext):
+            methodType = parentType.getChild(0)
+            if isinstance(methodType, JavaParser.PrimitiveTypeContext) or \
+                    isinstance(methodType, JavaParser.ClassOrInterfaceTypeContext):
+                return methodType.getText()
+
+        elif isinstance(parentType, TerminalNodeImpl):
+            return "void" if parentType.getText() == "void" else None
+
+        return None
+
     def tree2DOT(self, tree):
         """
 
@@ -338,7 +366,7 @@ class JavaParse(object):
         :rtype:
         """
         if noGraphviz:
-            return
+            return None
 
         assert isinstance(tree, JavaParser.CompilationUnitContext)
 
@@ -375,3 +403,4 @@ class JavaParse(object):
                 pass
 
         graph.render("img/tree")
+

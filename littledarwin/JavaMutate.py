@@ -5,7 +5,6 @@ from random import shuffle
 from typing import List, Tuple, Dict
 
 from antlr4 import Token
-from antlr4.tree import Tree
 from antlr4.tree.Tree import TerminalNodeImpl
 from littledarwin.JavaParse import JavaParse
 from littledarwin.JavaParser import JavaParser
@@ -220,6 +219,75 @@ class MutationOperator(object):
         """
 
         return ".{classname} {{ background: {color}; }} ".format(classname=self.mutatorType, color=self.color)
+
+#################################################
+#       Method-level Mutation Operators         #
+#################################################
+
+class RemoveMethod(MutationOperator):
+    """
+
+    """
+    instantiable = True
+
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+        super().__init__(sourceTree, sourceCode, javaParseObject)
+        self.mutatorType = "RemoveMethod"
+        self.metaTypes = ["Method", "All"]
+        self.color = "#FF00D4"
+        self.mutableNodesWithTypes = list()
+        self.findNodes()
+        self.filterCriteria()
+        self.generateMutants()
+
+    def findNodes(self):
+        """
+
+        """
+        self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodBodyContext)
+
+    def filterCriteria(self):
+        """
+
+        """
+        for node in self.allNodes:
+            assert isinstance(node, JavaParser.MethodBodyContext)
+            nodeType = self.javaParseObject.getMethodTypeForNode(node)
+            if nodeType is not None:
+                self.mutableNodes.append(node)  # No need to do this, but kept here for compatibility.
+                self.mutableNodesWithTypes.append((node, nodeType))
+
+    def generateMutants(self):
+        """
+
+        """
+        id = 0
+        for node, nodeType in self.mutableNodesWithTypes:
+            if nodeType == "void":
+                replacementTextList = ["{\n// void -- no return //\n}\n"]
+            elif nodeType == "boolean":
+                replacementTextList = ["{\n    return true;\n}\n", "{\n    return false;\n}\n"]
+            elif nodeType == "byte" or nodeType == "short" or nodeType == "long" or nodeType == "int":
+                replacementTextList = ["{\n    return 0;\n}\n", "{\n    return 1;\n}\n"]
+            elif nodeType == "float" or nodeType == "double":
+                replacementTextList = ["{\n    return 0.0;\n}\n", "{\n    return 0.1;\n}\n"]
+            elif nodeType == "char":
+                replacementTextList = ["{\n    return \'\';\n}\n", "{\n    return \'A\';\n}\n"]
+            elif nodeType == "String":
+                replacementTextList = ["{\n    return \"\";\n}\n", "{\n    return \"A\";\n}\n"]
+            elif '[' in nodeType and ']' in nodeType:
+                replacementTextList = ["{{\n    return new {} {{}};\n}}\n".format(nodeType)]
+            else:
+                replacementTextList = ["{\n    return null;\n}\n"]
+
+            for replacementText in replacementTextList:
+                id += 1
+                mutation = Mutation(startPos=node.start.start, endPos=node.stop.stop,
+                                    lineNumber=node.start.line, nodeID=node.nodeIndex,
+                                    mutatorType=self.mutatorType, replacementText=replacementText)
+                mutant = Mutant(mutantID=id, mutationList=[mutation], sourceCode=self.sourceCode)
+                mutant.mutateCode()
+                self.mutants.append(mutant)
 
 #################################################
 #          Null Mutation Operators              #
@@ -1014,12 +1082,12 @@ class JavaMutate(object):
 
         self.inMethodLines = self.javaParseObject.getInMethodLines(self.sourceTree)
 
-    def gatherMutants(self, metaType: str = "Traditional"):
+    def gatherMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
         Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
 
-        :param metaType: type of mutation operators to use
-        :type metaType: str
+        :param metaTypes: types of mutation operators to use
+        :type metaTypes: List[str]
         :return: mutated source code for each mutant, number of types of mutants
         :rtype: Tuple[List, Dict]
         """
@@ -1027,35 +1095,39 @@ class JavaMutate(object):
         mutantTexts = list()
 
         for mO in self.mutationOperators:
-            if metaType in mO.metaTypes:
-                mutationTypeCount[mO.mutatorType] = len(mO.mutants)
-                for mutant in mO.mutants:
-                    self.mutants.append(mutant)
-                    mutantTexts.append(str(mutant))
-                    for mutation in mutant.mutationList:
-                        self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber, 0)
-                        self.mutantsPerMethod[self.javaParseObject.getMethodNameForNode(
-                            self.sourceTree, mutation.nodeID)] = 1 + self.mutantsPerMethod.get(mutation.lineNumber, 0)
+            for metaType in metaTypes:
+                if metaType in mO.metaTypes:
+                    mutationTypeCount[mO.mutatorType] = len(mO.mutants)
+                    for mutant in mO.mutants:
+                        self.mutants.append(mutant)
+                        mutantTexts.append(str(mutant))
+                        for mutation in mutant.mutationList:
+                            self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber,
+                                                                                                   0)
+                            self.mutantsPerMethod[self.javaParseObject.getMethodNameForNode(
+                                self.sourceTree, mutation.nodeID)] = 1 + self.mutantsPerMethod.get(mutation.lineNumber,
+                                                                                                   0)
 
         self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
 
         return mutantTexts, mutationTypeCount
 
-    def gatherHigherOrderMutants(self, higherOrderDirective: int, metaType: str = "Traditional"):
+    def gatherHigherOrderMutants(self, higherOrderDirective: int, metaTypes: List[str] = ["Traditional"]):
         """
         Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
 
         :param higherOrderDirective: The requested higher-order order
         :type higherOrderDirective: int
-        :param metaType: type of mutation operators to use
-        :type metaType: str
+        :param metaTypes: type of mutation operators to use
+        :type metaTypes: List[str]
         :return: mutated source code for each mutant, number of types of mutants
         :rtype: Tuple[List, Dict]
         """
         selectedMutants = list()
         for mO in self.mutationOperators:
-            if metaType in mO.metaTypes:
-                selectedMutants.extend(mO.mutants)
+            for metaType in metaTypes:
+                if metaType in mO.metaTypes:
+                    selectedMutants.extend(mO.mutants)
 
         higherOrder = max(int(log10(len(selectedMutants))) if higherOrderDirective == -1 else higherOrderDirective, 1)
         shuffle(selectedMutants)

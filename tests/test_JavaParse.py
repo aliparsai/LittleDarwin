@@ -29,6 +29,79 @@ import java.lang.*;
 public interface EmptyInterface {}
 """
 
+        cls.methodTypesSourceCode = """
+import java.lang.*;
+public class VariousMethodTypes {
+    public static void main(String[] args) {
+    
+    }
+
+    private void voidMethod() {
+    String result = "NULL";
+    }
+    
+    private int intMethod(int n) {
+         int result = 1;
+         return result; 
+    }
+    
+    private byte byteMethod(int n) {
+         byte result = 1;
+         return result; 
+    }
+
+    private short shortMethod(int n) {
+         short result = 1;
+         return result; 
+    }
+
+    private long longMethod(int n) {
+         long result = 1;
+         return result; 
+    }
+    
+    
+    public boolean boolMethod() {
+         boolean result = true;
+         return result; 
+    }
+
+    public float floatMethod() {
+         float result = 0.1;
+         return result; 
+    }
+
+    private double doubleMethod() {
+         double result = 0.1;
+         return result; 
+    }
+    
+    private char charMethod() {
+         char result = "A";
+         return result; 
+    }
+    
+    private String stringMethod() {
+         String result = "Say Hello To My Little FRIEND!!!";
+         return result; 
+    }
+    
+    public Object objectMethod() {
+         Object result = new Object();
+         return result;
+    }
+    
+    private T[] typeArrayMethod(T[] t) {
+         T[] result = t;
+         return result; 
+    }
+    
+    
+}
+
+
+"""
+
         cls.java7SourceCode = """
 // Source: https://en.wikipedia.org/wiki/Java_syntax
 // Source: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/index.html
@@ -954,9 +1027,15 @@ public class TryWithResourceDemo implements AutoCloseable{
 
     def test_parseJava7(self):
         parsedTree = self.javaParse.parse(self.java7SourceCode)
+        pass
 
     def test_parseJava8(self):
         parsedTree = self.javaParse.parse(self.java8SourceCode)
+        pass
+
+    def test_parseMethodTypes(self):
+        parsedTree = self.javaParse.parse(self.methodTypesSourceCode)
+        pass
 
     # def test_parseJava9(self):
     #     parsedTree = self.javaParse.parse(self.java9SourceCode)

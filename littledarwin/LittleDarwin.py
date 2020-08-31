@@ -160,12 +160,16 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
         fileCounter += 1
 
+        enabledMutators = ["Traditional"]
+
+        if options.isNullCheck:
+            enabledMutators = ["Null"]
+
         if options.isAll:
-            enabledMutators = "All"
-        elif options.isNullCheck:
-            enabledMutators = "Null"
-        else:
-            enabledMutators = "Traditional"
+            enabledMutators = ["All"]
+
+        if options.isMethodLevel:
+            enabledMutators = ["Method"]
 
         # apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed
         # list of which operators created how many mutants.
@@ -491,6 +495,8 @@ def parseCmdArgs(optionParser: OptionParser) -> object:
                             help="Define order of mutation. Use -1 to dynamically adjust per class.")
     optionParser.add_option("--null-check", action="store_true", dest="isNullCheck", default=False,
                             help="Use null check mutation operators.")
+    optionParser.add_option("--method-level", action="store_true", dest="isMethodLevel", default=False,
+                            help="Use method level mutation operators.")
     optionParser.add_option("--all", action="store_true", dest="isAll", default=False,
                             help="Use all mutation operators.")
     optionParser.add_option("--whitelist", action="store", dest="whitelist", default="***dummy***",
