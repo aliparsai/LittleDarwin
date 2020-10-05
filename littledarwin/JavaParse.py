@@ -1,10 +1,15 @@
+from typing import Dict
+
 from antlr4 import *
 from antlr4.InputStream import InputStream
 from antlr4.tree.Tree import TerminalNodeImpl
+
 from .JavaLexer import JavaLexer
 from .JavaParser import JavaParser
+
 try:
     import graphviz
+
     noGraphviz = False
 except ImportError as e:
     noGraphviz = True
@@ -14,6 +19,7 @@ class JavaParse(object):
     """
 
     """
+
     def __init__(self, verbose=False):
         self.verbose = verbose
         self.lookupTable = dict()
@@ -248,7 +254,6 @@ class JavaParse(object):
 
         return sorted(lines)
 
-
     def getText(self, tree: RuleContext):
         """
 
@@ -293,11 +298,13 @@ class JavaParse(object):
             for index in range(0, len(methodDeclaration.children)):
                 if isinstance(methodDeclaration.children[index], JavaParser.FormalParametersContext):
                     assert isinstance(methodDeclaration.children[index - 1], TerminalNodeImpl)
-                    methodName = methodDeclaration.children[index - 1].symbol.text + self.getText(methodDeclaration.children[index])
+                    methodName = methodDeclaration.children[index - 1].symbol.text + self.getText(
+                        methodDeclaration.children[index])
                     gotName = True
 
                 if isinstance(methodDeclaration.children[index], JavaParser.MethodBodyContext):
-                    methodStartStop = (methodDeclaration.children[index].start.start, methodDeclaration.children[index].stop.stop)
+                    methodStartStop = (
+                        methodDeclaration.children[index].start.start, methodDeclaration.children[index].stop.stop)
                     gotStartStop = True
 
             if gotName and gotStartStop:
@@ -357,6 +364,53 @@ class JavaParse(object):
 
         return None
 
+    def getCyclomaticComplexity(self, methodBody) -> int:
+        """
+
+        :param methodBody:
+        :type methodBody:
+        :return:
+        :rtype:
+        """
+        assert isinstance(methodBody, JavaParser.MethodBodyContext) or \
+               isinstance(methodBody, JavaParser.ConstructorBodyContext)
+
+        cyclomaticComplexity = 1
+        keywordList = self.seekAllNodes(methodBody, TerminalNodeImpl)
+
+        for keyword in keywordList:
+            keywordText = keyword.getText()
+            if keywordText == "if" or \
+                    keywordText == "case" or \
+                    keywordText == "for" or \
+                    keywordText == "while" or \
+                    keywordText == "catch" or \
+                    keywordText == "&&" or \
+                    keywordText == "||" or \
+                    keywordText == "?" or \
+                    keywordText == "foreach":
+                cyclomaticComplexity += 1
+
+        return cyclomaticComplexity
+
+    def getCyclomaticComplexityAllMethods(self, tree) -> Dict[str, int]:
+        """
+
+        :param tree:
+        :type tree:
+        """
+        assert isinstance(tree, JavaParser.CompilationUnitContext)
+        cyclomaticComplexityPerMethod = dict()
+
+        methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
+        methodBodyList.extend(self.seekAllNodes(tree, JavaParser.ConstructorBodyContext))
+
+        for methodBody in methodBodyList:
+            cyclomaticComplexityPerMethod[
+                self.getMethodNameForNode(tree, methodBody.nodeIndex)] = self.getCyclomaticComplexity(methodBody)
+
+        return cyclomaticComplexityPerMethod
+
     def tree2DOT(self, tree):
         """
 
@@ -403,4 +457,3 @@ class JavaParse(object):
                 pass
 
         graph.render("img/tree")
-

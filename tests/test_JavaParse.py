@@ -1052,6 +1052,14 @@ public class TryWithResourceDemo implements AutoCloseable{
         assert 'factorial' in self.javaParse.getMethodNameForNode(parsedTree, nodeID)
         assert "***not in a method***" == self.javaParse.getMethodNameForNode(parsedTree, 3)
 
+    def test_getCyclomaticComplexity(self):
+        parsedTree = self.javaParse.parse(self.factorialSourceCode)
+        cyclomaticComplexityDict = self.javaParse.getCyclomaticComplexityAllMethods(parsedTree)
+
+        assert len(cyclomaticComplexityDict) == 2
+        assert cyclomaticComplexityDict['factorial( int n )'] == 2
+        assert cyclomaticComplexityDict['main( String [ ] args )'] == 2
+
     def test_getMethodRanges(self):
         parsedTree = self.javaParse.parse(self.factorialSourceCode)
         methodRanges = self.javaParse.getMethodRanges(parsedTree)

@@ -38,13 +38,12 @@ import time
 from distutils.spawn import find_executable
 from optparse import OptionParser
 
+from littledarwin import License
+from .JavaIO import JavaIO
+from .JavaMutate import JavaMutate
 # LittleDarwin modules
 from .JavaParse import JavaParse
-from .JavaIO import JavaIO
 from .ReportGenerator import ReportGenerator
-from littledarwin import License
-from .JavaMutate import JavaMutate
-
 
 ### DEBUG ###
 # def trace(frame, event, arg):
@@ -194,10 +193,12 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         fileRelativePath = os.path.relpath(srcFile, javaIO.sourceDirectory)
         densityReport = javaMutate.aggregateReport(littleDarwinVersion)
         averageDensityDict[fileRelativePath] = javaMutate.averageDensity
+        cyclomaticComplexityAllMethods = javaParse.getCyclomaticComplexityAllMethods(tree)
 
         for mutatedFile in mutated:
-            targetList.append(javaIO.generateNewFile(
-                srcFile, mutatedFile, javaMutate.mutantsPerLine, javaMutate.mutantsPerMethod, densityReport))
+            targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine,
+                                                     javaMutate.mutantsPerMethod, densityReport,
+                                                     cyclomaticComplexityAllMethods))
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:
@@ -578,8 +579,9 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     reliableCommandString = find_executable(os.path.abspath(commandString[0]))
     reliableCommandString = find_executable(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
-                                                   if reliableCommandString is None else reliableCommandString
-    reliableCommandString = find_executable(commandString[0]) if reliableCommandString is None else reliableCommandString
+        if reliableCommandString is None else reliableCommandString
+    reliableCommandString = find_executable(
+        commandString[0]) if reliableCommandString is None else reliableCommandString
 
     if reliableCommandString is None:
         print("\nBuild command not correct. Cannot find the executable: " + commandString[0])

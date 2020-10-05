@@ -3,10 +3,12 @@ import io
 import os
 import shutil
 
+
 class JavaIO(object):
     """
 
     """
+
     def __init__(self, verbose=False):
         self.verbose = False
         self.sourceDirectory = None
@@ -101,9 +103,14 @@ class JavaIO(object):
         normalizedData = str(file_data)
         return normalizedData
 
-    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, mutantsPerMethod=None, densityReport=None):
+    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, mutantsPerMethod=None,
+                        densityReport=None, cyclomaticComplexity=None):
         """
 
+        :param cyclomaticComplexity:
+        :type cyclomaticComplexity:
+        :param mutantsPerMethod:
+        :type mutantsPerMethod:
         :param densityReport:
         :type densityReport:
         :param originalFile:
@@ -125,12 +132,14 @@ class JavaIO(object):
         if not os.path.isfile(os.path.join(targetDir, "original.java")):
             shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
 
-        if mutantsPerLine is not None and mutantsPerMethod is not None and densityReport is not None:
+        if mutantsPerLine is not None and mutantsPerMethod is not None and densityReport is not None and cyclomaticComplexity is not None:
             densityPerLineCSVFile = os.path.abspath(os.path.join(targetDir, "MutantDensityPerLine.csv"))
             densityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "MutantDensityPerMethod.csv"))
+            cyclomaticComplexityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "CyclomaticComplexityPerMethod.csv"))
             densityReportFile = os.path.abspath(os.path.join(targetDir, "aggregate.html"))
 
-            if not os.path.isfile(densityPerMethodCSVFile) or not os.path.isfile(densityPerLineCSVFile) or not os.path.isfile(densityReportFile):
+            if not os.path.isfile(densityPerMethodCSVFile) or not os.path.isfile(
+                    densityPerLineCSVFile) or not os.path.isfile(densityReportFile):
                 with open(densityPerLineCSVFile, 'w') as densityFileHandle:
                     for key in sorted(mutantsPerLine.keys()):
                         densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
@@ -138,6 +147,10 @@ class JavaIO(object):
                 with open(densityPerMethodCSVFile, 'w') as densityFileHandle:
                     for key in sorted(mutantsPerMethod.keys()):
                         densityFileHandle.write(str(key) + ';' + str(mutantsPerMethod[key]) + '\n')
+
+                with open(cyclomaticComplexityPerMethodCSVFile, 'w') as cyclomaticComplexityFileHandle:
+                    for key in sorted(cyclomaticComplexity.keys()):
+                        cyclomaticComplexityFileHandle.write(str(key) + ';' + str(cyclomaticComplexity[key]) + '\n')
 
                 with open(densityReportFile, 'w') as densityFileHandle:
                     densityFileHandle.write(densityReport)
