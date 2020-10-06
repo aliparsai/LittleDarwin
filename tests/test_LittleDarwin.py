@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import unittest
 import tempfile
@@ -41,7 +42,17 @@ class TestLittleDarwin(unittest.TestCase):
             self.assertEqual(int(e.code), 0)
 
     def testVideoStoreTraditionalBuild(self):
-        argList = ['-m', '-b', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath, '-c', "mvn,clean,test"]
+        mavenPath = shutil.which("mvn")
+        if mavenPath is None:
+            mavenPath = shutil.which("mvn.bat")
+
+        if mavenPath is None:
+            mavenPath = shutil.which("mvn.cmd")
+
+        self.assertIsNotNone(mavenPath)
+
+        argList = ['-m', '-b', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath, '-c',
+                   str(mavenPath) + ",clean,test"]
         print("Running LittleDarwin with arguments:\n" + " ".join(argList))
 
         try:
