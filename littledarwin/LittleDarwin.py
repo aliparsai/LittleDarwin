@@ -588,10 +588,15 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
     assert isinstance(timeout, int)
 
     reliableCommandString = find_executable(os.path.abspath(commandString[0]))
+
     reliableCommandString = find_executable(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
         if reliableCommandString is None else reliableCommandString
-    reliableCommandString = find_executable(
-        commandString[0]) if reliableCommandString is None else reliableCommandString
+
+    reliableCommandString = find_executable(commandString[0]) \
+        if reliableCommandString is None else reliableCommandString
+
+    reliableCommandString = shutil.which(commandString[0]) \
+        if reliableCommandString is None else reliableCommandString
 
     if reliableCommandString is None:
         print("\nBuild command not correct. Cannot find the executable: " + commandString[0])
