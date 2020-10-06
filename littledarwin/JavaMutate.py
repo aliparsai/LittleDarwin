@@ -1104,9 +1104,8 @@ class JavaMutate(object):
                         for mutation in mutant.mutationList:
                             self.mutantsPerLine[mutation.lineNumber] = 1 + self.mutantsPerLine.get(mutation.lineNumber,
                                                                                                    0)
-                            self.mutantsPerMethod[self.javaParseObject.getMethodNameForNode(
-                                self.sourceTree, mutation.nodeID)] = 1 + self.mutantsPerMethod.get(mutation.lineNumber,
-                                                                                                   0)
+                            methodName = self.javaParseObject.getMethodNameForNode(self.sourceTree, mutation.nodeID)
+                            self.mutantsPerMethod[methodName] = 1 + self.mutantsPerMethod.get(methodName, 0)
 
         self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
 

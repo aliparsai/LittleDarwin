@@ -131,7 +131,21 @@ class JavaIO(object):
         return aggregateReport
 
     def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
+        """
 
+        :param originalFile:
+        :type originalFile:
+        :param fileData:
+        :type fileData:
+        :param mutantsPerLine:
+        :type mutantsPerLine:
+        :param densityReport:
+        :type densityReport:
+        :param aggregateComplexity:
+        :type aggregateComplexity:
+        :return:
+        :rtype:
+        """
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
         targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory),
