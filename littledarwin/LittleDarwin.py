@@ -55,7 +55,7 @@ from .ReportGenerator import ReportGenerator
 littleDarwinVersion = '0.9.0'
 
 
-def main():
+def main(mockArgs: list = None):
     """
     Main LittleDarwin Function
     """
@@ -82,7 +82,7 @@ def main():
     """ % littleDarwinVersion)
 
     optionParser = OptionParser(prog="littledarwin")
-    options, filterType, filterList, higherOrder = parseCmdArgs(optionParser)
+    options, filterType, filterList, higherOrder = parseCmdArgs(optionParser, mockArgs)
 
     # *****************************************************************************************************************
     # ---------------------------------------- mutant generation phase ------------------------------------------------
@@ -102,6 +102,8 @@ def main():
     if not (options.isBuildActive or options.isMutationActive):
         optionParser.print_help()
         print("\nExample:\n  LittleDarwin -m -b -t ./ -p ./src/main -c mvn,clean,test --timeout=120\n\n")
+
+    return 0
 
 
 def mutationPhase(options, filterType, filterList, higherOrder):
@@ -193,7 +195,9 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         fileRelativePath = os.path.relpath(srcFile, javaIO.sourceDirectory)
         densityReport = javaMutate.aggregateReport(littleDarwinVersion)
         averageDensityDict[fileRelativePath] = javaMutate.averageDensity
-        aggregateComplexity = javaIO.getAggregateComplexityReport(javaMutate.mutantsPerMethod, javaParse.getCyclomaticComplexityAllMethods(tree), javaParse.getLinesOfCodePerMethod(tree))
+        aggregateComplexity = javaIO.getAggregateComplexityReport(javaMutate.mutantsPerMethod,
+                                                                  javaParse.getCyclomaticComplexityAllMethods(tree),
+                                                                  javaParse.getLinesOfCodePerMethod(tree))
 
         for mutatedFile in mutated:
             targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine,
@@ -271,7 +275,7 @@ def buildPhase(options):
     except:
         print(
             "Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.")
-        sys.exit(1)
+        sys.exit(2)
     databaseKeys = list(mutationDatabase.keys())
     assert isinstance(databaseKeys, list)
     # let's sort the mutants by name to create the possibility of following the flow of the process by user.
@@ -320,7 +324,7 @@ def buildPhase(options):
         print("Initial build failed. Try building the system manually first to make sure it can be built. " +
               "Take a look at " + os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt"))
               + " to find out why this happened.")
-        sys.exit(1)
+        sys.exit(3)
     totalMutantCount = 0
     totalMutantCounter = 0
     for key in databaseKeys:
@@ -455,9 +459,11 @@ def buildPhase(options):
         htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
 
 
-def parseCmdArgs(optionParser: OptionParser) -> object:
+def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
     """
 
+    :param mockArgs:
+    :type mockArgs:
     :param optionParser:
     :type optionParser:
     :return:
@@ -503,10 +509,15 @@ def parseCmdArgs(optionParser: OptionParser) -> object:
                             help="Analyze only included packages or files defined in this file (one package name or path to file per line).")
     optionParser.add_option("--blacklist", action="store", dest="blacklist", default="***dummy***",
                             help="Analyze everything except packages or files defined in this file (one package name or path to file per line).")
-    (options, args) = optionParser.parse_args()
+
+    if mockArgs is None:
+        (options, args) = optionParser.parse_args()
+    else:
+        (options, args) = optionParser.parse_args(args=mockArgs)
+
     if options.whitelist != "***dummy***" and options.blacklist != "***dummy***":
         print("You can either define a whitelist or a blacklist but not both.")
-        sys.exit(0)
+        sys.exit(4)
     filterList = None
     filterType = None
     if options.whitelist != "***dummy***" and os.path.isfile(options.whitelist):
@@ -584,7 +595,7 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     if reliableCommandString is None:
         print("\nBuild command not correct. Cannot find the executable: " + commandString[0])
-        sys.exit(1)
+        sys.exit(5)
 
     commandString[0] = reliableCommandString
 
