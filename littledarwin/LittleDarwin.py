@@ -193,12 +193,11 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         fileRelativePath = os.path.relpath(srcFile, javaIO.sourceDirectory)
         densityReport = javaMutate.aggregateReport(littleDarwinVersion)
         averageDensityDict[fileRelativePath] = javaMutate.averageDensity
-        cyclomaticComplexityAllMethods = javaParse.getCyclomaticComplexityAllMethods(tree)
+        aggregateComplexity = javaIO.getAggregateComplexityReport(javaMutate.mutantsPerMethod, javaParse.getCyclomaticComplexityAllMethods(tree), javaParse.getLinesOfCodePerMethod(tree))
 
         for mutatedFile in mutated:
             targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine,
-                                                     javaMutate.mutantsPerMethod, densityReport,
-                                                     cyclomaticComplexityAllMethods))
+                                                     densityReport, aggregateComplexity))
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:

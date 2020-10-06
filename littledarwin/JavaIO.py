@@ -2,6 +2,7 @@ import fnmatch
 import io
 import os
 import shutil
+from typing import Dict, List
 
 
 class JavaIO(object):
@@ -103,25 +104,34 @@ class JavaIO(object):
         normalizedData = str(file_data)
         return normalizedData
 
-    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, mutantsPerMethod=None,
-                        densityReport=None, cyclomaticComplexity=None):
+    def getAggregateComplexityReport(self, mutantDensityPerMethod: Dict[str, int],
+                                     cyclomaticComplexityPerMethod: Dict[str, int],
+                                     linesOfCodePerMethod: Dict[str, int]) -> Dict[str, List[int]]:
         """
 
-        :param cyclomaticComplexity:
-        :type cyclomaticComplexity:
-        :param mutantsPerMethod:
-        :type mutantsPerMethod:
-        :param densityReport:
-        :type densityReport:
-        :param originalFile:
-        :type originalFile:
-        :param fileData:
-        :type fileData:
-        :param mutantsPerLine:
-        :type mutantsPerLine:
+        :param mutantDensityPerMethod:
+        :type mutantDensityPerMethod:
+        :param cyclomaticComplexityPerMethod:
+        :type cyclomaticComplexityPerMethod:
+        :param linesOfCodePerMethod:
+        :type linesOfCodePerMethod:
         :return:
         :rtype:
         """
+        aggregateReport = dict()
+        methodList = set(mutantDensityPerMethod.keys())
+        methodList.update(cyclomaticComplexityPerMethod.keys())
+        methodList.update(linesOfCodePerMethod.keys())
+
+        for method in methodList:
+            aggregateReport[method] = [mutantDensityPerMethod.get(method, 0),
+                                       cyclomaticComplexityPerMethod.get(method, 1),
+                                       linesOfCodePerMethod.get(method, 0)]
+
+        return aggregateReport
+
+    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
+
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
         targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory),
@@ -132,25 +142,22 @@ class JavaIO(object):
         if not os.path.isfile(os.path.join(targetDir, "original.java")):
             shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
 
-        if mutantsPerLine is not None and mutantsPerMethod is not None and densityReport is not None and cyclomaticComplexity is not None:
+        if mutantsPerLine is not None and densityReport is not None and aggregateComplexity is not None:
             densityPerLineCSVFile = os.path.abspath(os.path.join(targetDir, "MutantDensityPerLine.csv"))
-            densityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "MutantDensityPerMethod.csv"))
-            cyclomaticComplexityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "CyclomaticComplexityPerMethod.csv"))
+            complexityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "ComplexityPerMethod.csv"))
             densityReportFile = os.path.abspath(os.path.join(targetDir, "aggregate.html"))
 
-            if not os.path.isfile(densityPerMethodCSVFile) or not os.path.isfile(
+            if not os.path.isfile(complexityPerMethodCSVFile) or not os.path.isfile(
                     densityPerLineCSVFile) or not os.path.isfile(densityReportFile):
                 with open(densityPerLineCSVFile, 'w') as densityFileHandle:
                     for key in sorted(mutantsPerLine.keys()):
                         densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
 
-                with open(densityPerMethodCSVFile, 'w') as densityFileHandle:
-                    for key in sorted(mutantsPerMethod.keys()):
-                        densityFileHandle.write(str(key) + ';' + str(mutantsPerMethod[key]) + '\n')
-
-                with open(cyclomaticComplexityPerMethodCSVFile, 'w') as cyclomaticComplexityFileHandle:
-                    for key in sorted(cyclomaticComplexity.keys()):
-                        cyclomaticComplexityFileHandle.write(str(key) + ';' + str(cyclomaticComplexity[key]) + '\n')
+                with open(complexityPerMethodCSVFile, 'w') as densityFileHandle:
+                    for key in sorted(aggregateComplexity.keys()):
+                        line = [str(key)]
+                        line.extend([str(x) for x in aggregateComplexity[key]])
+                        densityFileHandle.write(";".join(line) + '\n')
 
                 with open(densityReportFile, 'w') as densityFileHandle:
                     densityFileHandle.write(densityReport)

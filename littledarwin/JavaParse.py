@@ -254,6 +254,29 @@ class JavaParse(object):
 
         return sorted(lines)
 
+    def getLinesOfCodePerMethod(self, tree: JavaParser.CompilationUnitContext) -> dict:
+        """
+
+        :param tree:
+        :type tree:
+        :return:
+        :rtype:
+        """
+        methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
+        methodBodyList.extend(self.seekAllNodes(tree, JavaParser.ConstructorBodyContext))
+
+        linesOfCodePerMethod = dict()
+
+        for methodBody in methodBodyList:
+            lines = set()
+            terminalNodeList = self.seekAllNodes(methodBody, TerminalNodeImpl)
+            for terminalNode in terminalNodeList:
+                lines.add(terminalNode.symbol.line)
+
+            linesOfCodePerMethod[self.getMethodNameForNode(tree, methodBody.nodeIndex)] = len(lines)
+
+        return linesOfCodePerMethod
+
     def getText(self, tree: RuleContext):
         """
 
