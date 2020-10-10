@@ -359,7 +359,15 @@ class JavaParse(object):
                 methodName = methodDeclaration.children[index - 1].symbol.text + self.getText(
                     methodDeclaration.children[index])
 
-        return methodName
+        classDeclaration = self.seekFirstMatchingParent(node, JavaParser.ClassDeclarationContext)
+        if classDeclaration is None:
+            return methodName
+
+        for index in range(0, len(classDeclaration.children)):
+            if isinstance(classDeclaration.children[index - 1], TerminalNodeImpl) and \
+                    isinstance(classDeclaration.children[index], TerminalNodeImpl) and \
+                    classDeclaration.children[index - 1].symbol.text == 'class':
+                return classDeclaration.children[index].symbol.text + '.' + methodName
 
     def getMethodTypeForNode(self, node):
         """

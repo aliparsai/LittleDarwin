@@ -1027,15 +1027,15 @@ public class TryWithResourceDemo implements AutoCloseable{
 
     def test_parseJava7(self):
         parsedTree = self.javaParse.parse(self.java7SourceCode)
-        pass
+        self.assertIsNotNone(parsedTree)
 
     def test_parseJava8(self):
         parsedTree = self.javaParse.parse(self.java8SourceCode)
-        pass
+        self.assertIsNotNone(parsedTree)
 
     def test_parseMethodTypes(self):
         parsedTree = self.javaParse.parse(self.methodTypesSourceCode)
-        pass
+        self.assertIsNotNone(parsedTree)
 
     # def test_parseJava9(self):
     #     parsedTree = self.javaParse.parse(self.java9SourceCode)
@@ -1048,25 +1048,38 @@ public class TryWithResourceDemo implements AutoCloseable{
     def test_getMethodNameForNode(self):
         parsedTree = self.javaParse.parse(self.factorialSourceCode)
         nodeID = parsedTree.children[0].children[1].children[2].children[2].children[2].children[0].children[3].children[0].children[3].children[0].children[1].nodeIndex
+        methodName = self.javaParse.getMethodNameForNode(parsedTree, nodeID)
 
-        assert 'factorial' in self.javaParse.getMethodNameForNode(parsedTree, nodeID)
-        assert "***not in a method***" == self.javaParse.getMethodNameForNode(parsedTree, 3)
+        self.assertIn('factorial', methodName)
+        self.assertEqual("***not in a method***", self.javaParse.getMethodNameForNode(parsedTree, 3))
 
     def test_getCyclomaticComplexity(self):
         parsedTree = self.javaParse.parse(self.factorialSourceCode)
         cyclomaticComplexityDict = self.javaParse.getCyclomaticComplexityAllMethods(parsedTree)
 
-        assert len(cyclomaticComplexityDict) == 2
-        assert cyclomaticComplexityDict['factorial( int n )'] == 2
-        assert cyclomaticComplexityDict['main( String [ ] args )'] == 2
+        for key in cyclomaticComplexityDict.keys():
+            if "main" in key:
+                keyMain = key
+            if "factorial" in key:
+                keyFactorial = key
+
+        self.assertEqual(len(cyclomaticComplexityDict), 2)
+        self.assertEqual(cyclomaticComplexityDict[keyMain], 2)
+        self.assertEqual(cyclomaticComplexityDict[keyFactorial], 2)
 
     def test_getMethodRanges(self):
         parsedTree = self.javaParse.parse(self.factorialSourceCode)
         methodRanges = self.javaParse.getMethodRanges(parsedTree)
 
-        assert len(methodRanges) == 2
-        assert methodRanges['main( String [ ] args )'] == (69, 219)
-        assert methodRanges['factorial( int n )'] == (261, 379)
+        for key in methodRanges.keys():
+            if "main" in key:
+                keyMain = key
+            if "factorial" in key:
+                keyFactorial = key
+
+        self.assertEqual(len(methodRanges), 2)
+        self.assertEqual(methodRanges[keyMain], (69, 219))
+        self.assertEqual(methodRanges[keyFactorial], (261, 379))
 
     def test_numerifyHelloWorld(self):
         tree = self.javaParse.parse("class HelloWorld { public static void main( String [] args ) { System.out.println( \"Hello World!\" );  } }")
@@ -1075,7 +1088,7 @@ public class TryWithResourceDemo implements AutoCloseable{
         nodeStack = [tree]
         while len(nodeStack) > 0:
             node = nodeStack.pop()
-            assert hasattr(node, 'nodeIndex')
+            self.assertTrue(hasattr(node, 'nodeIndex'))
             nodeStack.extend(getattr(node, 'children', []))
 
     def test_numerifyEmptyTree(self):
@@ -1085,13 +1098,18 @@ public class TryWithResourceDemo implements AutoCloseable{
         nodeStack = [tree]
         while len(nodeStack) > 0:
             node = nodeStack.pop()
-            assert hasattr(node, 'nodeIndex')
+            self.assertTrue(hasattr(node, 'nodeIndex'))
             nodeStack.extend(getattr(node, 'children', []))
 
     def test_numerifyWrongTree(self):
         tree = ['This is the wrong type for a tree']
         try:
             self.javaParse.numerify(tree)
-            assert False
+            raise ValueError
+
+        except ValueError as e:
+            self.fail("Expected exception was not raised.")
+
         except AssertionError as e:
-            assert True
+            # it's all good!
+            self.assertTrue(True)

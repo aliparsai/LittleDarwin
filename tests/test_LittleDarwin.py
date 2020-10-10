@@ -32,16 +32,21 @@ class TestLittleDarwin(unittest.TestCase):
         self.tempDir.cleanup()
         print("Deleted temp directory.")
 
-    def testVideoStoreGenerateTraditionalMutants(self):
+    def test_VideoStoreGenerateTraditionalMutants(self):
         argList = ['-m', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath]
         print("Running LittleDarwin with arguments:\n" + " ".join(argList))
 
         try:
             sys.exit(LittleDarwin.main(argList))
+
+        except Exception as e:
+            print(e)
+            self.fail("Irregular exit: exception occured.")
+
         except SystemExit as e:
             self.assertEqual(int(e.code), 0)
 
-    def testVideoStoreTraditionalBuild(self):
+    def test_VideoStoreTraditionalBuild(self):
         mavenPath = shutil.which("mvn")
         if mavenPath is None:
             mavenPath = shutil.which("mvn.bat")
@@ -57,6 +62,11 @@ class TestLittleDarwin(unittest.TestCase):
 
         try:
             sys.exit(LittleDarwin.main(argList))
+
+        except Exception as e:
+            print(e)
+            self.fail("Irregular exit: exception occured.")
+
         except SystemExit as e:
             self.assertEqual(int(e.code), 0)
 
