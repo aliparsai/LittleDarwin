@@ -2,6 +2,7 @@ from typing import Dict
 
 from antlr4 import *
 from antlr4.InputStream import InputStream
+from antlr4.error.ErrorStrategy import BailErrorStrategy
 from antlr4.tree.Tree import TerminalNodeImpl
 
 from .JavaLexer import JavaLexer
@@ -13,6 +14,12 @@ try:
     noGraphviz = False
 except ImportError as e:
     noGraphviz = True
+
+
+class LittleDarwinErrorStrategy(BailErrorStrategy):
+    def recover(self, parser: Parser, exception: RecognitionException):
+        parser._errHandler.reportError(parser, exception)
+        super().recover(parser, exception)
 
 
 class JavaParse(object):
@@ -35,9 +42,11 @@ class JavaParse(object):
         """
         lexer = JavaLexer(InputStream(fileContent))
         parser = JavaParser(CommonTokenStream(lexer))
+        parser._errHandler = LittleDarwinErrorStrategy()
         tree = parser.compilationUnit()
         self.lookupTable = dict()
         self.numerify(tree)
+
         return tree
 
     def numerify(self, tree):

@@ -1,5 +1,8 @@
 import unittest
+
 from littledarwin.JavaParse import JavaParse
+from antlr4.error.Errors import ParseCancellationException
+
 
 
 class TestJavaParse(unittest.TestCase):
@@ -1025,6 +1028,21 @@ public class TryWithResourceDemo implements AutoCloseable{
 }
 """
 
+        cls.issue13Code = """
+package x;
+import java.util.*;
+
+public class SyntaxError {
+  public int problemInParadise(int rekTiefe) {
+                return missingSemiColon
+                
+        }
+    }
+        """
+
+    def test_parseIssue13(self):
+        self.assertRaises(ParseCancellationException, self.javaParse.parse, self.issue13Code)
+
     def test_parseJava7(self):
         parsedTree = self.javaParse.parse(self.java7SourceCode)
         self.assertIsNotNone(parsedTree)
@@ -1047,7 +1065,9 @@ public class TryWithResourceDemo implements AutoCloseable{
 
     def test_getMethodNameForNode(self):
         parsedTree = self.javaParse.parse(self.factorialSourceCode)
-        nodeID = parsedTree.children[0].children[1].children[2].children[2].children[2].children[0].children[3].children[0].children[3].children[0].children[1].nodeIndex
+        nodeID = \
+            parsedTree.children[0].children[1].children[2].children[2].children[2].children[0].children[3].children[
+                0].children[3].children[0].children[1].nodeIndex
         methodName = self.javaParse.getMethodNameForNode(parsedTree, nodeID)
 
         self.assertIn('factorial', methodName)
@@ -1082,7 +1102,8 @@ public class TryWithResourceDemo implements AutoCloseable{
         self.assertEqual(methodRanges[keyFactorial], (261, 379))
 
     def test_numerifyHelloWorld(self):
-        tree = self.javaParse.parse("class HelloWorld { public static void main( String [] args ) { System.out.println( \"Hello World!\" );  } }")
+        tree = self.javaParse.parse(
+            "class HelloWorld { public static void main( String [] args ) { System.out.println( \"Hello World!\" );  } }")
         self.javaParse.numerify(tree)
 
         nodeStack = [tree]
