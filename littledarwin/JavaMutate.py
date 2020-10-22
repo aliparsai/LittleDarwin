@@ -1119,7 +1119,7 @@ class JavaMutate(object):
         else:
             self.javaParseObject = JavaParse()
 
-        self.instantiateMutationOperators()
+        # self.instantiateMutationOperators()
 
         self.inMethodLines = self.javaParseObject.getInMethodLines(self.sourceTree)
 
@@ -1157,7 +1157,7 @@ class JavaMutate(object):
                 except Exception as e:
                     lineNumber = -1
                 self.mutantsPerLine[lineNumber] = 1 + self.mutantsPerLine.get(lineNumber, 0)
-                methodName = self.javaParseObject.getMethodNameForNode(self.sourceTree, mutableNode.nodeID)
+                methodName = self.javaParseObject.getMethodNameForNode(self.sourceTree, mutableNode.nodeIndex)
                 self.mutantsPerMethod[methodName] = 1 + self.mutantsPerMethod.get(methodName, 0)
 
         self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(

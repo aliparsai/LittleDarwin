@@ -52,7 +52,7 @@ from .ReportGenerator import ReportGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.10.4'
+littleDarwinVersion = '0.10.5'
 
 
 def main(mockArgs: list = None):
