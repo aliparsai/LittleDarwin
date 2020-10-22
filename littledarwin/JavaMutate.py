@@ -179,12 +179,12 @@ class MutationOperator(object):
 
     """
     instantiable = True
+    metaTypes = ["Generic"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
         self.color = "#FFFFF0"
-        self.metaTypes = ["Generic"]
         self.mutatorType = "GenericMutationOperator"
         self.allNodes = list()  # populated by findNodes
         self.mutableNodes = list()  # populated by filterCriteria
@@ -229,11 +229,11 @@ class RemoveMethod(MutationOperator):
 
     """
     instantiable = True
+    metaTypes = ["Method", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveMethod"
-        self.metaTypes = ["Method", "All"]
         self.color = "#FF00D4"
         self.mutableNodesWithTypes = list()
         self.findNodes()
@@ -299,11 +299,11 @@ class RemoveNullCheck(MutationOperator):
 
     """
     instantiable = True
+    metaTypes = ["Null", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveNullCheck"
-        self.metaTypes = ["Null", "All"]
         self.color = "#ADD8E6"
         self.findNodes()
         self.filterCriteria()
@@ -365,11 +365,11 @@ class NullifyObjectInitialization(MutationOperator):
 
     """
     instantiable = True
+    metaTypes = ["Null", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyObjectInitialization"
-        self.metaTypes = ["Null", "All"]
         self.color = "#F08080"
         self.findNodes()
         self.filterCriteria()
@@ -431,11 +431,11 @@ class NullifyReturnValue(MutationOperator):
 
     """
     instantiable = True
+    metaTypes = ["Null", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyReturnValue"
-        self.metaTypes = ["Null", "All"]
         self.color = "#E0FFFF"
         self.findNodes()
         self.filterCriteria()
@@ -499,11 +499,11 @@ class NullifyInputVariable(MutationOperator):
 
     """
     instantiable = True
+    metaTypes = ["Null", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyInputVariable"
-        self.metaTypes = ["Null", "All"]
         self.color = "#90EE90"
         self.findNodes()
         self.filterCriteria()
@@ -572,10 +572,12 @@ class TraditionalMutationOperator(MutationOperator):
     """
 
     """
+
+    metaTypes = ["Traditional", "All"]
+
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "GenericTraditionalMutationOperator"
-        self.metaTypes = ["Traditional", "All"]
 
     def findNodes(self):
         """
@@ -1069,18 +1071,27 @@ class JavaMutate(object):
         self.mutantsPerMethod = dict()
         self.averageDensity = -1
         self.mutants = list()
+        self.mutationOperators = list()
 
         if isinstance(javaParseObject, JavaParse):
             self.javaParseObject = javaParseObject
         else:
             self.javaParseObject = JavaParse()
 
-        # find all mutation operators and instantiate them
-        self.mutationOperators = list()
-        for MO in getAllInstantiableSubclasses(MutationOperator):
-            self.mutationOperators.append(MO(sourceTree, sourceCode, javaParseObject))
+        self.instantiateMutationOperators()
 
         self.inMethodLines = self.javaParseObject.getInMethodLines(self.sourceTree)
+
+    def instantiateMutationOperators(self,  metaTypes: List[str] = ["Traditional"]):
+        """
+
+        :param metaTypes:
+        :type metaTypes:
+        """
+        for MO in getAllInstantiableSubclasses(MutationOperator):
+            for metaType in metaTypes:
+                if metaType in MO.metaTypes:
+                    self.mutationOperators.append(MO(self.sourceTree, self.sourceCode, self.javaParseObject))
 
     def gatherMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
@@ -1093,6 +1104,8 @@ class JavaMutate(object):
         """
         mutationTypeCount = dict()
         mutantTexts = list()
+
+        self.instantiateMutationOperators(metaTypes)
 
         for mO in self.mutationOperators:
             for metaType in metaTypes:

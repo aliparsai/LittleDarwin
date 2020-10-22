@@ -17,7 +17,17 @@ except ImportError as e:
 
 
 class LittleDarwinErrorStrategy(BailErrorStrategy):
+    """
+    A class to handle parsing exceptions. Throws exceptions when occured so that the file can safely be ignored.
+    """
     def recover(self, parser: Parser, exception: RecognitionException):
+        """
+
+        :param parser:
+        :type parser:
+        :param exception:
+        :type exception:
+        """
         parser._errHandler.reportError(parser, exception)
         super().recover(parser, exception)
 
