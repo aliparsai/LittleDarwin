@@ -16,6 +16,7 @@ class Mutation(object):
     """
     Defines a single mutation.
     """
+
     def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
                  replacementText: str, color: str = "#FFFFFF"):
         """
@@ -47,7 +48,8 @@ class Mutation(object):
         :return:
         :rtype:
         """
-        return sourceCode[:self.startPos + byteOffset] + self.replacementText + sourceCode[self.endPos + byteOffset + 1:]
+        return sourceCode[:self.startPos + byteOffset] + self.replacementText + sourceCode[
+                                                                                self.endPos + byteOffset + 1:]
 
     def isInRange(self, start, end):
         """
@@ -76,6 +78,7 @@ class Mutant(object):
     """
     Defines a mutant consisting of one or several mutations.
     """
+
     def __init__(self, mutantID: int, mutationList: List[Mutation], sourceCode: str):
         """
         :param mutantID: the ID of mutant
@@ -157,7 +160,7 @@ class Mutant(object):
                 newMutationList = list()
                 newMutationList.extend(self.mutationList)
                 newMutationList.extend(other.mutationList)
-                newMutant = Mutant(-1*self.mutantID*other.mutantID, newMutationList, self.sourceCode)
+                newMutant = Mutant(-1 * self.mutantID * other.mutantID, newMutationList, self.sourceCode)
                 newMutant.mutateCode()
                 return newMutant
             else:
@@ -181,7 +184,8 @@ class MutationOperator(object):
     instantiable = True
     metaTypes = ["Generic"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants=True):
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
         self.color = "#FFFFF0"
@@ -220,6 +224,7 @@ class MutationOperator(object):
 
         return ".{classname} {{ background: {color}; }} ".format(classname=self.mutatorType, color=self.color)
 
+
 #################################################
 #       Method-level Mutation Operators         #
 #################################################
@@ -231,14 +236,16 @@ class RemoveMethod(MutationOperator):
     instantiable = True
     metaTypes = ["Method", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveMethod"
         self.color = "#FF00D4"
         self.mutableNodesWithTypes = list()
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def findNodes(self):
         """
@@ -289,6 +296,7 @@ class RemoveMethod(MutationOperator):
                 mutant.mutateCode()
                 self.mutants.append(mutant)
 
+
 #################################################
 #          Null Mutation Operators              #
 #################################################
@@ -301,13 +309,15 @@ class RemoveNullCheck(MutationOperator):
     instantiable = True
     metaTypes = ["Null", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RemoveNullCheck"
         self.color = "#ADD8E6"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def findNodes(self):
         """
@@ -367,13 +377,15 @@ class NullifyObjectInitialization(MutationOperator):
     instantiable = True
     metaTypes = ["Null", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyObjectInitialization"
         self.color = "#F08080"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def findNodes(self):
         """
@@ -433,13 +445,15 @@ class NullifyReturnValue(MutationOperator):
     instantiable = True
     metaTypes = ["Null", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyReturnValue"
         self.color = "#E0FFFF"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def findNodes(self):
         """
@@ -501,13 +515,15 @@ class NullifyInputVariable(MutationOperator):
     instantiable = True
     metaTypes = ["Null", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "NullifyInputVariable"
         self.color = "#90EE90"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def findNodes(self):
         """
@@ -539,7 +555,8 @@ class NullifyInputVariable(MutationOperator):
             for variablesPerNode in variableList:
                 assert isinstance(variablesPerNode, JavaParser.VariableDeclaratorIdContext)
 
-                if variablesPerNode.parentCtx.getChild(0, JavaParser.JTypeContext).getChild(0, JavaParser.PrimitiveTypeContext) is not None:
+                if variablesPerNode.parentCtx.getChild(0, JavaParser.JTypeContext).getChild(0,
+                                                                                            JavaParser.PrimitiveTypeContext) is not None:
                     continue  # primitive typed variable
 
                 variablesPerNodeReplacementTextList.append('{ ' + variablesPerNode.getText() + ' = null;')
@@ -564,6 +581,7 @@ class NullifyInputVariable(MutationOperator):
                 mutant.mutateCode()
                 self.mutants.append(mutant)
 
+
 #################################################
 #      Traditional Mutation Operators           #
 #################################################
@@ -575,7 +593,8 @@ class TraditionalMutationOperator(MutationOperator):
 
     metaTypes = ["Traditional", "All"]
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "GenericTraditionalMutationOperator"
 
@@ -660,13 +679,15 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementBinary"
         self.color = "#FFB6C1"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -694,13 +715,15 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "RelationalOperatorReplacement"
         self.color = "#FFA07A"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -717,7 +740,8 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
         id = 0
         for node in self.mutableNodes:
             id += 1
-            mutant = self.generateMutantsBinaryExpression(node, {'>': '<=', '<': '>=', '>=': '<', '<=': '>', '!=': '==', '==': '!='}, id)
+            mutant = self.generateMutantsBinaryExpression(node, {'>': '<=', '<': '>=', '>=': '<', '<=': '>', '!=': '==',
+                                                                 '==': '!='}, id)
             self.mutants.append(mutant)
 
 
@@ -727,13 +751,15 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ConditionalOperatorReplacement"
         self.color = "#87CEFA"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -760,13 +786,15 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "LogicalOperatorReplacement"
         self.color = "#F0E68C"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -793,20 +821,23 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "AssignmentOperatorReplacementShortcut"
         self.color = "#B0C4DE"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
 
         """
         for node in self.allNodes:
-            if self.filterCriteriaBinaryExpression(node, ['+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=', '>>>=']):
+            if self.filterCriteriaBinaryExpression(node, ['+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=',
+                                                          '>>>=']):
                 self.mutableNodes.append(node)
 
     def generateMutants(self):
@@ -829,13 +860,15 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
 
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementUnary"
         self.color = "#DDA0DD"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -862,13 +895,15 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ConditionalOperatorDeletion"
         self.color = "#FFD700"
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -895,14 +930,16 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ArithmeticOperatorReplacementShortcut"
         self.color = "#FF00FF"
         self.terminalChild = dict()
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -916,7 +953,7 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
                         and isinstance(node.children[1], JavaParser.ExpressionContext)):
                     self.terminalChild[node] = 0
                 elif (isinstance(node.children[1], TerminalNodeImpl)
-                        and isinstance(node.children[0], JavaParser.ExpressionContext)):
+                      and isinstance(node.children[0], JavaParser.ExpressionContext)):
                     self.terminalChild[node] = 1
                 else:
                     continue  # not a shortcut expression
@@ -957,14 +994,16 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
     """
     instantiable = True
 
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse):
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 generateMutants: bool = True):
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "ShiftOperatorReplacement"
         self.color = "#9ACD32"
         self.threeTerminals = dict()
         self.findNodes()
         self.filterCriteria()
-        self.generateMutants()
+        if generateMutants:
+            self.generateMutants()
 
     def filterCriteria(self):
         """
@@ -1063,7 +1102,9 @@ class JavaMutate(object):
     """
     Main entry point for mutation of a Java source file.
     """
-    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse, verbose: bool = False):
+
+    def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
+                 verbose: bool = False):
         self.verbose = verbose
         self.sourceCode = sourceCode
         self.sourceTree = sourceTree
@@ -1082,16 +1123,47 @@ class JavaMutate(object):
 
         self.inMethodLines = self.javaParseObject.getInMethodLines(self.sourceTree)
 
-    def instantiateMutationOperators(self,  metaTypes: List[str] = ["Traditional"]):
+    def instantiateMutationOperators(self, metaTypes: List[str] = ["Traditional"], generateMutants: bool = True):
         """
 
+        :param generateMutants:
+        :type generateMutants:
         :param metaTypes:
         :type metaTypes:
         """
         for MO in getAllInstantiableSubclasses(MutationOperator):
             for metaType in metaTypes:
                 if metaType in MO.metaTypes:
-                    self.mutationOperators.append(MO(self.sourceTree, self.sourceCode, self.javaParseObject))
+                    self.mutationOperators.append(
+                        MO(self.sourceTree, self.sourceCode, self.javaParseObject, generateMutants))
+
+    def countMutants(self, metaTypes: List[str] = ["Traditional"]):
+        """
+        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
+
+        :param metaTypes: types of mutation operators to use
+        :type metaTypes: List[str]
+        :return: mutated source code for each mutant, number of types of mutants
+        :rtype: Tuple[List, Dict]
+        """
+        mutationTypeCount = dict()
+        self.instantiateMutationOperators(metaTypes, generateMutants=False)
+
+        for mO in self.mutationOperators:
+            mutationTypeCount[mO.mutatorType] = len(mO.mutableNodes)
+            for mutableNode in mO.mutableNodes:
+                try:
+                    lineNumber = mutableNode.start.line
+                except Exception as e:
+                    lineNumber = -1
+                self.mutantsPerLine[lineNumber] = 1 + self.mutantsPerLine.get(lineNumber, 0)
+                methodName = self.javaParseObject.getMethodNameForNode(self.sourceTree, mutableNode.nodeID)
+                self.mutantsPerMethod[methodName] = 1 + self.mutantsPerMethod.get(methodName, 0)
+
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(
+            self.inMethodLines) > 0 else 0
+
+        return mutationTypeCount
 
     def gatherMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
@@ -1120,7 +1192,8 @@ class JavaMutate(object):
                             methodName = self.javaParseObject.getMethodNameForNode(self.sourceTree, mutation.nodeID)
                             self.mutantsPerMethod[methodName] = 1 + self.mutantsPerMethod.get(methodName, 0)
 
-        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(
+            self.inMethodLines) > 0 else 0
 
         return mutantTexts, mutationTypeCount
 
@@ -1161,7 +1234,8 @@ class JavaMutate(object):
 
         mutationTypeCount = {"Higher-Order": len(mutantTexts)}
 
-        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(self.inMethodLines) > 0 else 0
+        self.averageDensity = sum(self.mutantsPerLine.values()) / len(self.inMethodLines) if len(
+            self.inMethodLines) > 0 else 0
 
         return mutantTexts, mutationTypeCount
 
@@ -1208,7 +1282,7 @@ class JavaMutate(object):
         output += self.cssStyle + "</style></head><body><h1>LittleDarwin Aggregate Mutation Report</h1>"
         output += "<p>Average Density: {:.2f}".format(self.averageDensity) + "</p><div><pre class=\"code\">"
         output += "<span class=\"{}\"><i>{:04d}</i> ".format(
-                    "methodLine" if lineNumber in self.inMethodLines else "outsideLine", lineNumber)
+            "methodLine" if lineNumber in self.inMethodLines else "outsideLine", lineNumber)
 
         mutationStartDict = dict()
         mutationEndList = list()
@@ -1250,13 +1324,3 @@ class JavaMutate(object):
         output += "Report generated by LittleDarwin {} </p></footer></body></html>".format(littleDarwinVersion)
 
         return output
-
-
-
-
-
-
-
-
-
-

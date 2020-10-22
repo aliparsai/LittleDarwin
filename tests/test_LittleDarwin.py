@@ -29,6 +29,13 @@ class TestLittleDarwin(unittest.TestCase):
         print("Extracted \"VideoStore\" project.")
 
     def tearDown(self) -> None:
+        try:
+            with open(os.path.join(self.videoStoreBuildPath, "LittleDarwinResults", "initialbuild.txt"), 'r') as ib:
+                for line in ib.readlines():
+                    print(str(line))
+        except Exception as e:
+            pass
+
         self.tempDir.cleanup()
         print("Deleted temp directory.")
 
