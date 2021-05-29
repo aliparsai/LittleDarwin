@@ -1209,6 +1209,9 @@ class JavaMutate(object):
         :rtype: Tuple[List, Dict]
         """
         selectedMutants = list()
+
+        self.instantiateMutationOperators(metaTypes)
+
         for mO in self.mutationOperators:
             for metaType in metaTypes:
                 if metaType in mO.metaTypes:

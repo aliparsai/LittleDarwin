@@ -53,6 +53,20 @@ class TestLittleDarwin(unittest.TestCase):
         except SystemExit as e:
             self.assertEqual(int(e.code), 0)
 
+    def test_VideoStoreGenerateSecondOrderMutants(self):
+        argList = ['-m', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath, "--higher-order=2"]
+        print("Running LittleDarwin with arguments:\n" + " ".join(argList))
+
+        try:
+            sys.exit(LittleDarwin.main(argList))
+
+        except Exception as e:
+            print(e)
+            self.fail("Irregular exit: exception occured.")
+
+        except SystemExit as e:
+            self.assertEqual(int(e.code), 0)
+
     def test_VideoStoreTraditionalBuild(self):
         mavenPath = shutil.which("mvn")
         if mavenPath is None:

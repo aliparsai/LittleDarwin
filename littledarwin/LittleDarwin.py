@@ -52,7 +52,7 @@ from .ReportGenerator import ReportGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.10.5'
+littleDarwinVersion = '0.10.6'
 
 
 def main(mockArgs: list = None):
@@ -211,6 +211,9 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
     mutationDatabase.close()
     print("\nTotal mutations found: ", totalMutantCount)
+    if totalMutantCount == 0:
+        print("No mutants generated? Something must be wrong.")
+        sys.exit(6)
 
     with open(densityResultsPath, 'w') as densityReportHandle:
         for key in averageDensityDict.keys():
