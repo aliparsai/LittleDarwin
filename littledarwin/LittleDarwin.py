@@ -20,7 +20,7 @@
 ##       If not, see <https://www.gnu.org/licenses/>.                                                         ##
 ##                                                                                                            ##
 ##       Find me at:                                                                                          ##
-##       https://www.parsai.net                                                                               ##
+##       https://www.parsai.net/                                                                              ##
 ##                                                                                                            ##
 ################################################################################################################
 
@@ -72,7 +72,7 @@ def main(mockArgs: list = None):
                                   /
 
 
-    LittleDarwin version %s Copyright (C) 2014-2020 Ali Parsai
+    LittleDarwin version %s Copyright (C) 2014-2022 Ali Parsai
 
     LittleDarwin comes with ABSOLUTELY NO WARRANTY.
     This is free software, and you are welcome to redistribute it
