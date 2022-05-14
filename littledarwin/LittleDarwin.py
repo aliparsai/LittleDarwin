@@ -6,7 +6,7 @@
 ##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##
 ##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##
 ##                                                                                                            ##
-##       Copyright (c) 2014-2020 Ali Parsai                                                                   ##
+##       Copyright (c) 2014-2022 Ali Parsai                                                                   ##
 ##                                                                                                            ##
 ##       This program is free software: you can redistribute it and/or modify it under the terms of           ##
 ##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##
@@ -52,7 +52,7 @@ from .ReportGenerator import ReportGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.10.6'
+littleDarwinVersion = '0.10.7'
 
 
 def main(mockArgs: list = None):
