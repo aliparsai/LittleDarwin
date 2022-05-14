@@ -54,7 +54,8 @@ class TestLittleDarwin(unittest.TestCase):
             self.assertEqual(int(e.code), 0)
 
     def test_VideoStoreGenerateSecondOrderMutants(self):
-        argList = ['-m', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath, "--higher-order=2"]
+        argList = ['-m', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath,
+                   "--higher-order=2", "--timeout=600"]
         print("Running LittleDarwin with arguments:\n" + " ".join(argList))
 
         try:
@@ -78,7 +79,7 @@ class TestLittleDarwin(unittest.TestCase):
         self.assertIsNotNone(mavenPath)
 
         argList = ['-m', '-b', '-p', self.videoStoreSourcePath, '-t', self.videoStoreBuildPath, '-c',
-                   str(mavenPath) + ",clean,test"]
+                   str(mavenPath) + ",clean,test", "--timeout=600"]
         print("Running LittleDarwin with arguments:\n" + " ".join(argList))
 
         try:
