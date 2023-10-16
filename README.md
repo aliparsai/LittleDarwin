@@ -3,7 +3,7 @@
 # LittleDarwin 
 
 Java Mutation Analysis Framework
-Copyright (C) 2014-2020 Ali Parsai
+Copyright (C) 2014-2023 Ali Parsai
 
 ## How to Use:
 On your selected python platform use:

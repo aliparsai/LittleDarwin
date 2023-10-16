@@ -52,7 +52,7 @@ from .ReportGenerator import ReportGenerator
 # sys.settrace(trace)
 #############
 
-littleDarwinVersion = '0.10.7'
+littleDarwinVersion = '0.10.8'
 
 
 def main(mockArgs: list = None):
@@ -353,8 +353,8 @@ def buildPhase(options):
             totalMutantCounter += 1
 
             # let's make sure that runOutput is empty, and not None to begin with.
-            runOutput = bytes()
-            runOutputTest = bytes()
+            runOutput = ""
+            runOutputTest = ""
 
             # replace the original file with the mutant
             shutil.copyfile(replacementFile, os.path.join(options.sourcePath, key))
@@ -391,17 +391,16 @@ def buildPhase(options):
                     # raise the same exception as the original check_output.
                     if processKilled or processExitCode:
                         raise subprocess.CalledProcessError(1 if processKilled else processExitCode,
-                                                            commandString, "\n".join([runOutput.decode("utf-8"),
-                                                                                      runOutputTest.decode("utf-8")]))
+                                                            commandString, f"{runOutput}\n{runOutputTest}")
 
-                # if we are here, it means no exceptions happened, so lets add this to our success list.
-                runOutput = runOutput.decode("utf-8") + '\n' + runOutputTest.decode("utf-8")
+                # if we are here, it means no exceptions happened, so let's add this to our success list.
+                runOutput = f"{runOutput}\n{runOutputTest}"
                 successList.append(os.path.basename(replacementFile))
 
             # putting two exceptions in one except clause, specially when one of them is not defined on some
             # platforms does not look like a good idea; even though both of them do exactly the same thing.
             except subprocess.CalledProcessError as exception:
-                runOutput = exception.output.decode("utf-8")
+                runOutput = str(exception.output) if exception.output else ""
                 # oops, error. let's add this to failure list.
                 failureList.append(os.path.basename(replacementFile))
 
@@ -622,11 +621,12 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     # do the stuff in the process.
     (stdout, stderr) = process.communicate(inputData)
+    output = stdout.decode(errors="replace") if isinstance(stdout, bytes) else str(stdout)
 
     # if the process is done, no need to kill it.
     timerWatchdog.cancel()
 
-    isKilled = killCheck.isSet()
+    isKilled = killCheck.is_set()
     killCheck.clear()
 
-    return isKilled, process.returncode, stdout
+    return isKilled, process.returncode, output

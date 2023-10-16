@@ -5,6 +5,7 @@ import unittest
 import tempfile
 import base64
 import zipfile
+import time
 from io import BytesIO
 
 from littledarwin import LittleDarwin
@@ -35,6 +36,11 @@ class TestLittleDarwin(unittest.TestCase):
                     print(str(line))
         except Exception as e:
             pass
+
+        print("Tearing down test harness", end=".")
+        for i in range(5):
+            time.sleep(1)
+            print(f"..{5-i}", end="")
 
         self.tempDir.cleanup()
         print("Deleted temp directory.")
