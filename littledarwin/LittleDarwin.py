@@ -215,7 +215,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
         print("No mutants generated? Something must be wrong.")
         sys.exit(6)
 
-    with open(densityResultsPath, 'w') as densityReportHandle:
+    with open(densityResultsPath, 'w', encoding="utf-8") as densityReportHandle:
         for key in averageDensityDict.keys():
             densityReportHandle.write(key + ',' + str(averageDensityDict[key]) + '\n')
 
@@ -314,13 +314,13 @@ def buildPhase(options):
             raise subprocess.CalledProcessError(1 if processKilled else processExitCode, commandString,
                                                 initialOutput)
 
-        with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
+        with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w', encoding="utf-8") as contentFile:
             contentFile.write(str(initialOutput))
         print("done.\n\n")
 
     except subprocess.CalledProcessError as exception:
         initialOutput = exception.output
-        with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w') as contentFile:
+        with open(os.path.abspath(os.path.join(mutantsPath, "initialbuild.txt")), 'w', encoding="utf-8") as contentFile:
             contentFile.write(str(initialOutput))
 
         print("failed.\n")
@@ -418,7 +418,7 @@ def buildPhase(options):
                 len(successList)) + " - killed: " + str(len(failureList)) + "         \r", end="\r", flush=True)
 
             # writing the build output to disk.
-            with open(targetTextOutputFile, 'w') as contentFile:
+            with open(targetTextOutputFile, 'w', encoding="utf-8") as contentFile:
                 contentFile.write(str(runOutput))
 
             # if there's a cleanup option, execute it. the results will be ignored because we don't want our process
@@ -446,18 +446,17 @@ def buildPhase(options):
 
         # generate an HTML report for the file.
         targetHTMLOutputFile = os.path.join(os.path.dirname(replacementFile), "index.html")
-        with open(targetHTMLOutputFile, 'w') as contentFile:
+        with open(targetHTMLOutputFile, 'w', encoding="utf-8") as contentFile:
             contentFile.write(
                 reportGenerator.generateHTMLReportPerFile(key, targetHTMLOutputFile, successList, failureList))
 
         print("\n\n")
     # write final text report.
-    with open(os.path.abspath(os.path.join(mutantsPath, "report.txt")),
-              'w') as textReportFile:
+    with open(os.path.abspath(os.path.join(mutantsPath, "report.txt")), 'w', encoding="utf-8") as textReportFile:
         textReportFile.writelines(textReportData)
     # write final HTML report.
     targetHTMLReportFile = os.path.abspath(os.path.join(mutantsPath, "index.html"))
-    with open(targetHTMLReportFile, 'w') as htmlReportFile:
+    with open(targetHTMLReportFile, 'w', encoding="utf-8") as htmlReportFile:
         htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
 
 
@@ -608,10 +607,10 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
 
     # starting the process with the given parameters.
     if platform.system() != "Windows":
-        process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
+        process = subprocess.Popen(commandString, cwd=workingDirectory, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
     else:  # in Windows
-        process = subprocess.Popen(commandString, bufsize=1, cwd=workingDirectory, stdin=subprocess.PIPE,
+        process = subprocess.Popen(commandString, cwd=workingDirectory, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     # passing the process and timeout references to threading's timer method, so that it kills the process

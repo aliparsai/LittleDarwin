@@ -163,17 +163,17 @@ class JavaIO(object):
 
             if not os.path.isfile(complexityPerMethodCSVFile) or not os.path.isfile(
                     densityPerLineCSVFile) or not os.path.isfile(densityReportFile):
-                with open(densityPerLineCSVFile, 'w') as densityFileHandle:
+                with open(densityPerLineCSVFile, 'w', encoding="utf-8") as densityFileHandle:
                     for key in sorted(mutantsPerLine.keys()):
                         densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
 
-                with open(complexityPerMethodCSVFile, 'w') as densityFileHandle:
+                with open(complexityPerMethodCSVFile, 'w', encoding="utf-8") as densityFileHandle:
                     for key in sorted(aggregateComplexity.keys()):
                         line = [str(key)]
                         line.extend([str(x) for x in aggregateComplexity[key]])
                         densityFileHandle.write(";".join(line) + '\n')
 
-                with open(densityReportFile, 'w') as densityFileHandle:
+                with open(densityReportFile, 'w', encoding="utf-8") as densityFileHandle:
                     densityFileHandle.write(densityReport)
 
         counter = 1
@@ -181,7 +181,7 @@ class JavaIO(object):
             counter += 1
 
         targetFile = os.path.abspath(os.path.join(targetDir, str(counter) + ".java"))
-        with open(targetFile, 'w') as contentFile:
+        with open(targetFile, 'w', encoding="utf-8") as contentFile:
             contentFile.write(fileData)
 
         if self.verbose:
