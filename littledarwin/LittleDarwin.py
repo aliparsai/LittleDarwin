@@ -35,7 +35,6 @@ import subprocess
 import sys
 import threading
 import time
-from distutils.spawn import find_executable
 from optparse import OptionParser
 
 from littledarwin import License
@@ -588,12 +587,9 @@ def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None)
     # timeout must be int, otherwise problems arise.
     assert isinstance(timeout, int)
 
-    reliableCommandString = find_executable(os.path.abspath(commandString[0]))
+    reliableCommandString = shutil.which(os.path.abspath(commandString[0]))
 
-    reliableCommandString = find_executable(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
-        if reliableCommandString is None else reliableCommandString
-
-    reliableCommandString = find_executable(commandString[0]) \
+    reliableCommandString = shutil.which(os.path.abspath(os.path.join(workingDirectory, commandString[0]))) \
         if reliableCommandString is None else reliableCommandString
 
     reliableCommandString = shutil.which(commandString[0]) \

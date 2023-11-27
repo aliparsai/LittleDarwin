@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import sys
 import unittest
@@ -75,7 +76,8 @@ class TestLittleDarwin(unittest.TestCase):
             self.assertEqual(int(e.code), 0)
 
     def test_VideoStoreTraditionalBuild(self):
-        mavenPath = shutil.which("mvn")
+        mavenPath = shutil.which("mvn") if platform.system() != "Windows" else None
+        
         if mavenPath is None:
             mavenPath = shutil.which("mvn.bat")
 
