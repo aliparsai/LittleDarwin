@@ -522,11 +522,11 @@ def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
     filterType = None
     if options.whitelist != "***dummy***" and os.path.isfile(options.whitelist):
         with io.open(options.whitelist, mode='r', errors='replace') as contentFile:
-            filterList = contentFile.readlines()
+            filterList = [l.strip() for l in contentFile.readlines()]
             filterType = "whitelist"
     if options.blacklist != "***dummy***" and os.path.isfile(options.blacklist):
         with io.open(options.blacklist, mode='r', errors='replace') as contentFile:
-            filterList = contentFile.readlines()
+            filterList = [l.strip() for l in contentFile.readlines()]
             filterType = "blacklist"
     if filterList is not None:
         filterList = [_f for _f in filterList if _f]
