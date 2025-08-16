@@ -256,19 +256,70 @@ class RemoveMethod(MutationOperator):
 
     def findNodes(self):
         """
-        Finds all method bodies in the parse tree.
+        Finds all method and constructor bodies in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodBodyContext)
+        self.allNodes.extend(self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ConstructorBodyContext))
 
     def filterCriteria(self):
         """
         Filters the found method bodies to include only those with a valid return type.
+        It also filters out simple getters and setters and methods/constructors with @Inject annotation.
         """
         for node in self.allNodes:
-            assert isinstance(node, JavaParser.MethodBodyContext)
+            assert isinstance(node, (JavaParser.MethodBodyContext, JavaParser.ConstructorBodyContext))
+
+            parent_declaration = self.javaParseObject.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+            if not parent_declaration:
+                parent_declaration = self.javaParseObject.seekFirstMatchingParent(node,
+                                                                                    JavaParser.ConstructorDeclarationContext)
+            is_injected = False
+            parent_declaration = self.javaParseObject.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
+            if not parent_declaration:
+                parent_declaration = self.javaParseObject.seekFirstMatchingParent(node,
+                                                                                    JavaParser.ConstructorDeclarationContext)
+            is_injected = False
+            if parent_declaration:
+                # The parent of a method/constructor declaration is a member declaration, which is inside a class body declaration.
+                # The modifiers are children of the class body declaration.
+                member_declaration = parent_declaration.parentCtx
+                if member_declaration:
+                    class_body_declaration = member_declaration.parentCtx
+                    if class_body_declaration:
+                        for child in class_body_declaration.getChildren():
+                            if isinstance(child, JavaParser.ModifierContext):
+                                if '@Inject' in child.getText():
+                                    is_injected = True
+                                    break
+
+            block_statements = self.javaParseObject.seekAllNodes(node, JavaParser.BlockStatementContext)
+            if len(block_statements) == 1:
+                operators = self.javaParseObject.seekAllNodes(block_statements[0], TerminalNodeImpl)
+                operator_texts = [op.getText() for op in operators]
+                has_logic = any(
+                    op in operator_texts for op in ['+', '-', '*', '/', '%', '&&', '||', '!', '?', 'instanceof', 'new'])
+
+                if any(op.getText() == '(' for op in operators):
+                    has_logic = True
+
+                is_simple_setter = not has_logic and '=' in operator_texts and len(
+                    self.javaParseObject.seekAllNodes(block_statements[0], JavaParser.ExpressionContext)) <= 4
+                is_simple_getter = not has_logic and '=' not in operator_texts
+
+                if is_injected:
+                    if is_simple_setter:
+                        continue
+                else:
+                    if is_simple_getter or is_simple_setter:
+                        continue
+
             nodeType = self.javaParseObject.getMethodTypeForNode(node)
+            # For constructors, nodeType will be None. We'll treat them as void.
+            if nodeType is None and isinstance(node, JavaParser.ConstructorBodyContext):
+                nodeType = 'void'
+
             if nodeType is not None:
-                self.mutableNodes.append(node)  # No need to do this, but kept here for compatibility.
+                self.mutableNodes.append(node)
                 self.mutableNodesWithTypes.append((node, nodeType))
 
     def generateMutants(self):
