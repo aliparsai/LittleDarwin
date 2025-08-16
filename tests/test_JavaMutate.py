@@ -253,5 +253,129 @@ public class NullifyInputVariable {
         self.assertIn("a = null;", str(mutator.mutants[0]))
 
 
+    def test_RemoveMethod_smart_pattern(self):
+        sourceCode = '''
+public class SmartPattern {
+    private String name;
+
+    public SmartPattern(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String addToName(String toAdd) {
+        this.name = this.name + toAdd;
+        return this.name;
+    }
+
+    public String getPrefixedName() {
+        String prefix = "prefix_";
+        return prefix + this.name;
+    }
+}
+'''
+        tree = self.javaParse.parse(sourceCode)
+        mutator = RemoveMethod(tree, sourceCode, self.javaParse)
+
+        # The RemoveMethod operator should not mutate simple getters and setters.
+        # It should also not mutate constructors (as they are not MethodDeclarationContext).
+        # In the SmartPattern class:
+        # - SmartPattern(String name) is a constructor, and should NOT be mutated.
+        # - getName() is a simple getter, and should NOT be mutated.
+        # - setName(String name) is a simple setter, and should NOT be mutated.
+        # - addToName(String toAdd) has logic, and should be mutated. It returns a String, so 2 mutants are generated.
+        # - getPrefixedName() has logic, and should be mutated. It returns a String, so 2 mutants are generated.
+        # Total expected mutants = 2 + 2 = 4.
+        self.assertEqual(len(mutator.mutants), 4)
+
+
+    def test_RemoveMethod_inject_annotation(self):
+        sourceCode = '''
+import javax.inject.Inject;
+
+public class Construct {
+    private final Injected injected;
+
+    @Inject
+    public Construct(Injected injected) {
+        this.injected = injected;
+    }
+}
+
+class Injected {}
+'''
+        tree = self.javaParse.parse(sourceCode)
+        mutator = RemoveMethod(tree, sourceCode, self.javaParse)
+        self.assertEqual(len(mutator.mutants), 0)
+
+
+    def test_RemoveMethod_inject_annotation_with_logic(self):
+        sourceCode = '''
+import javax.inject.Inject;
+
+public class ConstructWithLogic {
+    private final Injected injected;
+
+    @Inject
+    public ConstructWithLogic(Injected injected) {
+        System.out.println("Injected");
+        this.injected = injected;
+    }
+}
+
+class Injected {}
+'''
+        tree = self.javaParse.parse(sourceCode)
+        mutator = RemoveMethod(tree, sourceCode, self.javaParse)
+        self.assertEqual(len(mutator.mutants), 1)
+
+
+    def test_RemoveMethod_inject_annotation_on_method(self):
+        sourceCode = '''
+import javax.inject.Inject;
+
+public class InjectedMethod {
+    private Injected injected;
+
+    @Inject
+    public void setInjected(Injected injected) {
+        this.injected = injected;
+    }
+}
+
+class Injected {}
+'''
+        tree = self.javaParse.parse(sourceCode)
+        mutator = RemoveMethod(tree, sourceCode, self.javaParse)
+        self.assertEqual(len(mutator.mutants), 0)
+
+    def test_RemoveMethod_inject_annotation_on_method_with_logic(self):
+        sourceCode = '''
+import javax.inject.Inject;
+
+public class InjectedMethodWithLogic {
+    private Injected injected;
+
+    @Inject
+    public void setInjected(Injected injected) {
+        System.out.println("Injected");
+        this.injected = injected;
+    }
+}
+
+class Injected {}
+'''
+        tree = self.javaParse.parse(sourceCode)
+        mutator = RemoveMethod(tree, sourceCode, self.javaParse)
+        self.assertEqual(len(mutator.mutants), 1)
+
+
 if __name__ == '__main__':
     unittest.main()
