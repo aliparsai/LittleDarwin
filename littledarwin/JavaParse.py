@@ -34,21 +34,23 @@ class LittleDarwinErrorStrategy(BailErrorStrategy):
 
 class JavaParse(object):
     """
-
+    A class that uses ANTLR4 to parse Java source code. It provides methods for traversing and analyzing the parse tree.
     """
 
     def __init__(self, verbose=False):
+        """
+        Initializes the JavaParse object.
+        :param verbose: A boolean indicating whether to print verbose output.
+        """
         self.verbose = verbose
         self.lookupTable = dict()
 
     # antlr-based parser
     def parse(self, fileContent):
         """
-
-        :param fileContent:
-        :type fileContent:
-        :return:
-        :rtype:
+        Parses the given Java source code and returns a parse tree.
+        :param fileContent: A string containing the Java source code.
+        :return: A parse tree representing the Java source code.
         """
         lexer = JavaLexer(InputStream(fileContent))
         parser = JavaParser(CommonTokenStream(lexer))
@@ -61,9 +63,8 @@ class JavaParse(object):
 
     def numerify(self, tree):
         """
-
-        :param tree:
-        :type tree:
+        Adds a unique nodeIndex to each node in the parse tree.
+        :param tree: The root of the parse tree.
         """
         assert isinstance(tree, RuleContext)
 
@@ -78,9 +79,8 @@ class JavaParse(object):
 
     def toString(self, tree):
         """
-
-        :param tree:
-        :type tree:
+        Prints the text of all nodes in the parse tree.
+        :param tree: The root of the parse tree.
         """
         try:
             for child in tree.getChildren():
@@ -90,13 +90,10 @@ class JavaParse(object):
 
     def seekAllNodes(self, tree, nodeType):
         """
-
-        :param tree:
-        :type tree:
-        :param nodeType:
-        :type nodeType:
-        :return:
-        :rtype:
+        Finds all nodes of a specific type in the parse tree.
+        :param tree: The root of the parse tree.
+        :param nodeType: The type of node to search for.
+        :return: A list of nodes of the specified type.
         """
         resultList = list()
         seekStack = [tree]
@@ -116,13 +113,10 @@ class JavaParse(object):
     ## Deprecated
     def seek(self, tree, type):
         """
-
-        :param tree:
-        :type tree:
-        :param type:
-        :type type:
-        :return:
-        :rtype:
+        DEPRECATED. Finds all nodes of a specific type in the parse tree.
+        :param tree: The root of the parse tree.
+        :param type: The type of node to search for.
+        :return: A list of node indices of the specified type.
         """
         seekList = list()
 
@@ -139,13 +133,10 @@ class JavaParse(object):
 
     def seekFirstMatchingParent(self, node, nodeType):
         """
-
-        :param node:
-        :type node:
-        :param nodeType:
-        :type nodeType:
-        :return:
-        :rtype:
+        Finds the first parent of a node that matches the specified type.
+        :param node: The node to start the search from.
+        :param nodeType: The type of parent node to search for.
+        :return: The first matching parent node, or None if no matching parent is found.
         """
         try:
             parent = node.parentCtx
@@ -159,13 +150,10 @@ class JavaParse(object):
 
     def seekNode(self, tree, nodeIndex):
         """
-
-        :param tree:
-        :type tree:
-        :param nodeIndex:
-        :type nodeIndex:
-        :return:
-        :rtype:
+        Finds a node in the parse tree by its index.
+        :param tree: The root of the parse tree.
+        :param nodeIndex: The index of the node to find.
+        :return: The depth of the node in the tree, or None if the node is not found.
         """
         if tree.nodeIndex == nodeIndex:
             return 0
@@ -182,13 +170,10 @@ class JavaParse(object):
 
     def getNode(self, tree, index):
         """
-
-        :param tree:
-        :type tree:
-        :param index:
-        :type index:
-        :return:
-        :rtype:
+        Gets a node from the parse tree by its index.
+        :param tree: The root of the parse tree.
+        :param index: The index of the node to get.
+        :return: The node with the specified index, or None if the node is not found.
         """
         if index in self.lookupTable:
             return self.lookupTable[index]
@@ -211,13 +196,10 @@ class JavaParse(object):
 
     def setNode(self, tree, index, node):
         """
-
-        :param tree:
-        :type tree:
-        :param index:
-        :type index:
-        :param node:
-        :type node:
+        Sets a node in the parse tree at a specific index.
+        :param tree: The root of the parse tree.
+        :param index: The index of the node to set.
+        :param node: The new node.
         """
         if tree.nodeIndex == index:
             tree = node
@@ -229,15 +211,11 @@ class JavaParse(object):
 
     def distance(self, tree, node1, node2):
         """
-
-        :param tree:
-        :type tree:
-        :param node1:
-        :type node1:
-        :param node2:
-        :type node2:
-        :return:
-        :rtype:
+        Calculates the distance between two nodes in the parse tree.
+        :param tree: The root of the parse tree.
+        :param node1: The index of the first node.
+        :param node2: The index of the second node.
+        :return: The distance between the two nodes, or -1 if they are not in the same subtree.
         """
         rootDistance1 = self.seekNode(tree, node1)
         rootDistance2 = self.seekNode(tree, node2)
@@ -255,11 +233,9 @@ class JavaParse(object):
 
     def getInMethodLines(self, tree: JavaParser.CompilationUnitContext) -> list:
         """
-
-        :param tree:
-        :type tree:
-        :return:
-        :rtype:
+        Gets a list of all line numbers that are within a method.
+        :param tree: The root of the parse tree.
+        :return: A sorted list of line numbers.
         """
         methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
         methodBodyList.extend(self.seekAllNodes(tree, JavaParser.ConstructorBodyContext))
@@ -275,11 +251,9 @@ class JavaParse(object):
 
     def getLinesOfCodePerMethod(self, tree: JavaParser.CompilationUnitContext) -> dict:
         """
-
-        :param tree:
-        :type tree:
-        :return:
-        :rtype:
+        Gets the number of lines of code for each method in the parse tree.
+        :param tree: The root of the parse tree.
+        :return: A dictionary mapping method names to the number of lines of code.
         """
         methodBodyList = self.seekAllNodes(tree, JavaParser.MethodBodyContext)
         methodBodyList.extend(self.seekAllNodes(tree, JavaParser.ConstructorBodyContext))
@@ -298,11 +272,9 @@ class JavaParse(object):
 
     def getText(self, tree: RuleContext):
         """
-
-        :param tree:
-        :type tree:
-        :return:
-        :rtype:
+        Gets the text of a node and all its children.
+        :param tree: The root of the node.
+        :return: A string containing the text of the node and its children.
         """
         if tree is None:
             return None
@@ -324,11 +296,9 @@ class JavaParse(object):
 
     def getMethodRanges(self, tree: JavaParser.CompilationUnitContext) -> dict:
         """
-
-        :param tree:
-        :type tree:
-        :return:
-        :rtype:
+        Gets the start and end character indices for each method in the parse tree.
+        :param tree: The root of the parse tree.
+        :return: A dictionary mapping method names to a tuple of (start, stop) character indices.
         """
         methodDeclarationList = self.seekAllNodes(tree, JavaParser.MethodDeclarationContext)
         methodDeclarationList.extend(self.seekAllNodes(tree, JavaParser.ConstructorDeclarationContext))
@@ -356,13 +326,10 @@ class JavaParse(object):
 
     def getMethodNameForNode(self, tree: JavaParser.CompilationUnitContext, nodeIndex: int):
         """
-
-        :param tree:
-        :type tree:
-        :param nodeIndex:
-        :type nodeIndex:
-        :return:
-        :rtype:
+        Gets the name of the method that contains the node with the specified index.
+        :param tree: The root of the parse tree.
+        :param nodeIndex: The index of the node.
+        :return: The name of the method, or "***not in a method***" if the node is not in a method.
         """
         methodName = None
         node = self.getNode(tree, nodeIndex)
@@ -390,11 +357,9 @@ class JavaParse(object):
 
     def getMethodTypeForNode(self, node):
         """
-
-        :param node:
-        :type node:
-        :return:
-        :rtype:
+        Gets the return type of the method that contains the specified node.
+        :param node: The node to check.
+        :return: The return type of the method, or None if the node is not in a method.
         """
         parentMethod = self.seekFirstMatchingParent(node, JavaParser.MethodDeclarationContext)
         if parentMethod is None:
@@ -416,11 +381,9 @@ class JavaParse(object):
 
     def getCyclomaticComplexity(self, methodBody) -> int:
         """
-
-        :param methodBody:
-        :type methodBody:
-        :return:
-        :rtype:
+        Calculates the cyclomatic complexity of a method.
+        :param methodBody: The MethodBodyContext or ConstructorBodyContext of the method.
+        :return: The cyclomatic complexity of the method.
         """
         assert isinstance(methodBody, JavaParser.MethodBodyContext) or \
                isinstance(methodBody, JavaParser.ConstructorBodyContext)
@@ -445,9 +408,9 @@ class JavaParse(object):
 
     def getCyclomaticComplexityAllMethods(self, tree) -> Dict[str, int]:
         """
-
-        :param tree:
-        :type tree:
+        Calculates the cyclomatic complexity for all methods in the parse tree.
+        :param tree: The root of the parse tree.
+        :return: A dictionary mapping method names to their cyclomatic complexity.
         """
         assert isinstance(tree, JavaParser.CompilationUnitContext)
         cyclomaticComplexityPerMethod = dict()
@@ -463,11 +426,9 @@ class JavaParse(object):
 
     def tree2DOT(self, tree):
         """
-
-        :param tree:
-        :type tree:
-        :return:
-        :rtype:
+        Converts a parse tree to a DOT representation for visualization with Graphviz.
+        :param tree: The root of the parse tree.
+        :return: A Graphviz Digraph object, or None if Graphviz is not installed.
         """
         if noGraphviz:
             return None

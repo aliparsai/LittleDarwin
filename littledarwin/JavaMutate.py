@@ -20,7 +20,14 @@ class Mutation(object):
     def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
                  replacementText: str, color: str = "#FFFFFF"):
         """
-
+        Initializes a Mutation object.
+        :param startPos: The starting position of the mutation in the source code.
+        :param endPos: The ending position of the mutation in the source code.
+        :param lineNumber: The line number of the mutation.
+        :param nodeID: The ID of the node being mutated.
+        :param mutatorType: The type of mutator being used.
+        :param replacementText: The text to replace the original code with.
+        :param color: The color to use for highlighting the mutation.
         """
         assert endPos >= startPos
 
@@ -40,26 +47,20 @@ class Mutation(object):
 
     def applyMutation(self, sourceCode: str, byteOffset: int = 0) -> str:
         """
-
-        :param byteOffset:
-        :type byteOffset:
-        :param sourceCode:
-        :type sourceCode:
-        :return:
-        :rtype:
+        Applies the mutation to the given source code.
+        :param sourceCode: The source code to apply the mutation to.
+        :param byteOffset: The byte offset to apply to the start and end positions.
+        :return: The mutated source code.
         """
         return sourceCode[:self.startPos + byteOffset] + self.replacementText + sourceCode[
                                                                                 self.endPos + byteOffset + 1:]
 
     def isInRange(self, start, end):
         """
-
-        :param start:
-        :type start:
-        :param end:
-        :type end:
-        :return:
-        :rtype:
+        Checks if the mutation is within the given range.
+        :param start: The start of the range.
+        :param end: The end of the range.
+        :return: True if the mutation is within the range, False otherwise.
         """
         return end >= self.startPos >= start
 
@@ -81,12 +82,10 @@ class Mutant(object):
 
     def __init__(self, mutantID: int, mutationList: List[Mutation], sourceCode: str):
         """
+        Initializes a Mutant object.
         :param mutantID: the ID of mutant
-        :type mutantID: int
         :param mutationList: The list containing all Mutation objects
-        :type mutationList: list
         :param sourceCode: The source code for the current file
-        :type sourceCode: str
         """
         self.mutantID = mutantID
         self.sourceCode = sourceCode
@@ -99,9 +98,10 @@ class Mutant(object):
 
     def getLine(self, lineNumber: int, code: str = None) -> str:
         """
-        :returns the referenced line from source code.
-        :param lineNumber: Desired line number.
-        :param code: The code from which the line is taken. Defaults to original source code.
+        Gets a specific line from the source code.
+        :param lineNumber: The line number to get.
+        :param code: The code to get the line from. If None, the original source code is used.
+        :return: The specified line of code.
         """
         if code is None:
             code = self.sourceCode
@@ -179,13 +179,20 @@ class Mutant(object):
 
 class MutationOperator(object):
     """
-
+    A base class for all mutation operators.
     """
     instantiable = True
     metaTypes = ["Generic"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
                  generateMutants=True):
+        """
+        Initializes a MutationOperator object.
+        :param sourceTree: The root of the parse tree.
+        :param sourceCode: The source code to mutate.
+        :param javaParseObject: The JavaParse object to use for parsing.
+        :param generateMutants: A boolean indicating whether to generate mutants.
+        """
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
         self.color = "#FFFFF0"
@@ -231,7 +238,7 @@ class MutationOperator(object):
 
 class RemoveMethod(MutationOperator):
     """
-
+    A mutation operator that removes the body of a method and replaces it with a default return value.
     """
     instantiable = True
     metaTypes = ["Method", "All"]
@@ -249,13 +256,13 @@ class RemoveMethod(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all method bodies in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodBodyContext)
 
     def filterCriteria(self):
         """
-
+        Filters the found method bodies to include only those with a valid return type.
         """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.MethodBodyContext)
@@ -266,7 +273,7 @@ class RemoveMethod(MutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the method body with a default return value based on the method's return type.
         """
         id = 0
         for node, nodeType in self.mutableNodesWithTypes:
@@ -304,7 +311,7 @@ class RemoveMethod(MutationOperator):
 
 class RemoveNullCheck(MutationOperator):
     """
-
+    A mutation operator that removes null checks by replacing them with true or false.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -321,13 +328,13 @@ class RemoveNullCheck(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all expression nodes in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ExpressionContext)
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are null checks.
         """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.ExpressionContext)
@@ -351,7 +358,7 @@ class RemoveNullCheck(MutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the null check with true or false.
         """
         id = 0
         for node in self.mutableNodes:
@@ -372,7 +379,7 @@ class RemoveNullCheck(MutationOperator):
 
 class NullifyObjectInitialization(MutationOperator):
     """
-
+    A mutation operator that nullifies object initializations.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -389,13 +396,13 @@ class NullifyObjectInitialization(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all creator nodes in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.CreatorContext)
 
     def filterCriteria(self):
         """
-
+        Filters the creator nodes to include only those that are object initializations.
         """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.CreatorContext)
@@ -420,7 +427,7 @@ class NullifyObjectInitialization(MutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the object initialization with null.
         """
         id = 0
         for node in self.mutableNodes:
@@ -440,7 +447,7 @@ class NullifyObjectInitialization(MutationOperator):
 
 class NullifyReturnValue(MutationOperator):
     """
-
+    A mutation operator that nullifies the return value of a method.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -457,13 +464,13 @@ class NullifyReturnValue(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all terminal nodes in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, TerminalNodeImpl)
 
     def filterCriteria(self):
         """
-
+        Filters the terminal nodes to include only those that are 'return' statements with a non-primitive return type.
         """
         for node in self.allNodes:
             assert isinstance(node, TerminalNodeImpl)
@@ -491,7 +498,7 @@ class NullifyReturnValue(MutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the return statement with "return null;".
         """
         id = 0
         for node in self.mutableNodes:
@@ -510,7 +517,7 @@ class NullifyReturnValue(MutationOperator):
 
 class NullifyInputVariable(MutationOperator):
     """
-
+    A mutation operator that nullifies input variables to a method.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -527,13 +534,13 @@ class NullifyInputVariable(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all method declaration nodes in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.MethodDeclarationContext)
 
     def filterCriteria(self):
         """
-
+        Filters the method declaration nodes to include only those with non-primitive input variables.
         """
         self.replacementTextDict = dict()
 
@@ -566,7 +573,7 @@ class NullifyInputVariable(MutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by adding a statement to nullify each non-primitive input variable.
         """
         id = 0
         for node in self.mutableNodes:
@@ -588,7 +595,7 @@ class NullifyInputVariable(MutationOperator):
 
 class TraditionalMutationOperator(MutationOperator):
     """
-
+    A base class for all traditional mutation operators.
     """
 
     metaTypes = ["Traditional", "All"]
@@ -600,13 +607,16 @@ class TraditionalMutationOperator(MutationOperator):
 
     def findNodes(self):
         """
-
+        Finds all expression nodes in the parse tree.
         """
         self.allNodes = self.javaParseObject.seekAllNodes(self.sourceTree, JavaParser.ExpressionContext)
 
     def filterCriteriaBinaryExpression(self, node: JavaParser.ExpressionContext, symbolList: List[str]):
         """
-
+        A helper method to filter binary expressions based on a list of symbols.
+        :param node: The expression node to check.
+        :param symbolList: A list of symbols to match.
+        :return: True if the node is a binary expression with a matching symbol, False otherwise.
         """
         assert isinstance(node, JavaParser.ExpressionContext)
 
@@ -626,7 +636,10 @@ class TraditionalMutationOperator(MutationOperator):
 
     def filterCriteriaUnaryExpression(self, node: JavaParser.ExpressionContext, symbolList: List[str]):
         """
-
+        A helper method to filter unary expressions based on a list of symbols.
+        :param node: The expression node to check.
+        :param symbolList: A list of symbols to match.
+        :return: True if the node is a unary expression with a matching symbol, False otherwise.
         """
         assert isinstance(node, JavaParser.ExpressionContext)
 
@@ -644,7 +657,11 @@ class TraditionalMutationOperator(MutationOperator):
 
     def generateMutantsUnaryExpression(self, node: JavaParser.ExpressionContext, symbolDict: dict, id: int):
         """
-
+        A helper method to generate mutants for unary expressions.
+        :param node: The expression node to mutate.
+        :param symbolDict: A dictionary mapping original symbols to their replacements.
+        :param id: The ID of the mutant.
+        :return: A Mutant object.
         """
         replacementText = symbolDict[node.children[0].symbol.text]
 
@@ -659,7 +676,11 @@ class TraditionalMutationOperator(MutationOperator):
 
     def generateMutantsBinaryExpression(self, node: JavaParser.ExpressionContext, symbolDict: dict, id: int):
         """
-
+        A helper method to generate mutants for binary expressions.
+        :param node: The expression node to mutate.
+        :param symbolDict: A dictionary mapping original symbols to their replacements.
+        :param id: The ID of the mutant.
+        :return: A Mutant object.
         """
         replacementText = symbolDict[node.children[1].symbol.text]
 
@@ -675,7 +696,7 @@ class TraditionalMutationOperator(MutationOperator):
 
 class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces binary arithmetic operators.
     """
     instantiable = True
 
@@ -691,7 +712,7 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are binary arithmetic operations.
         """
         for node in self.allNodes:
             if (self.filterCriteriaBinaryExpression(node, ['+', '-', '*', '/', '%'])
@@ -700,7 +721,7 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the binary arithmetic operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -711,7 +732,7 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
 
 class RelationalOperatorReplacement(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces relational operators.
     """
     instantiable = True
 
@@ -727,7 +748,7 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are relational operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaBinaryExpression(node, ['>', '>=', '<', '<=', '==', '!=']):
@@ -735,7 +756,7 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the relational operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -747,7 +768,7 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
 
 class ConditionalOperatorReplacement(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces conditional operators.
     """
     instantiable = True
 
@@ -763,7 +784,7 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are conditional operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaBinaryExpression(node, ['&&', '||']):
@@ -771,7 +792,7 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the conditional operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -782,7 +803,7 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
 
 class LogicalOperatorReplacement(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces logical operators.
     """
     instantiable = True
 
@@ -798,7 +819,7 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are logical operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaBinaryExpression(node, ['&', '|', '^']):
@@ -806,7 +827,7 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the logical operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -817,7 +838,7 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
 
 class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces shortcut assignment operators.
     """
     instantiable = True
 
@@ -833,7 +854,7 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are shortcut assignment operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaBinaryExpression(node, ['+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=',
@@ -842,7 +863,7 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the shortcut assignment operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -855,7 +876,7 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
 
 class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces unary arithmetic operators.
     """
 
     instantiable = True
@@ -872,7 +893,7 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are unary arithmetic operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaUnaryExpression(node, ['+', '-']):
@@ -880,7 +901,7 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the unary arithmetic operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -891,7 +912,7 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
 
 class ConditionalOperatorDeletion(TraditionalMutationOperator):
     """
-
+    A mutation operator that deletes conditional operators.
     """
     instantiable = True
 
@@ -907,7 +928,7 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are conditional operations.
         """
         for node in self.allNodes:
             if self.filterCriteriaUnaryExpression(node, ['!']):
@@ -915,7 +936,7 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by deleting the conditional operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -926,7 +947,7 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
 
 class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces shortcut arithmetic operators.
     """
     instantiable = True
 
@@ -943,7 +964,7 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are shortcut arithmetic operations.
         """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.ExpressionContext)
@@ -967,7 +988,7 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the shortcut arithmetic operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -990,7 +1011,7 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
 
 class ShiftOperatorReplacement(TraditionalMutationOperator):
     """
-
+    A mutation operator that replaces shift operators.
     """
     instantiable = True
 
@@ -1007,7 +1028,7 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
 
     def filterCriteria(self):
         """
-
+        Filters the expression nodes to include only those that are shift operations.
         """
         for node in self.allNodes:
             assert isinstance(node, JavaParser.ExpressionContext)
@@ -1053,7 +1074,7 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
 
     def generateMutants(self):
         """
-
+        Generates mutants by replacing the shift operators.
         """
         id = 0
         for node in self.mutableNodes:
@@ -1082,11 +1103,9 @@ class ShiftOperatorReplacement(TraditionalMutationOperator):
 
 def getAllInstantiableSubclasses(parentClass):
     """
-
+    Gets all instantiable subclasses of a given class.
     :param parentClass: the class that all its subclasses must be returned
-    :type parentClass: Type[MutationOperator]
     :return: set of MutationOperator instantiable subclasses
-    :rtype: set
     """
     allInstantiableSubclasses = set()
 
@@ -1105,6 +1124,13 @@ class JavaMutate(object):
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
                  verbose: bool = False):
+        """
+        Initializes a JavaMutate object.
+        :param sourceTree: The root of the parse tree.
+        :param sourceCode: The source code to mutate.
+        :param javaParseObject: The JavaParse object to use for parsing.
+        :param verbose: A boolean indicating whether to print verbose output.
+        """
         self.verbose = verbose
         self.sourceCode = sourceCode
         self.sourceTree = sourceTree
@@ -1125,11 +1151,9 @@ class JavaMutate(object):
 
     def instantiateMutationOperators(self, metaTypes: List[str] = ["Traditional"], generateMutants: bool = True):
         """
-
-        :param generateMutants:
-        :type generateMutants:
-        :param metaTypes:
-        :type metaTypes:
+        Instantiates all mutation operators of the specified meta types.
+        :param metaTypes: A list of meta types to instantiate.
+        :param generateMutants: A boolean indicating whether to generate mutants.
         """
         for MO in getAllInstantiableSubclasses(MutationOperator):
             for metaType in metaTypes:
@@ -1139,12 +1163,9 @@ class JavaMutate(object):
 
     def countMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
-        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
-
+        Counts the number of mutants for each mutation operator type.
         :param metaTypes: types of mutation operators to use
-        :type metaTypes: List[str]
-        :return: mutated source code for each mutant, number of types of mutants
-        :rtype: Tuple[List, Dict]
+        :return: A dictionary mapping mutation operator types to the number of mutants.
         """
         mutationTypeCount = dict()
         self.instantiateMutationOperators(metaTypes, generateMutants=False)
@@ -1167,12 +1188,9 @@ class JavaMutate(object):
 
     def gatherMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
-        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
-
+        Gathers all mutants of the specified meta types.
         :param metaTypes: types of mutation operators to use
-        :type metaTypes: List[str]
-        :return: mutated source code for each mutant, number of types of mutants
-        :rtype: Tuple[List, Dict]
+        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.
         """
         mutationTypeCount = dict()
         mutantTexts = list()
@@ -1199,14 +1217,10 @@ class JavaMutate(object):
 
     def gatherHigherOrderMutants(self, higherOrderDirective: int, metaTypes: List[str] = ["Traditional"]):
         """
-        Gathers all mutants, creates desired higher-order mutants, and returns the mutated code
-
+        Gathers all mutants and creates higher-order mutants.
         :param higherOrderDirective: The requested higher-order order
-        :type higherOrderDirective: int
         :param metaTypes: type of mutation operators to use
-        :type metaTypes: List[str]
-        :return: mutated source code for each mutant, number of types of mutants
-        :rtype: Tuple[List, Dict]
+        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.
         """
         selectedMutants = list()
 
@@ -1268,11 +1282,9 @@ class JavaMutate(object):
 
     def aggregateReport(self, littleDarwinVersion: str):
         """
-
+        Generates an HTML report of all mutations for a file.
         :param littleDarwinVersion: LittleDarwin Version
-        :type littleDarwinVersion: str
         :return: Aggregate report on all mutations for a file
-        :rtype: str
         """
         lineNumber = 1
         col = 0
