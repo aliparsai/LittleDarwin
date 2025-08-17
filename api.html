@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="LittleDarwin documentation" href="index.html" /> 
+    <link rel="prev" title="Usage" href="usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,6 +43,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#littledarwin.LittleDarwin.buildPhase"><code class="docutils literal notranslate"><span class="pre">buildPhase()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#littledarwin.LittleDarwin.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
@@ -233,12 +234,20 @@
              
   <section id="module-littledarwin.LittleDarwin">
 <span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-littledarwin.LittleDarwin" title="Link to this heading"></a></h1>
+<p>This module is the main entry point for the LittleDarwin mutation analysis
+framework. It contains the logic for parsing command-line arguments, running the
+mutation phase, and running the build phase.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.LittleDarwin.buildPhase">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.LittleDarwin.</span></span><span class="sig-name descname"><span class="pre">buildPhase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/LittleDarwin.html#buildPhase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.LittleDarwin.buildPhase" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs the build phase of LittleDarwin.</p>
+<p>This function iterates through the mutants in the database, and for each
+mutant, it replaces the original file with the mutant, runs the build
+command, and records whether the build succeeded or failed. It then
+generates a report of the results.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>options</strong></p>
+<dd class="field-odd"><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/optparse.html#optparse.Values" title="(in Python v3.13)"><em>optparse.Values</em></a>) – The command-line options.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -246,19 +255,30 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.LittleDarwin.main">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.LittleDarwin.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mockArgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/LittleDarwin.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.LittleDarwin.main" title="Link to this definition"></a></dt>
-<dd><p>Main LittleDarwin Function</p>
+<dd><p>The main entry point for the LittleDarwin application.</p>
+<p>This function parses the command-line arguments and then calls the
+appropriate functions to perform the mutation and/or build phases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mockArgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>, </em><em>optional</em>) – A list of command-line arguments for testing purposes.
+If None, the arguments are read from <code class="docutils literal notranslate"><span class="pre">sys.argv</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.LittleDarwin.mutationPhase">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.LittleDarwin.</span></span><span class="sig-name descname"><span class="pre">mutationPhase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">higherOrder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/LittleDarwin.html#mutationPhase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.LittleDarwin.mutationPhase" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Performs the mutation phase of LittleDarwin.</p>
+<p>This function finds all the Java files in the source directory,
+parses them, generates mutants, and stores them in a database.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>options</strong></p></li>
-<li><p><strong>filterType</strong></p></li>
-<li><p><strong>filterList</strong></p></li>
-<li><p><strong>higherOrder</strong></p></li>
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/optparse.html#optparse.Values" title="(in Python v3.13)"><em>optparse.Values</em></a>) – The command-line options.</p></li>
+<li><p><strong>filterType</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The type of filter to use (“whitelist” or “blacklist”).</p></li>
+<li><p><strong>filterList</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of files or packages to include or exclude.</p></li>
+<li><p><strong>higherOrder</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The order of mutation to perform.</p></li>
 </ul>
 </dd>
 </dl>
@@ -267,18 +287,21 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.LittleDarwin.parseCmdArgs">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.LittleDarwin.</span></span><span class="sig-name descname"><span class="pre">parseCmdArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optionParser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/optparse.html#optparse.OptionParser" title="(in Python v3.13)"><span class="pre">OptionParser</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mockArgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><span class="pre">object</span></a></span></span><a class="reference internal" href="_modules/littledarwin/LittleDarwin.html#parseCmdArgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.LittleDarwin.parseCmdArgs" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Parses the command-line arguments for LittleDarwin.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mockArgs</strong></p></li>
-<li><p><strong>optionParser</strong></p></li>
+<li><p><strong>optionParser</strong> (<a class="reference external" href="https://docs.python.org/3/library/optparse.html#optparse.OptionParser" title="(in Python v3.13)"><em>optparse.OptionParser</em></a>) – The OptionParser instance to use.</p></li>
+<li><p><strong>mockArgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>, </em><em>optional</em>) – A list of command-line arguments for testing purposes.
+If None, the arguments are read from <code class="docutils literal notranslate"><span class="pre">sys.argv</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>A tuple containing the parsed options, the filter type, the filter
+list, and the higher-order mutation value.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -286,17 +309,24 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.LittleDarwin.timeoutAlternative">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.LittleDarwin.</span></span><span class="sig-name descname"><span class="pre">timeoutAlternative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commandString</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workingDirectory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/LittleDarwin.html#timeoutAlternative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.LittleDarwin.timeoutAlternative" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Runs a command with a timeout, and kills it if it takes too long.</p>
+<p>This function uses a watchdog thread to kill the process if the timeout
+expires. It is used to prevent the build process from hanging.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>commandString</strong> – command to run</p></li>
-<li><p><strong>workingDirectory</strong> – the directory that the command is supposed to run in</p></li>
-<li><p><strong>timeout</strong> – timeout in seconds</p></li>
-<li><p><strong>inputData</strong> – the data that the run process may need. defaults to None.</p></li>
+<li><p><strong>commandString</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – The command to run, as a list of strings.</p></li>
+<li><p><strong>workingDirectory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The directory in which to run the command.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The timeout in seconds.</p></li>
+<li><p><strong>inputData</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.13)"><em>bytes</em></a><em>, </em><em>optional</em>) – Input data to pass to the process’s stdin.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns kill status, process return code and the output of the system</p>
+<dd class="field-even"><p>A tuple containing a boolean indicating if the process was
+killed, the process’s return code, and the process’s stdout.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -304,21 +334,19 @@
 <dl class="py class" id="module-littledarwin.JavaIO">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaIO.</span></span><span class="sig-name descname"><span class="pre">JavaIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>This class handles all the file I/O operations for LittleDarwin, such as
+finding Java files, reading their content, and writing the mutated files
+to disk.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO.filterFiles">
 <span class="sig-name descname"><span class="pre">filterFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blacklist'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO.filterFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO.filterFiles" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Filters the list of files based on a whitelist or blacklist.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong></p></li>
-<li><p><strong>filterList</strong></p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The filter mode, either “whitelist” or “blacklist”.</p></li>
+<li><p><strong>filterList</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of package names or file paths to filter by.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,21 +354,28 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO.generateNewFile">
 <span class="sig-name descname"><span class="pre">generateNewFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">originalFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileData</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutantsPerLine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">densityReport</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregateComplexity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO.generateNewFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO.generateNewFile" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Generates a new file containing a mutant.</p>
+<p>This function creates a new directory for the mutated file, copies the
+original file to that directory, and then writes the mutated code to a
+new file in that directory. It also writes out a number of reports
+about the mutation.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>originalFile</strong></p></li>
-<li><p><strong>fileData</strong></p></li>
-<li><p><strong>mutantsPerLine</strong></p></li>
-<li><p><strong>densityReport</strong></p></li>
-<li><p><strong>aggregateComplexity</strong></p></li>
+<li><p><strong>originalFile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the original file.</p></li>
+<li><p><strong>fileData</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The content of the mutated file.</p></li>
+<li><p><strong>mutantsPerLine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary mapping line numbers to the number
+of mutants on that line.</p></li>
+<li><p><strong>densityReport</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The HTML report of the mutant density.</p></li>
+<li><p><strong>aggregateComplexity</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary containing the aggregate
+complexity report for the class.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The relative path to the new file.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -348,19 +383,24 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO.getAggregateComplexityReport">
 <span class="sig-name descname"><span class="pre">getAggregateComplexityReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutantDensityPerMethod</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cyclomaticComplexityPerMethod</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linesOfCodePerMethod</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO.getAggregateComplexityReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO.getAggregateComplexityReport" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Aggregates complexity metrics for each method in a class.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mutantDensityPerMethod</strong></p></li>
-<li><p><strong>cyclomaticComplexityPerMethod</strong></p></li>
-<li><p><strong>linesOfCodePerMethod</strong></p></li>
+<li><p><strong>mutantDensityPerMethod</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary mapping method names to the
+number of mutants in that method.</p></li>
+<li><p><strong>cyclomaticComplexityPerMethod</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary mapping method names
+to their cyclomatic complexity.</p></li>
+<li><p><strong>linesOfCodePerMethod</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary mapping method names to their
+lines of code.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>A dictionary mapping method names to a list containing the
+mutant density, cyclomatic complexity, and lines of code.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -368,15 +408,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO.getFileContent">
 <span class="sig-name descname"><span class="pre">getFileContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO.getFileContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO.getFileContent" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Reads the content of a file and returns it as a string.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filePath</strong></p>
+<dd class="field-odd"><p><strong>filePath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the file.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The content of the file.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -384,14 +425,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaIO.JavaIO.listFiles">
 <span class="sig-name descname"><span class="pre">listFiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">targetPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buildPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filterType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blacklist'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desiredType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*.java'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaIO.html#JavaIO.listFiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaIO.JavaIO.listFiles" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Lists all the files in a directory that match a given type, and
+optionally filters them.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>targetPath</strong></p></li>
-<li><p><strong>buildPath</strong></p></li>
-<li><p><strong>filterList</strong></p></li>
-<li><p><strong>filterType</strong></p></li>
-<li><p><strong>desiredType</strong></p></li>
+<li><p><strong>targetPath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the source files.</p></li>
+<li><p><strong>buildPath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the build directory.</p></li>
+<li><p><strong>filterList</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of package names or file paths to filter by.</p></li>
+<li><p><strong>filterType</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The filter mode, either “whitelist” or “blacklist”.</p></li>
+<li><p><strong>desiredType</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The type of files to list (e.g., “<code class="docutils literal notranslate"><span class="pre">*.java</span></code>”).</p></li>
 </ul>
 </dd>
 </dl>
@@ -402,7 +445,8 @@
 <dl class="py class" id="module-littledarwin.JavaMutate">
 <span id="module-littledarwin.JavaLexer"></span><dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementBinary">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ArithmeticOperatorReplacementBinary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementBinary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementBinary" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces binary arithmetic operators.</p>
+<dd><p>This mutation operator replaces binary arithmetic operators. For example,
+<code class="docutils literal notranslate"><span class="pre">+</span></code> is replaced with <code class="docutils literal notranslate"><span class="pre">-</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementBinary.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementBinary.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementBinary.filterCriteria" title="Link to this definition"></a></dt>
@@ -420,7 +464,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementShortcut">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ArithmeticOperatorReplacementShortcut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementShortcut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementShortcut" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces shortcut arithmetic operators.</p>
+<dd><p>This mutation operator replaces shortcut arithmetic operators. For example,
+<code class="docutils literal notranslate"><span class="pre">++</span></code> is replaced with <code class="docutils literal notranslate"><span class="pre">--</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementShortcut.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementShortcut.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementShortcut.filterCriteria" title="Link to this definition"></a></dt>
@@ -438,7 +483,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementUnary">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ArithmeticOperatorReplacementUnary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementUnary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementUnary" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces unary arithmetic operators.</p>
+<dd><p>This mutation operator replaces unary arithmetic operators. For example, a
+unary <code class="docutils literal notranslate"><span class="pre">+</span></code> is replaced with a unary <code class="docutils literal notranslate"><span class="pre">-</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ArithmeticOperatorReplacementUnary.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ArithmeticOperatorReplacementUnary.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ArithmeticOperatorReplacementUnary.filterCriteria" title="Link to this definition"></a></dt>
@@ -456,7 +502,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.AssignmentOperatorReplacementShortcut">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">AssignmentOperatorReplacementShortcut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#AssignmentOperatorReplacementShortcut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.AssignmentOperatorReplacementShortcut" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces shortcut assignment operators.</p>
+<dd><p>This mutation operator replaces shortcut assignment operators. For example,
+<code class="docutils literal notranslate"><span class="pre">+=</span></code> is replaced with <code class="docutils literal notranslate"><span class="pre">-=</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.AssignmentOperatorReplacementShortcut.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#AssignmentOperatorReplacementShortcut.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.AssignmentOperatorReplacementShortcut.filterCriteria" title="Link to this definition"></a></dt>
@@ -474,7 +521,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ConditionalOperatorDeletion">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ConditionalOperatorDeletion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ConditionalOperatorDeletion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ConditionalOperatorDeletion" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that deletes conditional operators.</p>
+<dd><p>This mutation operator deletes conditional operators. For example, <code class="docutils literal notranslate"><span class="pre">!a</span></code>
+is replaced with <code class="docutils literal notranslate"><span class="pre">a</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ConditionalOperatorDeletion.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ConditionalOperatorDeletion.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ConditionalOperatorDeletion.filterCriteria" title="Link to this definition"></a></dt>
@@ -492,7 +540,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ConditionalOperatorReplacement">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ConditionalOperatorReplacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ConditionalOperatorReplacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ConditionalOperatorReplacement" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces conditional operators.</p>
+<dd><p>This mutation operator replaces conditional operators. For example, <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code>
+is replaced with <code class="docutils literal notranslate"><span class="pre">||</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ConditionalOperatorReplacement.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ConditionalOperatorReplacement.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ConditionalOperatorReplacement.filterCriteria" title="Link to this definition"></a></dt>
@@ -510,21 +559,42 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">JavaMutate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate" title="Link to this definition"></a></dt>
-<dd><p>Main entry point for mutation of a Java source file.</p>
+<dd><p>This class is the main entry point for the mutation of a Java source file.
+It takes a parse tree and the original source code, and then uses a
+collection of mutation operators to generate a list of mutants.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate.aggregateReport">
 <span class="sig-name descname"><span class="pre">aggregateReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">littleDarwinVersion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate.aggregateReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate.aggregateReport" title="Link to this definition"></a></dt>
-<dd><p>Generates an HTML report of all mutations for a file.
-:param littleDarwinVersion: LittleDarwin Version
-:return: Aggregate report on all mutations for a file</p>
+<dd><p>Generates an HTML report of all mutations for a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>littleDarwinVersion</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The version of LittleDarwin.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An HTML report of all mutations for a file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate.countMutants">
 <span class="sig-name descname"><span class="pre">countMutants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['Traditional']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate.countMutants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate.countMutants" title="Link to this definition"></a></dt>
-<dd><p>Counts the number of mutants for each mutation operator type.
-:param metaTypes: types of mutation operators to use
-:return: A dictionary mapping mutation operator types to the number of mutants.</p>
+<dd><p>Counts the number of mutants for each mutation operator type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metaTypes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – The types of mutation operators to use.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping mutation operator types to the number of
+mutants.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -544,26 +614,56 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate.gatherHigherOrderMutants">
 <span class="sig-name descname"><span class="pre">gatherHigherOrderMutants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">higherOrderDirective</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">metaTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['Traditional']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate.gatherHigherOrderMutants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate.gatherHigherOrderMutants" title="Link to this definition"></a></dt>
-<dd><p>Gathers all mutants and creates higher-order mutants.
-:param higherOrderDirective: The requested higher-order order
-:param metaTypes: type of mutation operators to use
-:return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.</p>
+<dd><p>Gathers all mutants and creates higher-order mutants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>higherOrderDirective</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The requested higher-order order.</p></li>
+<li><p><strong>metaTypes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – The type of mutation operators to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing a list of mutated source code and a
+dictionary mapping mutation operator types to the number of
+mutants.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate.gatherMutants">
 <span class="sig-name descname"><span class="pre">gatherMutants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['Traditional']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate.gatherMutants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate.gatherMutants" title="Link to this definition"></a></dt>
-<dd><p>Gathers all mutants of the specified meta types.
-:param metaTypes: types of mutation operators to use
-:return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.</p>
+<dd><p>Gathers all mutants of the specified meta types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metaTypes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – The types of mutation operators to use.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing a list of mutated source code and a
+dictionary mapping mutation operator types to the number of
+mutants.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.JavaMutate.instantiateMutationOperators">
 <span class="sig-name descname"><span class="pre">instantiateMutationOperators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metaTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['Traditional']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#JavaMutate.instantiateMutationOperators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.JavaMutate.instantiateMutationOperators" title="Link to this definition"></a></dt>
-<dd><p>Instantiates all mutation operators of the specified meta types.
-:param metaTypes: A list of meta types to instantiate.
-:param generateMutants: A boolean indicating whether to generate mutants.</p>
+<dd><p>Instantiates all mutation operators of the specified meta types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metaTypes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of meta types to instantiate.</p></li>
+<li><p><strong>generateMutants</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – A boolean indicating whether to generate mutants.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -571,7 +671,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.LogicalOperatorReplacement">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">LogicalOperatorReplacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#LogicalOperatorReplacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.LogicalOperatorReplacement" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces logical operators.</p>
+<dd><p>This mutation operator replaces logical operators. For example, <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> is
+replaced with <code class="docutils literal notranslate"><span class="pre">|</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.LogicalOperatorReplacement.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#LogicalOperatorReplacement.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.LogicalOperatorReplacement.filterCriteria" title="Link to this definition"></a></dt>
@@ -589,20 +690,36 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutant">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">Mutant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutantID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutationList</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#littledarwin.JavaMutate.Mutation" title="littledarwin.JavaMutate.Mutation"><span class="pre">Mutation</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutant" title="Link to this definition"></a></dt>
-<dd><p>Defines a mutant consisting of one or several mutations.</p>
+<dd><p>This class represents a mutant, which is a version of the source code
+that has been modified by one or more mutations. It contains a list of
+mutations and the original source code, and it can be used to generate
+the mutated source code.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutant.getLine">
 <span class="sig-name descname"><span class="pre">getLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lineNumber</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutant.getLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutant.getLine" title="Link to this definition"></a></dt>
-<dd><p>Gets a specific line from the source code.
-:param lineNumber: The line number to get.
-:param code: The code to get the line from. If None, the original source code is used.
-:return: The specified line of code.</p>
+<dd><p>Gets a specific line from the source code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lineNumber</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The line number to get.</p></li>
+<li><p><strong>code</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The code to get the line from. If None, the original
+source code is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The specified line of code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutant.mutateCode">
 <span class="sig-name descname"><span class="pre">mutateCode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutant.mutateCode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutant.mutateCode" title="Link to this definition"></a></dt>
-<dd><p>Applies the mutations in mutationList to the source code.</p>
+<dd><p>Applies the mutations in the mutation list to the source code to
+generate the mutated code.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -624,14 +741,30 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutation">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">Mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">startPos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">endPos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineNumber</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutatorType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacementText</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'#FFFFFF'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutation" title="Link to this definition"></a></dt>
-<dd><p>Defines a single mutation.</p>
+<dd><p>This class represents a single mutation, which is a change to a small
+section of the source code. It contains information about the location of
+the mutation, the type of mutator used, and the text to replace the
+original code with.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutation.applyMutation">
 <span class="sig-name descname"><span class="pre">applyMutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">byteOffset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutation.applyMutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutation.applyMutation" title="Link to this definition"></a></dt>
-<dd><p>Applies the mutation to the given source code.
-:param sourceCode: The source code to apply the mutation to.
-:param byteOffset: The byte offset to apply to the start and end positions.
-:return: The mutated source code.</p>
+<dd><p>Applies the mutation to the given source code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sourceCode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The source code to apply the mutation to.</p></li>
+<li><p><strong>byteOffset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The byte offset to apply to the start and end
+positions. This is used when applying multiple
+mutations to the same file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated source code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -651,10 +784,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.Mutation.isInRange">
 <span class="sig-name descname"><span class="pre">isInRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#Mutation.isInRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.Mutation.isInRange" title="Link to this definition"></a></dt>
-<dd><p>Checks if the mutation is within the given range.
-:param start: The start of the range.
-:param end: The end of the range.
-:return: True if the mutation is within the range, False otherwise.</p>
+<dd><p>Checks if the mutation is within the given range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The start of the range.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The end of the range.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the mutation is within the range, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -662,7 +806,9 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.MutationOperator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">MutationOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#MutationOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.MutationOperator" title="Link to this definition"></a></dt>
-<dd><p>A base class for all mutation operators.</p>
+<dd><p>This is a base class for all mutation operators. A mutation operator is a
+class that knows how to find specific nodes in a parse tree and generate
+mutants from them.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.MutationOperator.cssClass">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cssClass</span></span><a class="headerlink" href="#littledarwin.JavaMutate.MutationOperator.cssClass" title="Link to this definition"></a></dt>
@@ -700,7 +846,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyInputVariable">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">NullifyInputVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyInputVariable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyInputVariable" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that nullifies input variables to a method.</p>
+<dd><p>This mutation operator nullifies input variables to a method by adding a
+statement at the beginning of the method to set the variable to <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyInputVariable.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyInputVariable.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyInputVariable.filterCriteria" title="Link to this definition"></a></dt>
@@ -724,7 +871,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyObjectInitialization">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">NullifyObjectInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyObjectInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyObjectInitialization" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that nullifies object initializations.</p>
+<dd><p>This mutation operator nullifies object initializations by replacing them
+with <code class="docutils literal notranslate"><span class="pre">null</span></code>. For example, <code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">Foo()</span></code> will be replaced with <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyObjectInitialization.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyObjectInitialization.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyObjectInitialization.filterCriteria" title="Link to this definition"></a></dt>
@@ -748,7 +896,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyReturnValue">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">NullifyReturnValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyReturnValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyReturnValue" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that nullifies the return value of a method.</p>
+<dd><p>This mutation operator nullifies the return value of a method by
+replacing the return statement with <code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">null;</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.NullifyReturnValue.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#NullifyReturnValue.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.NullifyReturnValue.filterCriteria" title="Link to this definition"></a></dt>
@@ -772,7 +921,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RelationalOperatorReplacement">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">RelationalOperatorReplacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RelationalOperatorReplacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RelationalOperatorReplacement" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces relational operators.</p>
+<dd><p>This mutation operator replaces relational operators. For example, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> is
+replaced with <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RelationalOperatorReplacement.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RelationalOperatorReplacement.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RelationalOperatorReplacement.filterCriteria" title="Link to this definition"></a></dt>
@@ -790,7 +940,9 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RemoveMethod">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">RemoveMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RemoveMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RemoveMethod" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that removes the body of a method and replaces it with a default return value.</p>
+<dd><p>This mutation operator removes the body of a method and replaces it with a
+default return value. For example, a method that returns an <code class="docutils literal notranslate"><span class="pre">int</span></code> will be
+replaced with <code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">0;</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RemoveMethod.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RemoveMethod.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RemoveMethod.filterCriteria" title="Link to this definition"></a></dt>
@@ -815,7 +967,9 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RemoveNullCheck">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">RemoveNullCheck</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RemoveNullCheck"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RemoveNullCheck" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that removes null checks by replacing them with true or false.</p>
+<dd><p>This mutation operator removes null checks by replacing them with <code class="docutils literal notranslate"><span class="pre">true</span></code> or
+<code class="docutils literal notranslate"><span class="pre">false</span></code>. For example, <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">(x</span> <span class="pre">!=</span> <span class="pre">null)</span></code> will be replaced with <code class="docutils literal notranslate"><span class="pre">if</span>
+<span class="pre">(true)</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.RemoveNullCheck.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#RemoveNullCheck.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.RemoveNullCheck.filterCriteria" title="Link to this definition"></a></dt>
@@ -839,7 +993,8 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ShiftOperatorReplacement">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">ShiftOperatorReplacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ShiftOperatorReplacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ShiftOperatorReplacement" title="Link to this definition"></a></dt>
-<dd><p>A mutation operator that replaces shift operators.</p>
+<dd><p>This mutation operator replaces shift operators. For example, <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> is
+replaced with <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.ShiftOperatorReplacement.filterCriteria">
 <span class="sig-name descname"><span class="pre">filterCriteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#ShiftOperatorReplacement.filterCriteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.ShiftOperatorReplacement.filterCriteria" title="Link to this definition"></a></dt>
@@ -857,7 +1012,8 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.TraditionalMutationOperator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaMutate.</span></span><span class="sig-name descname"><span class="pre">TraditionalMutationOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceTree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceCode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">javaParseObject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#littledarwin.JavaParse.JavaParse" title="littledarwin.JavaParse.JavaParse"><span class="pre">JavaParse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">generateMutants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#TraditionalMutationOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.TraditionalMutationOperator" title="Link to this definition"></a></dt>
-<dd><p>A base class for all traditional mutation operators.</p>
+<dd><p>A base class for all traditional mutation operators. These operators
+perform simple mutations, such as replacing one operator with another.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaMutate.TraditionalMutationOperator.filterCriteriaBinaryExpression">
 <span class="sig-name descname"><span class="pre">filterCriteriaBinaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExpressionContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbolList</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaMutate.html#TraditionalMutationOperator.filterCriteriaBinaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaMutate.TraditionalMutationOperator.filterCriteriaBinaryExpression" title="Link to this definition"></a></dt>
@@ -915,164 +1071,354 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class" id="module-littledarwin.JavaParse">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaParse.</span></span><span class="sig-name descname"><span class="pre">JavaParse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse" title="Link to this definition"></a></dt>
-<dd><p>A class that uses ANTLR4 to parse Java source code. It provides methods for traversing and analyzing the parse tree.</p>
+<dd><p>This class uses ANTLR4 to parse Java source code. It provides methods for
+traversing and analyzing the parse tree, such as finding nodes of a
+specific type, getting the cyclomatic complexity of a method, and getting
+the name of the method that contains a specific node.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.distance">
 <span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.distance" title="Link to this definition"></a></dt>
-<dd><p>Calculates the distance between two nodes in the parse tree.
-:param tree: The root of the parse tree.
-:param node1: The index of the first node.
-:param node2: The index of the second node.
-:return: The distance between the two nodes, or -1 if they are not in the same subtree.</p>
+<dd><p>Calculates the distance between two nodes in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>node1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the first node.</p></li>
+<li><p><strong>node2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the second node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The distance between the two nodes, or -1 if they are not in
+the same subtree.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getCyclomaticComplexity">
 <span class="sig-name descname"><span class="pre">getCyclomaticComplexity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodBody</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getCyclomaticComplexity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getCyclomaticComplexity" title="Link to this definition"></a></dt>
-<dd><p>Calculates the cyclomatic complexity of a method.
-:param methodBody: The MethodBodyContext or ConstructorBodyContext of the method.
-:return: The cyclomatic complexity of the method.</p>
+<dd><p>Calculates the cyclomatic complexity of a method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>methodBody</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The MethodBodyContext or ConstructorBodyContext of
+the method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cyclomatic complexity of the method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getCyclomaticComplexityAllMethods">
 <span class="sig-name descname"><span class="pre">getCyclomaticComplexityAllMethods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getCyclomaticComplexityAllMethods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getCyclomaticComplexityAllMethods" title="Link to this definition"></a></dt>
-<dd><p>Calculates the cyclomatic complexity for all methods in the parse tree.
-:param tree: The root of the parse tree.
-:return: A dictionary mapping method names to their cyclomatic complexity.</p>
+<dd><p>Calculates the cyclomatic complexity for all methods in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping method names to their cyclomatic
+complexity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getInMethodLines">
 <span class="sig-name descname"><span class="pre">getInMethodLines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getInMethodLines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getInMethodLines" title="Link to this definition"></a></dt>
-<dd><p>Gets a list of all line numbers that are within a method.
-:param tree: The root of the parse tree.
-:return: A sorted list of line numbers.</p>
+<dd><p>Gets a list of all line numbers that are within a method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A sorted list of line numbers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getLinesOfCodePerMethod">
 <span class="sig-name descname"><span class="pre">getLinesOfCodePerMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getLinesOfCodePerMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getLinesOfCodePerMethod" title="Link to this definition"></a></dt>
-<dd><p>Gets the number of lines of code for each method in the parse tree.
-:param tree: The root of the parse tree.
-:return: A dictionary mapping method names to the number of lines of code.</p>
+<dd><p>Gets the number of lines of code for each method in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping method names to the number of lines of
+code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getMethodNameForNode">
 <span class="sig-name descname"><span class="pre">getMethodNameForNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeIndex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getMethodNameForNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getMethodNameForNode" title="Link to this definition"></a></dt>
-<dd><p>Gets the name of the method that contains the node with the specified index.
-:param tree: The root of the parse tree.
-:param nodeIndex: The index of the node.
-:return: The name of the method, or “<strong>*not in a method*</strong>” if the node is not in a method.</p>
+<dd><p>Gets the name of the method that contains the node with the specified
+index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>nodeIndex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the node.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The name of the method, or “<strong>*not in a method*</strong>” if the node
+is not in a method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getMethodRanges">
 <span class="sig-name descname"><span class="pre">getMethodRanges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">CompilationUnitContext</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getMethodRanges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getMethodRanges" title="Link to this definition"></a></dt>
-<dd><p>Gets the start and end character indices for each method in the parse tree.
-:param tree: The root of the parse tree.
-:return: A dictionary mapping method names to a tuple of (start, stop) character indices.</p>
+<dd><p>Gets the start and end character indices for each method in the parse
+tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary mapping method names to a tuple of (start, stop)
+character indices.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getMethodTypeForNode">
 <span class="sig-name descname"><span class="pre">getMethodTypeForNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getMethodTypeForNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getMethodTypeForNode" title="Link to this definition"></a></dt>
-<dd><p>Gets the return type of the method that contains the specified node.
-:param node: The node to check.
-:return: The return type of the method, or None if the node is not in a method.</p>
+<dd><p>Gets the return type of the method that contains the specified node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The node to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The return type of the method, or None if the node is not in a
+method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getNode">
 <span class="sig-name descname"><span class="pre">getNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getNode" title="Link to this definition"></a></dt>
-<dd><p>Gets a node from the parse tree by its index.
-:param tree: The root of the parse tree.
-:param index: The index of the node to get.
-:return: The node with the specified index, or None if the node is not found.</p>
+<dd><p>Gets a node from the parse tree by its index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the node to get.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The node with the specified index, or None if the node is not
+found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>antlr4.tree.Tree.ParseTree</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.getText">
 <span class="sig-name descname"><span class="pre">getText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RuleContext</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.getText"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.getText" title="Link to this definition"></a></dt>
-<dd><p>Gets the text of a node and all its children.
-:param tree: The root of the node.
-:return: A string containing the text of the node and its children.</p>
+<dd><p>Gets the text of a node and all its children.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string containing the text of the node and its children.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.numerify">
 <span class="sig-name descname"><span class="pre">numerify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.numerify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.numerify" title="Link to this definition"></a></dt>
-<dd><p>Adds a unique nodeIndex to each node in the parse tree.
-:param tree: The root of the parse tree.</p>
+<dd><p>Adds a unique <code class="docutils literal notranslate"><span class="pre">nodeIndex</span></code> to each node in the parse tree. This is
+used to identify nodes when creating mutations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.parse">
 <span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileContent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.parse" title="Link to this definition"></a></dt>
-<dd><p>Parses the given Java source code and returns a parse tree.
-:param fileContent: A string containing the Java source code.
-:return: A parse tree representing the Java source code.</p>
+<dd><p>Parses the given Java source code and returns a parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileContent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A string containing the Java source code.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A parse tree representing the Java source code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>antlr4.tree.Tree.ParseTree</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.seek">
 <span class="sig-name descname"><span class="pre">seek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.seek"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.seek" title="Link to this definition"></a></dt>
-<dd><p>DEPRECATED. Finds all nodes of a specific type in the parse tree.
-:param tree: The root of the parse tree.
-:param type: The type of node to search for.
-:return: A list of node indices of the specified type.</p>
+<dd><p>DEPRECATED. Finds all nodes of a specific type in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a>) – The type of node to search for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of node indices of the specified type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.seekAllNodes">
 <span class="sig-name descname"><span class="pre">seekAllNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.seekAllNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.seekAllNodes" title="Link to this definition"></a></dt>
-<dd><p>Finds all nodes of a specific type in the parse tree.
-:param tree: The root of the parse tree.
-:param nodeType: The type of node to search for.
-:return: A list of nodes of the specified type.</p>
+<dd><p>Finds all nodes of a specific type in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>nodeType</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a>) – The type of node to search for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of nodes of the specified type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.seekFirstMatchingParent">
 <span class="sig-name descname"><span class="pre">seekFirstMatchingParent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeType</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.seekFirstMatchingParent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.seekFirstMatchingParent" title="Link to this definition"></a></dt>
-<dd><p>Finds the first parent of a node that matches the specified type.
-:param node: The node to start the search from.
-:param nodeType: The type of parent node to search for.
-:return: The first matching parent node, or None if no matching parent is found.</p>
+<dd><p>Finds the first parent of a node that matches the specified type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The node to start the search from.</p></li>
+<li><p><strong>nodeType</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a>) – The type of parent node to search for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The first matching parent node, or None if no matching parent
+is found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>antlr4.tree.Tree.ParseTree</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.seekNode">
 <span class="sig-name descname"><span class="pre">seekNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodeIndex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.seekNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.seekNode" title="Link to this definition"></a></dt>
-<dd><p>Finds a node in the parse tree by its index.
-:param tree: The root of the parse tree.
-:param nodeIndex: The index of the node to find.
-:return: The depth of the node in the tree, or None if the node is not found.</p>
+<dd><p>Finds a node in the parse tree by its index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>nodeIndex</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the node to find.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The depth of the node in the tree, or None if the node is not
+found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.setNode">
 <span class="sig-name descname"><span class="pre">setNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.setNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.setNode" title="Link to this definition"></a></dt>
-<dd><p>Sets a node in the parse tree at a specific index.
-:param tree: The root of the parse tree.
-:param index: The index of the node to set.
-:param node: The new node.</p>
+<dd><p>Sets a node in the parse tree at a specific index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The index of the node to set.</p></li>
+<li><p><strong>node</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The new node.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.toString">
 <span class="sig-name descname"><span class="pre">toString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.toString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.toString" title="Link to this definition"></a></dt>
-<dd><p>Prints the text of all nodes in the parse tree.
-:param tree: The root of the parse tree.</p>
+<dd><p>Prints the text of all nodes in the parse tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.JavaParse.tree2DOT">
 <span class="sig-name descname"><span class="pre">tree2DOT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#JavaParse.tree2DOT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.JavaParse.tree2DOT" title="Link to this definition"></a></dt>
-<dd><p>Converts a parse tree to a DOT representation for visualization with Graphviz.
-:param tree: The root of the parse tree.
-:return: A Graphviz Digraph object, or None if Graphviz is not installed.</p>
+<dd><p>Converts a parse tree to a DOT representation for visualization with
+Graphviz.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>antlr4.tree.Tree.ParseTree</em>) – The root of the parse tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Graphviz Digraph object, or None if Graphviz is not
+installed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>graphviz.Digraph</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1080,15 +1426,18 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.LittleDarwinErrorStrategy">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.JavaParse.</span></span><span class="sig-name descname"><span class="pre">LittleDarwinErrorStrategy</span></span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#LittleDarwinErrorStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.LittleDarwinErrorStrategy" title="Link to this definition"></a></dt>
-<dd><p>A class to handle parsing exceptions. Throws exceptions when occured so that the file can safely be ignored.</p>
+<dd><p>This class is a custom error strategy for the ANTLR4 parser. It is used
+to handle parsing errors by throwing an exception, which allows the file
+to be safely ignored.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.JavaParse.LittleDarwinErrorStrategy.recover">
 <span class="sig-name descname"><span class="pre">recover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exception</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RecognitionException</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/JavaParse.html#LittleDarwinErrorStrategy.recover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.JavaParse.LittleDarwinErrorStrategy.recover" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>This method is called when the parser encounters a syntax error.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parser</strong></p></li>
-<li><p><strong>exception</strong></p></li>
+<li><p><strong>parser</strong> (<em>antlr4.Parser</em>) – The parser that encountered the error.</p></li>
+<li><p><strong>exception</strong> (<em>antlr4.RecognitionException</em>) – The recognition exception.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1099,17 +1448,19 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py function" id="module-littledarwin.License">
 <span id="module-littledarwin.JavaParser"></span><dt class="sig sig-object py" id="littledarwin.License.outputLicense">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.License.</span></span><span class="sig-name descname"><span class="pre">outputLicense</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/License.html#outputLicense"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.License.outputLicense" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Prints the license text to stdout.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="littledarwin.License.returnLicense">
 <span class="sig-prename descclassname"><span class="pre">littledarwin.License.</span></span><span class="sig-name descname"><span class="pre">returnLicense</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/License.html#returnLicense"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.License.returnLicense" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Returns the license text.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>The license text.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1117,21 +1468,27 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py class" id="module-littledarwin.ReportGenerator">
 <dt class="sig sig-object py" id="littledarwin.ReportGenerator.ReportGenerator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">littledarwin.ReportGenerator.</span></span><span class="sig-name descname"><span class="pre">ReportGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">littleDarwinVersion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/ReportGenerator.html#ReportGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.ReportGenerator.ReportGenerator" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>This class generates the HTML reports for LittleDarwin. It creates a
+summary report for the entire project, as well as detailed reports for
+each file that was mutated.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.ReportGenerator.ReportGenerator.generateHTMLFinalReport">
 <span class="sig-name descname"><span class="pre">generateHTMLFinalReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resultData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportPath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/ReportGenerator.html#ReportGenerator.generateHTMLFinalReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.ReportGenerator.ReportGenerator.generateHTMLFinalReport" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Generates the final HTML report for the entire project.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resultData</strong></p></li>
-<li><p><strong>reportPath</strong></p></li>
+<li><p><strong>resultData</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of lists, where each inner list contains
+the file path, the number of survived mutants, and
+the total number of mutants for a file.</p></li>
+<li><p><strong>reportPath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the report file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The HTML report as a string.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1139,20 +1496,21 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.ReportGenerator.ReportGenerator.generateHTMLReportPerFile">
 <span class="sig-name descname"><span class="pre">generateHTMLReportPerFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survived</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">killed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/ReportGenerator.html#ReportGenerator.generateHTMLReportPerFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.ReportGenerator.ReportGenerator.generateHTMLReportPerFile" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Generates an HTML report for a single file.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filePath</strong></p></li>
-<li><p><strong>reportPath</strong></p></li>
-<li><p><strong>survived</strong></p></li>
-<li><p><strong>killed</strong></p></li>
+<li><p><strong>filePath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the file.</p></li>
+<li><p><strong>reportPath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the report file.</p></li>
+<li><p><strong>survived</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of the names of the survived mutants.</p></li>
+<li><p><strong>killed</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a>) – A list of the names of the killed mutants.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The HTML report as a string.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1160,9 +1518,10 @@ It also filters out simple getters and setters and methods/constructors with &#6
 <dl class="py method">
 <dt class="sig sig-object py" id="littledarwin.ReportGenerator.ReportGenerator.initiateDatabase">
 <span class="sig-name descname"><span class="pre">initiateDatabase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">databasePath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/littledarwin/ReportGenerator.html#ReportGenerator.initiateDatabase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#littledarwin.ReportGenerator.ReportGenerator.initiateDatabase" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Initiates the results database.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>databasePath</strong></p>
+<dd class="field-odd"><p><strong>databasePath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to the results database.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1175,7 +1534,7 @@ It also filters out simple getters and setters and methods/constructors with &#6
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="LittleDarwin documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

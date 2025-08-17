@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 </ul>
 
@@ -80,10 +81,18 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaIO.JavaIO">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JavaIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
+<span class="sd">    This class handles all the file I/O operations for LittleDarwin, such as</span>
+<span class="sd">    finding Java files, reading their content, and writing the mutated files</span>
+<span class="sd">    to disk.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the JavaIO object.</span>
+
+<span class="sd">        :param verbose: Whether to print verbose output.</span>
+<span class="sd">        :type verbose: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceDirectory</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targetDirectory</span> <span class="o">=</span> <span class="kc">None</span>
@@ -93,13 +102,12 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaIO.JavaIO.filterFiles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">filterFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;blacklist&quot;</span><span class="p">,</span> <span class="n">filterList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filters the list of files based on a whitelist or blacklist.</span>
 
-<span class="sd">        :param mode:</span>
-<span class="sd">        :type mode:</span>
-<span class="sd">        :param filterList:</span>
-<span class="sd">        :type filterList:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        :param mode: The filter mode, either &quot;whitelist&quot; or &quot;blacklist&quot;.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param filterList: A list of package names or file paths to filter by.</span>
+<span class="sd">        :type filterList: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">filterList</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
@@ -144,17 +152,19 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaIO.JavaIO.listFiles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">listFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targetPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buildPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filterList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filterType</span><span class="o">=</span><span class="s2">&quot;blacklist&quot;</span><span class="p">,</span> <span class="n">desiredType</span><span class="o">=</span><span class="s2">&quot;*.java&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lists all the files in a directory that match a given type, and</span>
+<span class="sd">        optionally filters them.</span>
 
-<span class="sd">        :param targetPath:</span>
-<span class="sd">        :type targetPath:</span>
-<span class="sd">        :param buildPath:</span>
-<span class="sd">        :type buildPath:</span>
-<span class="sd">        :param filterList:</span>
-<span class="sd">        :type filterList:</span>
-<span class="sd">        :param filterType:</span>
-<span class="sd">        :type filterType:</span>
-<span class="sd">        :param desiredType:</span>
-<span class="sd">        :type desiredType:</span>
+<span class="sd">        :param targetPath: The path to the source files.</span>
+<span class="sd">        :type targetPath: str</span>
+<span class="sd">        :param buildPath: The path to the build directory.</span>
+<span class="sd">        :type buildPath: str</span>
+<span class="sd">        :param filterList: A list of package names or file paths to filter by.</span>
+<span class="sd">        :type filterList: list</span>
+<span class="sd">        :param filterType: The filter mode, either &quot;whitelist&quot; or &quot;blacklist&quot;.</span>
+<span class="sd">        :type filterType: str</span>
+<span class="sd">        :param desiredType: The type of files to list (e.g., &quot;``*.java``&quot;).</span>
+<span class="sd">        :type desiredType: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># print targetPath, desiredType</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceDirectory</span> <span class="o">=</span> <span class="n">targetPath</span>
@@ -174,11 +184,12 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaIO.JavaIO.getFileContent">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getFileContent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the content of a file and returns it as a string.</span>
 
-<span class="sd">        :param filePath:</span>
-<span class="sd">        :type filePath:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        :param filePath: The path to the file.</span>
+<span class="sd">        :type filePath: str</span>
+<span class="sd">        :return: The content of the file.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filePath</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
             <span class="n">file_data</span> <span class="o">=</span> <span class="n">contentFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -192,15 +203,20 @@
                                      <span class="n">cyclomaticComplexityPerMethod</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
                                      <span class="n">linesOfCodePerMethod</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aggregates complexity metrics for each method in a class.</span>
 
-<span class="sd">        :param mutantDensityPerMethod:</span>
-<span class="sd">        :type mutantDensityPerMethod:</span>
-<span class="sd">        :param cyclomaticComplexityPerMethod:</span>
-<span class="sd">        :type cyclomaticComplexityPerMethod:</span>
-<span class="sd">        :param linesOfCodePerMethod:</span>
-<span class="sd">        :type linesOfCodePerMethod:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        :param mutantDensityPerMethod: A dictionary mapping method names to the</span>
+<span class="sd">                                       number of mutants in that method.</span>
+<span class="sd">        :type mutantDensityPerMethod: dict</span>
+<span class="sd">        :param cyclomaticComplexityPerMethod: A dictionary mapping method names</span>
+<span class="sd">                                              to their cyclomatic complexity.</span>
+<span class="sd">        :type cyclomaticComplexityPerMethod: dict</span>
+<span class="sd">        :param linesOfCodePerMethod: A dictionary mapping method names to their</span>
+<span class="sd">                                     lines of code.</span>
+<span class="sd">        :type linesOfCodePerMethod: dict</span>
+<span class="sd">        :return: A dictionary mapping method names to a list containing the</span>
+<span class="sd">                 mutant density, cyclomatic complexity, and lines of code.</span>
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">aggregateReport</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">methodList</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">mutantDensityPerMethod</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -219,19 +235,27 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaIO.JavaIO.generateNewFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generateNewFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">originalFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fileData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mutantsPerLine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">densityReport</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aggregateComplexity</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a new file containing a mutant.</span>
 
-<span class="sd">        :param originalFile:</span>
-<span class="sd">        :type originalFile:</span>
-<span class="sd">        :param fileData:</span>
-<span class="sd">        :type fileData:</span>
-<span class="sd">        :param mutantsPerLine:</span>
-<span class="sd">        :type mutantsPerLine:</span>
-<span class="sd">        :param densityReport:</span>
-<span class="sd">        :type densityReport:</span>
-<span class="sd">        :param aggregateComplexity:</span>
-<span class="sd">        :type aggregateComplexity:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        This function creates a new directory for the mutated file, copies the</span>
+<span class="sd">        original file to that directory, and then writes the mutated code to a</span>
+<span class="sd">        new file in that directory. It also writes out a number of reports</span>
+<span class="sd">        about the mutation.</span>
+
+<span class="sd">        :param originalFile: The path to the original file.</span>
+<span class="sd">        :type originalFile: str</span>
+<span class="sd">        :param fileData: The content of the mutated file.</span>
+<span class="sd">        :type fileData: str</span>
+<span class="sd">        :param mutantsPerLine: A dictionary mapping line numbers to the number</span>
+<span class="sd">                               of mutants on that line.</span>
+<span class="sd">        :type mutantsPerLine: dict</span>
+<span class="sd">        :param densityReport: The HTML report of the mutant density.</span>
+<span class="sd">        :type densityReport: str</span>
+<span class="sd">        :param aggregateComplexity: A dictionary containing the aggregate</span>
+<span class="sd">                                    complexity report for the class.</span>
+<span class="sd">        :type aggregateComplexity: dict</span>
+<span class="sd">        :return: The relative path to the new file.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">originalFileRoot</span><span class="p">,</span> <span class="n">originalFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">originalFile</span><span class="p">)</span>
 

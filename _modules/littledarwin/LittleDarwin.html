@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 </ul>
 
@@ -77,7 +78,7 @@
 <span class="c1">##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##</span>
 <span class="c1">##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##</span>
 <span class="c1">##                                                                                                            ##</span>
-<span class="c1">##       Copyright (c) 2014-2022 Ali Parsai                                                                   ##</span>
+<span class="c1">##       Copyright (c) 2014-2025 Ali Parsai                                                                   ##</span>
 <span class="c1">##                                                                                                            ##</span>
 <span class="c1">##       This program is free software: you can redistribute it and/or modify it under the terms of           ##</span>
 <span class="c1">##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##</span>
@@ -94,6 +95,13 @@
 <span class="c1">##       https://www.parsai.net/                                                                              ##</span>
 <span class="c1">##                                                                                                            ##</span>
 <span class="c1">################################################################################################################</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module is the main entry point for the LittleDarwin mutation analysis</span>
+<span class="sd">framework. It contains the logic for parsing command-line arguments, running the</span>
+<span class="sd">mutation phase, and running the build phase.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
@@ -129,7 +137,14 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.main">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">mockArgs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main LittleDarwin Function</span>
+<span class="sd">    The main entry point for the LittleDarwin application.</span>
+
+<span class="sd">    This function parses the command-line arguments and then calls the</span>
+<span class="sd">    appropriate functions to perform the mutation and/or build phases.</span>
+
+<span class="sd">    :param mockArgs: A list of command-line arguments for testing purposes.</span>
+<span class="sd">                     If None, the arguments are read from ``sys.argv``.</span>
+<span class="sd">    :type mockArgs: list, optional</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    __     _  __   __   __       ____                          _</span>
@@ -144,7 +159,7 @@
 <span class="s2">                                  /</span>
 
 
-<span class="s2">    LittleDarwin version </span><span class="si">%s</span><span class="s2"> Copyright (C) 2014-2022 Ali Parsai</span>
+<span class="s2">    LittleDarwin version </span><span class="si">%s</span><span class="s2"> Copyright (C) 2014-2025 Ali Parsai</span>
 
 <span class="s2">    LittleDarwin comes with ABSOLUTELY NO WARRANTY.</span>
 <span class="s2">    This is free software, and you are welcome to redistribute it</span>
@@ -183,15 +198,19 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.mutationPhase">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">mutationPhase</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="p">,</span> <span class="n">higherOrder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the mutation phase of LittleDarwin.</span>
 
-<span class="sd">    :param options:</span>
-<span class="sd">    :type options:</span>
-<span class="sd">    :param filterType:</span>
-<span class="sd">    :type filterType:</span>
-<span class="sd">    :param filterList:</span>
-<span class="sd">    :type filterList:</span>
-<span class="sd">    :param higherOrder:</span>
-<span class="sd">    :type higherOrder:</span>
+<span class="sd">    This function finds all the Java files in the source directory,</span>
+<span class="sd">    parses them, generates mutants, and stores them in a database.</span>
+
+<span class="sd">    :param options: The command-line options.</span>
+<span class="sd">    :type options: optparse.Values</span>
+<span class="sd">    :param filterType: The type of filter to use (&quot;whitelist&quot; or &quot;blacklist&quot;).</span>
+<span class="sd">    :type filterType: str</span>
+<span class="sd">    :param filterList: A list of files or packages to include or exclude.</span>
+<span class="sd">    :type filterList: list</span>
+<span class="sd">    :param higherOrder: The order of mutation to perform.</span>
+<span class="sd">    :type higherOrder: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># creating our module objects.</span>
     <span class="n">javaIO</span> <span class="o">=</span> <span class="n">JavaIO</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">isVerboseActive</span><span class="p">)</span>
@@ -304,9 +323,15 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.buildPhase">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">buildPhase</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the build phase of LittleDarwin.</span>
 
-<span class="sd">    :param options:</span>
-<span class="sd">    :type options:</span>
+<span class="sd">    This function iterates through the mutants in the database, and for each</span>
+<span class="sd">    mutant, it replaces the original file with the mutant, runs the build</span>
+<span class="sd">    command, and records whether the build succeeded or failed. It then</span>
+<span class="sd">    generates a report of the results.</span>
+
+<span class="sd">    :param options: The command-line options.</span>
+<span class="sd">    :type options: optparse.Values</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># let&#39;s tell the user upfront that this may corrupt the source code.</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">!!! CAUTION !!!&quot;</span><span class="p">)</span>
@@ -543,13 +568,16 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.parseCmdArgs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">parseCmdArgs</span><span class="p">(</span><span class="n">optionParser</span><span class="p">:</span> <span class="n">OptionParser</span><span class="p">,</span> <span class="n">mockArgs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses the command-line arguments for LittleDarwin.</span>
 
-<span class="sd">    :param mockArgs:</span>
-<span class="sd">    :type mockArgs:</span>
-<span class="sd">    :param optionParser:</span>
-<span class="sd">    :type optionParser:</span>
-<span class="sd">    :return:</span>
-<span class="sd">    :rtype:</span>
+<span class="sd">    :param optionParser: The OptionParser instance to use.</span>
+<span class="sd">    :type optionParser: optparse.OptionParser</span>
+<span class="sd">    :param mockArgs: A list of command-line arguments for testing purposes.</span>
+<span class="sd">                     If None, the arguments are read from ``sys.argv``.</span>
+<span class="sd">    :type mockArgs: list, optional</span>
+<span class="sd">    :return: A tuple containing the parsed options, the filter type, the filter</span>
+<span class="sd">             list, and the higher-order mutation value.</span>
+<span class="sd">    :rtype: tuple</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># parsing input options</span>
     <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--mutate&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isMutationActive&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -634,12 +662,22 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.timeoutAlternative">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">timeoutAlternative</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span> <span class="n">workingDirectory</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">inputData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs a command with a timeout, and kills it if it takes too long.</span>
 
-<span class="sd">    :param commandString: command to run</span>
-<span class="sd">    :param workingDirectory: the directory that the command is supposed to run in</span>
-<span class="sd">    :param timeout: timeout in seconds</span>
-<span class="sd">    :param inputData: the data that the run process may need. defaults to None.</span>
-<span class="sd">    :return: returns kill status, process return code and the output of the system</span>
+<span class="sd">    This function uses a watchdog thread to kill the process if the timeout</span>
+<span class="sd">    expires. It is used to prevent the build process from hanging.</span>
+
+<span class="sd">    :param commandString: The command to run, as a list of strings.</span>
+<span class="sd">    :type commandString: list</span>
+<span class="sd">    :param workingDirectory: The directory in which to run the command.</span>
+<span class="sd">    :type workingDirectory: str</span>
+<span class="sd">    :param timeout: The timeout in seconds.</span>
+<span class="sd">    :type timeout: int</span>
+<span class="sd">    :param inputData: Input data to pass to the process&#39;s stdin.</span>
+<span class="sd">    :type inputData: bytes, optional</span>
+<span class="sd">    :return: A tuple containing a boolean indicating if the process was</span>
+<span class="sd">             killed, the process&#39;s return code, and the process&#39;s stdout.</span>
+<span class="sd">    :rtype: tuple</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">killCheck</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>

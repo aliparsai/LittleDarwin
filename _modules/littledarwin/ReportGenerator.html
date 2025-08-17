@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 </ul>
 
@@ -77,9 +78,17 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ReportGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-
+<span class="sd">    This class generates the HTML reports for LittleDarwin. It creates a</span>
+<span class="sd">    summary report for the entire project, as well as detailed reports for</span>
+<span class="sd">    each file that was mutated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">littleDarwinVersion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the ReportGenerator object.</span>
+
+<span class="sd">        :param littleDarwinVersion: The version of LittleDarwin.</span>
+<span class="sd">        :type littleDarwinVersion: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ldVersion</span> <span class="o">=</span> <span class="n">littleDarwinVersion</span>
 
@@ -87,9 +96,10 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.initiateDatabase">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">initiateDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">databasePath</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates the results database.</span>
 
-<span class="sd">        :param databasePath:</span>
-<span class="sd">        :type databasePath:</span>
+<span class="sd">        :param databasePath: The path to the results database.</span>
+<span class="sd">        :type databasePath: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">shelve</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">databasePath</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span></div>
 
@@ -98,13 +108,16 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.generateHTMLFinalReport">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generateHTMLFinalReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resultData</span><span class="p">,</span> <span class="n">reportPath</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the final HTML report for the entire project.</span>
 
-<span class="sd">        :param resultData:</span>
-<span class="sd">        :type resultData:</span>
-<span class="sd">        :param reportPath:</span>
-<span class="sd">        :type reportPath:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        :param resultData: A list of lists, where each inner list contains</span>
+<span class="sd">                           the file path, the number of survived mutants, and</span>
+<span class="sd">                           the total number of mutants for a file.</span>
+<span class="sd">        :type resultData: list</span>
+<span class="sd">        :param reportPath: The path to the report file.</span>
+<span class="sd">        :type reportPath: str</span>
+<span class="sd">        :return: The HTML report as a string.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">reportBeginning</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;LittleDarwin Mutation Coverage Report&lt;/title&gt;</span>
 <span class="s2">             &lt;style type=&#39;text/css&#39;&gt; body { font-family: &quot;Carlito&quot;, &quot;Calibri&quot;, &quot;Helvetica Neue&quot;, sans-serif; } </span>
@@ -165,17 +178,18 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.generateHTMLReportPerFile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">generateHTMLReportPerFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="p">,</span> <span class="n">reportPath</span><span class="p">,</span> <span class="n">survived</span><span class="p">,</span> <span class="n">killed</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates an HTML report for a single file.</span>
 
-<span class="sd">        :param filePath:</span>
-<span class="sd">        :type filePath:</span>
-<span class="sd">        :param reportPath:</span>
-<span class="sd">        :type reportPath:</span>
-<span class="sd">        :param survived:</span>
-<span class="sd">        :type survived:</span>
-<span class="sd">        :param killed:</span>
-<span class="sd">        :type killed:</span>
-<span class="sd">        :return:</span>
-<span class="sd">        :rtype:</span>
+<span class="sd">        :param filePath: The path to the file.</span>
+<span class="sd">        :type filePath: str</span>
+<span class="sd">        :param reportPath: The path to the report file.</span>
+<span class="sd">        :type reportPath: str</span>
+<span class="sd">        :param survived: A list of the names of the survived mutants.</span>
+<span class="sd">        :type survived: list</span>
+<span class="sd">        :param killed: A list of the names of the killed mutants.</span>
+<span class="sd">        :type killed: list</span>
+<span class="sd">        :return: The HTML report as a string.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">xstr</span><span class="p">(</span><span class="n">inputVar</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>

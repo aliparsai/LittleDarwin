@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 </ul>
 
@@ -91,17 +92,20 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.LittleDarwinErrorStrategy">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LittleDarwinErrorStrategy</span><span class="p">(</span><span class="n">BailErrorStrategy</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class to handle parsing exceptions. Throws exceptions when occured so that the file can safely be ignored.</span>
+<span class="sd">    This class is a custom error strategy for the ANTLR4 parser. It is used</span>
+<span class="sd">    to handle parsing errors by throwing an exception, which allows the file</span>
+<span class="sd">    to be safely ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="LittleDarwinErrorStrategy.recover">
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.LittleDarwinErrorStrategy.recover">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">recover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">Parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">:</span> <span class="n">RecognitionException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called when the parser encounters a syntax error.</span>
 
-<span class="sd">        :param parser:</span>
-<span class="sd">        :type parser:</span>
-<span class="sd">        :param exception:</span>
-<span class="sd">        :type exception:</span>
+<span class="sd">        :param parser: The parser that encountered the error.</span>
+<span class="sd">        :type parser: antlr4.Parser</span>
+<span class="sd">        :param exception: The recognition exception.</span>
+<span class="sd">        :type exception: antlr4.RecognitionException</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">_errHandler</span><span class="o">.</span><span class="n">reportError</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">recover</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span></div>
@@ -113,13 +117,18 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JavaParse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class that uses ANTLR4 to parse Java source code. It provides methods for traversing and analyzing the parse tree.</span>
+<span class="sd">    This class uses ANTLR4 to parse Java source code. It provides methods for</span>
+<span class="sd">    traversing and analyzing the parse tree, such as finding nodes of a</span>
+<span class="sd">    specific type, getting the cyclomatic complexity of a method, and getting</span>
+<span class="sd">    the name of the method that contains a specific node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the JavaParse object.</span>
+
 <span class="sd">        :param verbose: A boolean indicating whether to print verbose output.</span>
+<span class="sd">        :type verbose: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -130,8 +139,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileContent</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses the given Java source code and returns a parse tree.</span>
+
 <span class="sd">        :param fileContent: A string containing the Java source code.</span>
+<span class="sd">        :type fileContent: str</span>
 <span class="sd">        :return: A parse tree representing the Java source code.</span>
+<span class="sd">        :rtype: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lexer</span> <span class="o">=</span> <span class="n">JavaLexer</span><span class="p">(</span><span class="n">InputStream</span><span class="p">(</span><span class="n">fileContent</span><span class="p">))</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">JavaParser</span><span class="p">(</span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">))</span>
@@ -147,8 +159,11 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.numerify">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">numerify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds a unique nodeIndex to each node in the parse tree.</span>
+<span class="sd">        Adds a unique ``nodeIndex`` to each node in the parse tree. This is</span>
+<span class="sd">        used to identify nodes when creating mutations.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">RuleContext</span><span class="p">)</span>
 
@@ -167,7 +182,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">toString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints the text of all nodes in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">getChildren</span><span class="p">():</span>
@@ -181,9 +198,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">seekAllNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds all nodes of a specific type in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param nodeType: The type of node to search for.</span>
+<span class="sd">        :type nodeType: type</span>
 <span class="sd">        :return: A list of nodes of the specified type.</span>
+<span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">resultList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">seekStack</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="p">]</span>
@@ -207,9 +228,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        DEPRECATED. Finds all nodes of a specific type in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param type: The type of node to search for.</span>
+<span class="sd">        :type type: type</span>
 <span class="sd">        :return: A list of node indices of the specified type.</span>
+<span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seekList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
@@ -230,9 +255,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">seekFirstMatchingParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds the first parent of a node that matches the specified type.</span>
+
 <span class="sd">        :param node: The node to start the search from.</span>
+<span class="sd">        :type node: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param nodeType: The type of parent node to search for.</span>
-<span class="sd">        :return: The first matching parent node, or None if no matching parent is found.</span>
+<span class="sd">        :type nodeType: type</span>
+<span class="sd">        :return: The first matching parent node, or None if no matching parent</span>
+<span class="sd">                 is found.</span>
+<span class="sd">        :rtype: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parentCtx</span>
@@ -250,9 +280,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">seekNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds a node in the parse tree by its index.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param nodeIndex: The index of the node to find.</span>
-<span class="sd">        :return: The depth of the node in the tree, or None if the node is not found.</span>
+<span class="sd">        :type nodeIndex: int</span>
+<span class="sd">        :return: The depth of the node in the tree, or None if the node is not</span>
+<span class="sd">                 found.</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">==</span> <span class="n">nodeIndex</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -273,9 +308,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets a node from the parse tree by its index.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param index: The index of the node to get.</span>
-<span class="sd">        :return: The node with the specified index, or None if the node is not found.</span>
+<span class="sd">        :type index: int</span>
+<span class="sd">        :return: The node with the specified index, or None if the node is not</span>
+<span class="sd">                 found.</span>
+<span class="sd">        :rtype: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -302,9 +342,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">setNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a node in the parse tree at a specific index.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param index: The index of the node to set.</span>
+<span class="sd">        :type index: int</span>
 <span class="sd">        :param node: The new node.</span>
+<span class="sd">        :type node: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
             <span class="n">tree</span> <span class="o">=</span> <span class="n">node</span>
@@ -320,10 +364,16 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the distance between two nodes in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param node1: The index of the first node.</span>
+<span class="sd">        :type node1: int</span>
 <span class="sd">        :param node2: The index of the second node.</span>
-<span class="sd">        :return: The distance between the two nodes, or -1 if they are not in the same subtree.</span>
+<span class="sd">        :type node2: int</span>
+<span class="sd">        :return: The distance between the two nodes, or -1 if they are not in</span>
+<span class="sd">                 the same subtree.</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rootDistance1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node1</span><span class="p">)</span>
         <span class="n">rootDistance2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node2</span><span class="p">)</span>
@@ -345,8 +395,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getInMethodLines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets a list of all line numbers that are within a method.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :return: A sorted list of line numbers.</span>
+<span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">methodBodyList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span>
         <span class="n">methodBodyList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">))</span>
@@ -366,8 +419,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getLinesOfCodePerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the number of lines of code for each method in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
-<span class="sd">        :return: A dictionary mapping method names to the number of lines of code.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :return: A dictionary mapping method names to the number of lines of</span>
+<span class="sd">                 code.</span>
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">methodBodyList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span>
         <span class="n">methodBodyList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">))</span>
@@ -390,8 +447,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">RuleContext</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the text of a node and all its children.</span>
+
 <span class="sd">        :param tree: The root of the node.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :return: A string containing the text of the node and its children.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -416,9 +476,14 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getMethodRanges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getMethodRanges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the start and end character indices for each method in the parse tree.</span>
+<span class="sd">        Gets the start and end character indices for each method in the parse</span>
+<span class="sd">        tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
-<span class="sd">        :return: A dictionary mapping method names to a tuple of (start, stop) character indices.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :return: A dictionary mapping method names to a tuple of (start, stop)</span>
+<span class="sd">                 character indices.</span>
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">methodDeclarationList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
         <span class="n">methodDeclarationList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorDeclarationContext</span><span class="p">))</span>
@@ -449,10 +514,16 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getMethodNameForNode">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">getMethodNameForNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the name of the method that contains the node with the specified index.</span>
+<span class="sd">        Gets the name of the method that contains the node with the specified</span>
+<span class="sd">        index.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param nodeIndex: The index of the node.</span>
-<span class="sd">        :return: The name of the method, or &quot;***not in a method***&quot; if the node is not in a method.</span>
+<span class="sd">        :type nodeIndex: int</span>
+<span class="sd">        :return: The name of the method, or &quot;***not in a method***&quot; if the node</span>
+<span class="sd">                 is not in a method.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">methodName</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">)</span>
@@ -484,8 +555,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getMethodTypeForNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the return type of the method that contains the specified node.</span>
+
 <span class="sd">        :param node: The node to check.</span>
-<span class="sd">        :return: The return type of the method, or None if the node is not in a method.</span>
+<span class="sd">        :type node: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :return: The return type of the method, or None if the node is not in a</span>
+<span class="sd">                 method.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parentMethod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">parentMethod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -511,8 +586,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getCyclomaticComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the cyclomatic complexity of a method.</span>
-<span class="sd">        :param methodBody: The MethodBodyContext or ConstructorBodyContext of the method.</span>
+
+<span class="sd">        :param methodBody: The MethodBodyContext or ConstructorBodyContext of</span>
+<span class="sd">                           the method.</span>
+<span class="sd">        :type methodBody: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :return: The cyclomatic complexity of the method.</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span> <span class="ow">or</span> \
                <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">)</span>
@@ -541,8 +620,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getCyclomaticComplexityAllMethods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the cyclomatic complexity for all methods in the parse tree.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
-<span class="sd">        :return: A dictionary mapping method names to their cyclomatic complexity.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :return: A dictionary mapping method names to their cyclomatic</span>
+<span class="sd">                 complexity.</span>
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span>
         <span class="n">cyclomaticComplexityPerMethod</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -561,9 +644,14 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.tree2DOT">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tree2DOT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a parse tree to a DOT representation for visualization with Graphviz.</span>
+<span class="sd">        Converts a parse tree to a DOT representation for visualization with</span>
+<span class="sd">        Graphviz.</span>
+
 <span class="sd">        :param tree: The root of the parse tree.</span>
-<span class="sd">        :return: A Graphviz Digraph object, or None if Graphviz is not installed.</span>
+<span class="sd">        :type tree: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :return: A Graphviz Digraph object, or None if Graphviz is not</span>
+<span class="sd">                 installed.</span>
+<span class="sd">        :rtype: graphviz.Digraph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noGraphviz</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>

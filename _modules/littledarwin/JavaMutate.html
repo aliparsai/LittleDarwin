@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
 </ul>
 
@@ -87,20 +88,32 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.Mutation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Mutation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Defines a single mutation.</span>
+<span class="sd">    This class represents a single mutation, which is a change to a small</span>
+<span class="sd">    section of the source code. It contains information about the location of</span>
+<span class="sd">    the mutation, the type of mutator used, and the text to replace the</span>
+<span class="sd">    original code with.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startPos</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">endPos</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lineNumber</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nodeID</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mutatorType</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                  <span class="n">replacementText</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#FFFFFF&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a Mutation object.</span>
-<span class="sd">        :param startPos: The starting position of the mutation in the source code.</span>
+
+<span class="sd">        :param startPos: The starting position of the mutation in the source</span>
+<span class="sd">                         code.</span>
+<span class="sd">        :type startPos: int</span>
 <span class="sd">        :param endPos: The ending position of the mutation in the source code.</span>
+<span class="sd">        :type endPos: int</span>
 <span class="sd">        :param lineNumber: The line number of the mutation.</span>
+<span class="sd">        :type lineNumber: int</span>
 <span class="sd">        :param nodeID: The ID of the node being mutated.</span>
+<span class="sd">        :type nodeID: int</span>
 <span class="sd">        :param mutatorType: The type of mutator being used.</span>
+<span class="sd">        :type mutatorType: str</span>
 <span class="sd">        :param replacementText: The text to replace the original code with.</span>
+<span class="sd">        :type replacementText: str</span>
 <span class="sd">        :param color: The color to use for highlighting the mutation.</span>
+<span class="sd">        :type color: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">endPos</span> <span class="o">&gt;=</span> <span class="n">startPos</span>
 
@@ -123,9 +136,15 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">applyMutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceCode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">byteOffset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the mutation to the given source code.</span>
+
 <span class="sd">        :param sourceCode: The source code to apply the mutation to.</span>
-<span class="sd">        :param byteOffset: The byte offset to apply to the start and end positions.</span>
+<span class="sd">        :type sourceCode: str</span>
+<span class="sd">        :param byteOffset: The byte offset to apply to the start and end</span>
+<span class="sd">                           positions. This is used when applying multiple</span>
+<span class="sd">                           mutations to the same file.</span>
+<span class="sd">        :type byteOffset: int</span>
 <span class="sd">        :return: The mutated source code.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">sourceCode</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">startPos</span> <span class="o">+</span> <span class="n">byteOffset</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">replacementText</span> <span class="o">+</span> <span class="n">sourceCode</span><span class="p">[</span>
                                                                                 <span class="bp">self</span><span class="o">.</span><span class="n">endPos</span> <span class="o">+</span> <span class="n">byteOffset</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span></div>
@@ -136,9 +155,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">isInRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if the mutation is within the given range.</span>
+
 <span class="sd">        :param start: The start of the range.</span>
+<span class="sd">        :type start: int</span>
 <span class="sd">        :param end: The end of the range.</span>
+<span class="sd">        :type end: int</span>
 <span class="sd">        :return: True if the mutation is within the range, False otherwise.</span>
+<span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">end</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startPos</span> <span class="o">&gt;=</span> <span class="n">start</span></div>
 
@@ -159,15 +182,22 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.Mutant">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Mutant</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Defines a mutant consisting of one or several mutations.</span>
+<span class="sd">    This class represents a mutant, which is a version of the source code</span>
+<span class="sd">    that has been modified by one or more mutations. It contains a list of</span>
+<span class="sd">    mutations and the original source code, and it can be used to generate</span>
+<span class="sd">    the mutated source code.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mutantID</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">mutationList</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Mutation</span><span class="p">],</span> <span class="n">sourceCode</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a Mutant object.</span>
-<span class="sd">        :param mutantID: the ID of mutant</span>
-<span class="sd">        :param mutationList: The list containing all Mutation objects</span>
-<span class="sd">        :param sourceCode: The source code for the current file</span>
+
+<span class="sd">        :param mutantID: The ID of the mutant.</span>
+<span class="sd">        :type mutantID: int</span>
+<span class="sd">        :param mutationList: The list of mutations to apply.</span>
+<span class="sd">        :type mutationList: list</span>
+<span class="sd">        :param sourceCode: The original source code.</span>
+<span class="sd">        :type sourceCode: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mutantID</span> <span class="o">=</span> <span class="n">mutantID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span> <span class="o">=</span> <span class="n">sourceCode</span>
@@ -183,9 +213,14 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">getLine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lineNumber</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets a specific line from the source code.</span>
+
 <span class="sd">        :param lineNumber: The line number to get.</span>
-<span class="sd">        :param code: The code to get the line from. If None, the original source code is used.</span>
+<span class="sd">        :type lineNumber: int</span>
+<span class="sd">        :param code: The code to get the line from. If None, the original</span>
+<span class="sd">                     source code is used.</span>
+<span class="sd">        :type code: str, optional</span>
 <span class="sd">        :return: The specified line of code.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span>
@@ -197,7 +232,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.Mutant.mutateCode">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">mutateCode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Applies the mutations in mutationList to the source code.</span>
+<span class="sd">        Applies the mutations in the mutation list to the source code to</span>
+<span class="sd">        generate the mutated code.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span>
         <span class="n">byteOffsetDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -270,7 +306,9 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.MutationOperator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MutationOperator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A base class for all mutation operators.</span>
+<span class="sd">    This is a base class for all mutation operators. A mutation operator is a</span>
+<span class="sd">    class that knows how to find specific nodes in a parse tree and generate</span>
+<span class="sd">    mutants from them.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Generic&quot;</span><span class="p">]</span>
@@ -279,10 +317,15 @@
                  <span class="n">generateMutants</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a MutationOperator object.</span>
+
 <span class="sd">        :param sourceTree: The root of the parse tree.</span>
+<span class="sd">        :type sourceTree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param sourceCode: The source code to mutate.</span>
+<span class="sd">        :type sourceCode: str</span>
 <span class="sd">        :param javaParseObject: The JavaParse object to use for parsing.</span>
+<span class="sd">        :type javaParseObject: littledarwin.JavaParse.JavaParse</span>
 <span class="sd">        :param generateMutants: A boolean indicating whether to generate mutants.</span>
+<span class="sd">        :type generateMutants: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceTree</span> <span class="o">=</span> <span class="n">sourceTree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span> <span class="o">=</span> <span class="n">sourceCode</span>
@@ -341,7 +384,9 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.RemoveMethod">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveMethod</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that removes the body of a method and replaces it with a default return value.</span>
+<span class="sd">    This mutation operator removes the body of a method and replaces it with a</span>
+<span class="sd">    default return value. For example, a method that returns an ``int`` will be</span>
+<span class="sd">    replaced with ``return 0;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Method&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
@@ -477,7 +522,9 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.RemoveNullCheck">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RemoveNullCheck</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that removes null checks by replacing them with true or false.</span>
+<span class="sd">    This mutation operator removes null checks by replacing them with ``true`` or</span>
+<span class="sd">    ``false``. For example, ``if (x != null)`` will be replaced with ``if</span>
+<span class="sd">    (true)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
@@ -557,7 +604,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.NullifyObjectInitialization">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NullifyObjectInitialization</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that nullifies object initializations.</span>
+<span class="sd">    This mutation operator nullifies object initializations by replacing them</span>
+<span class="sd">    with ``null``. For example, ``new Foo()`` will be replaced with ``null``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
@@ -637,7 +685,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.NullifyReturnValue">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NullifyReturnValue</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that nullifies the return value of a method.</span>
+<span class="sd">    This mutation operator nullifies the return value of a method by</span>
+<span class="sd">    replacing the return statement with ``return null;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
@@ -719,7 +768,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.NullifyInputVariable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">NullifyInputVariable</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that nullifies input variables to a method.</span>
+<span class="sd">    This mutation operator nullifies input variables to a method by adding a</span>
+<span class="sd">    statement at the beginning of the method to set the variable to ``null``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
@@ -809,13 +859,26 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.TraditionalMutationOperator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TraditionalMutationOperator</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A base class for all traditional mutation operators.</span>
+<span class="sd">    A base class for all traditional mutation operators. These operators</span>
+<span class="sd">    perform simple mutations, such as replacing one operator with another.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">metaTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">,</span> <span class="s2">&quot;All&quot;</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceTree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">,</span> <span class="n">sourceCode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">javaParseObject</span><span class="p">:</span> <span class="n">JavaParse</span><span class="p">,</span>
                  <span class="n">generateMutants</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a TraditionalMutationOperator object.</span>
+
+<span class="sd">        :param sourceTree: The root of the parse tree.</span>
+<span class="sd">        :type sourceTree: antlr4.tree.Tree.ParseTree</span>
+<span class="sd">        :param sourceCode: The source code to mutate.</span>
+<span class="sd">        :type sourceCode: str</span>
+<span class="sd">        :param javaParseObject: The JavaParse object to use for parsing.</span>
+<span class="sd">        :type javaParseObject: littledarwin.JavaParse.JavaParse</span>
+<span class="sd">        :param generateMutants: A boolean indicating whether to generate mutants.</span>
+<span class="sd">        :type generateMutants: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sourceTree</span><span class="p">,</span> <span class="n">sourceCode</span><span class="p">,</span> <span class="n">javaParseObject</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mutatorType</span> <span class="o">=</span> <span class="s2">&quot;GenericTraditionalMutationOperator&quot;</span>
 
@@ -928,7 +991,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ArithmeticOperatorReplacementBinary">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ArithmeticOperatorReplacementBinary</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces binary arithmetic operators.</span>
+<span class="sd">    This mutation operator replaces binary arithmetic operators. For example,</span>
+<span class="sd">    ``+`` is replaced with ``-``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -973,7 +1037,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.RelationalOperatorReplacement">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RelationalOperatorReplacement</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces relational operators.</span>
+<span class="sd">    This mutation operator replaces relational operators. For example, ``&gt;`` is</span>
+<span class="sd">    replaced with ``&lt;=``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1018,7 +1083,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ConditionalOperatorReplacement">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConditionalOperatorReplacement</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces conditional operators.</span>
+<span class="sd">    This mutation operator replaces conditional operators. For example, ``&amp;&amp;``</span>
+<span class="sd">    is replaced with ``||``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1062,7 +1128,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.LogicalOperatorReplacement">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LogicalOperatorReplacement</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces logical operators.</span>
+<span class="sd">    This mutation operator replaces logical operators. For example, ``&amp;`` is</span>
+<span class="sd">    replaced with ``|``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1106,7 +1173,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.AssignmentOperatorReplacementShortcut">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AssignmentOperatorReplacementShortcut</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces shortcut assignment operators.</span>
+<span class="sd">    This mutation operator replaces shortcut assignment operators. For example,</span>
+<span class="sd">    ``+=`` is replaced with ``-=``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1153,7 +1221,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ArithmeticOperatorReplacementUnary">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ArithmeticOperatorReplacementUnary</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces unary arithmetic operators.</span>
+<span class="sd">    This mutation operator replaces unary arithmetic operators. For example, a</span>
+<span class="sd">    unary ``+`` is replaced with a unary ``-``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1198,7 +1267,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ConditionalOperatorDeletion">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConditionalOperatorDeletion</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that deletes conditional operators.</span>
+<span class="sd">    This mutation operator deletes conditional operators. For example, ``!a``</span>
+<span class="sd">    is replaced with ``a``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1242,7 +1312,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ArithmeticOperatorReplacementShortcut">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ArithmeticOperatorReplacementShortcut</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces shortcut arithmetic operators.</span>
+<span class="sd">    This mutation operator replaces shortcut arithmetic operators. For example,</span>
+<span class="sd">    ``++`` is replaced with ``--``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1315,7 +1386,8 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.ShiftOperatorReplacement">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ShiftOperatorReplacement</span><span class="p">(</span><span class="n">TraditionalMutationOperator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A mutation operator that replaces shift operators.</span>
+<span class="sd">    This mutation operator replaces shift operators. For example, ``&lt;&lt;`` is</span>
+<span class="sd">    replaced with ``&gt;&gt;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1435,17 +1507,24 @@
 <a class="viewcode-back" href="../../api.html#littledarwin.JavaMutate.JavaMutate">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">JavaMutate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main entry point for mutation of a Java source file.</span>
+<span class="sd">    This class is the main entry point for the mutation of a Java source file.</span>
+<span class="sd">    It takes a parse tree and the original source code, and then uses a</span>
+<span class="sd">    collection of mutation operators to generate a list of mutants.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceTree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">,</span> <span class="n">sourceCode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">javaParseObject</span><span class="p">:</span> <span class="n">JavaParse</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a JavaMutate object.</span>
+
 <span class="sd">        :param sourceTree: The root of the parse tree.</span>
+<span class="sd">        :type sourceTree: antlr4.tree.Tree.ParseTree</span>
 <span class="sd">        :param sourceCode: The source code to mutate.</span>
+<span class="sd">        :type sourceCode: str</span>
 <span class="sd">        :param javaParseObject: The JavaParse object to use for parsing.</span>
+<span class="sd">        :type javaParseObject: littledarwin.JavaParse.JavaParse</span>
 <span class="sd">        :param verbose: A boolean indicating whether to print verbose output.</span>
+<span class="sd">        :type verbose: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourceCode</span> <span class="o">=</span> <span class="n">sourceCode</span>
@@ -1470,8 +1549,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">instantiateMutationOperators</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metaTypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">],</span> <span class="n">generateMutants</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates all mutation operators of the specified meta types.</span>
+
 <span class="sd">        :param metaTypes: A list of meta types to instantiate.</span>
+<span class="sd">        :type metaTypes: list</span>
 <span class="sd">        :param generateMutants: A boolean indicating whether to generate mutants.</span>
+<span class="sd">        :type generateMutants: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">MO</span> <span class="ow">in</span> <span class="n">getAllInstantiableSubclasses</span><span class="p">(</span><span class="n">MutationOperator</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">metaType</span> <span class="ow">in</span> <span class="n">metaTypes</span><span class="p">:</span>
@@ -1485,8 +1567,12 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">countMutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metaTypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Counts the number of mutants for each mutation operator type.</span>
-<span class="sd">        :param metaTypes: types of mutation operators to use</span>
-<span class="sd">        :return: A dictionary mapping mutation operator types to the number of mutants.</span>
+
+<span class="sd">        :param metaTypes: The types of mutation operators to use.</span>
+<span class="sd">        :type metaTypes: list</span>
+<span class="sd">        :return: A dictionary mapping mutation operator types to the number of</span>
+<span class="sd">                 mutants.</span>
+<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mutationTypeCount</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instantiateMutationOperators</span><span class="p">(</span><span class="n">metaTypes</span><span class="p">,</span> <span class="n">generateMutants</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1513,8 +1599,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">gatherMutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metaTypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers all mutants of the specified meta types.</span>
-<span class="sd">        :param metaTypes: types of mutation operators to use</span>
-<span class="sd">        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.</span>
+
+<span class="sd">        :param metaTypes: The types of mutation operators to use.</span>
+<span class="sd">        :type metaTypes: list</span>
+<span class="sd">        :return: A tuple containing a list of mutated source code and a</span>
+<span class="sd">                 dictionary mapping mutation operator types to the number of</span>
+<span class="sd">                 mutants.</span>
+<span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mutationTypeCount</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">mutantTexts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1545,9 +1636,15 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">gatherHigherOrderMutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">higherOrderDirective</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metaTypes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gathers all mutants and creates higher-order mutants.</span>
-<span class="sd">        :param higherOrderDirective: The requested higher-order order</span>
-<span class="sd">        :param metaTypes: type of mutation operators to use</span>
-<span class="sd">        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.</span>
+
+<span class="sd">        :param higherOrderDirective: The requested higher-order order.</span>
+<span class="sd">        :type higherOrderDirective: int</span>
+<span class="sd">        :param metaTypes: The type of mutation operators to use.</span>
+<span class="sd">        :type metaTypes: list</span>
+<span class="sd">        :return: A tuple containing a list of mutated source code and a</span>
+<span class="sd">                 dictionary mapping mutation operator types to the number of</span>
+<span class="sd">                 mutants.</span>
+<span class="sd">        :rtype: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">selectedMutants</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
@@ -1613,8 +1710,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">aggregateReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">littleDarwinVersion</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates an HTML report of all mutations for a file.</span>
-<span class="sd">        :param littleDarwinVersion: LittleDarwin Version</span>
-<span class="sd">        :return: Aggregate report on all mutations for a file</span>
+
+<span class="sd">        :param littleDarwinVersion: The version of LittleDarwin.</span>
+<span class="sd">        :type littleDarwinVersion: str</span>
+<span class="sd">        :return: An HTML report of all mutations for a file.</span>
+<span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lineNumber</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">col</span> <span class="o">=</span> <span class="mi">0</span>

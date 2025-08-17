@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; LittleDarwin 0.10.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=058d9255"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="LittleDarwin: A Java Mutation Analysis Framework" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            LittleDarwin
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-littledarwin">Running LittleDarwin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-options">Command-Line Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#generating-traditional-mutants">Generating Traditional Mutants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generating-higher-order-mutants">Generating Higher-Order Mutants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-a-full-mutation-analysis">Running a Full Mutation Analysis</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">LittleDarwin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<p>This guide explains how to install and use LittleDarwin.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>You can install LittleDarwin using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>littledarwin
+</pre></div>
+</div>
+</section>
+<section id="running-littledarwin">
+<h2>Running LittleDarwin<a class="headerlink" href="#running-littledarwin" title="Link to this heading"></a></h2>
+<p>You can run LittleDarwin as a Python module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>littledarwin<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+<p>LittleDarwin has two main phases:</p>
+<ul class="simple">
+<li><p><strong>Mutation phase:</strong> In this phase, LittleDarwin generates mutants of your
+Java source code. To activate this phase, use the <code class="docutils literal notranslate"><span class="pre">-m</span></code> or <code class="docutils literal notranslate"><span class="pre">--mutate</span></code>
+option.</p></li>
+<li><p><strong>Build phase:</strong> In this phase, LittleDarwin runs a build command for each
+mutant and checks if the build passes or fails. To activate this phase,
+use the <code class="docutils literal notranslate"><span class="pre">-b</span></code> or <code class="docutils literal notranslate"><span class="pre">--build</span></code> option.</p></li>
+</ul>
+<p>You can run both phases in a single command, but it is recommended to run
+them separately.</p>
+</section>
+<section id="command-line-options">
+<h2>Command-Line Options<a class="headerlink" href="#command-line-options" title="Link to this heading"></a></h2>
+<p>Here is a list of the available command-line options:</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-m">
+<span id="cmdoption-littledarwin-mutate"></span><span class="sig-name descname"><span class="pre">-m</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--mutate</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-m" title="Link to this definition"></a></dt>
+<dd><p>Activate the mutation phase.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-b">
+<span id="cmdoption-littledarwin-build"></span><span class="sig-name descname"><span class="pre">-b</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--build</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-b" title="Link to this definition"></a></dt>
+<dd><p>Activate the build phase.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-v">
+<span id="cmdoption-littledarwin-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-v" title="Link to this definition"></a></dt>
+<dd><p>Verbose output.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-p">
+<span id="cmdoption-littledarwin-path"></span><span class="sig-name descname"><span class="pre">-p</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-p" title="Link to this definition"></a></dt>
+<dd><p>Path to source files.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-t">
+<span id="cmdoption-littledarwin-build-path"></span><span class="sig-name descname"><span class="pre">-t</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--build-path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-t" title="Link to this definition"></a></dt>
+<dd><p>Path to build system working directory.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-c">
+<span id="cmdoption-littledarwin-build-command"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--build-command</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;command&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-c" title="Link to this definition"></a></dt>
+<dd><p>Command to run the build system. If it includes more than a single
+argument, they should be separated by a comma. For example:
+<code class="docutils literal notranslate"><span class="pre">mvn,clean,test</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-test-path">
+<span class="sig-name descname"><span class="pre">--test-path</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-test-path" title="Link to this definition"></a></dt>
+<dd><p>Path to test project build system working directory.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-test-command">
+<span class="sig-name descname"><span class="pre">--test-command</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;command&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-test-command" title="Link to this definition"></a></dt>
+<dd><p>Command to run the test-suite. If it includes more than a single
+argument, they should be separated by a comma. For example:
+<code class="docutils literal notranslate"><span class="pre">mvn,test</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-initial-build-command">
+<span class="sig-name descname"><span class="pre">--initial-build-command</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;command&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-initial-build-command" title="Link to this definition"></a></dt>
+<dd><p>Command to run the initial build.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-timeout">
+<span class="sig-name descname"><span class="pre">--timeout</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;seconds&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-timeout" title="Link to this definition"></a></dt>
+<dd><p>Timeout value for the build process.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-cleanup">
+<span class="sig-name descname"><span class="pre">--cleanup</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;command&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-cleanup" title="Link to this definition"></a></dt>
+<dd><p>Commands to run after each build.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-use-alternate-database">
+<span class="sig-name descname"><span class="pre">--use-alternate-database</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-use-alternate-database" title="Link to this definition"></a></dt>
+<dd><p>Path to alternative database.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-license">
+<span class="sig-name descname"><span class="pre">--license</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-license" title="Link to this definition"></a></dt>
+<dd><p>Output the license and exit.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-higher-order">
+<span class="sig-name descname"><span class="pre">--higher-order</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;order&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-higher-order" title="Link to this definition"></a></dt>
+<dd><p>Define order of mutation. Use -1 to dynamically adjust per class.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-null-check">
+<span class="sig-name descname"><span class="pre">--null-check</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-null-check" title="Link to this definition"></a></dt>
+<dd><p>Use null check mutation operators.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-method-level">
+<span class="sig-name descname"><span class="pre">--method-level</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-method-level" title="Link to this definition"></a></dt>
+<dd><p>Use method level mutation operators.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-all">
+<span class="sig-name descname"><span class="pre">--all</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-littledarwin-all" title="Link to this definition"></a></dt>
+<dd><p>Use all mutation operators.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-whitelist">
+<span class="sig-name descname"><span class="pre">--whitelist</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-whitelist" title="Link to this definition"></a></dt>
+<dd><p>Analyze only included packages or files defined in this file (one
+package name or path to file per line).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-littledarwin-blacklist">
+<span class="sig-name descname"><span class="pre">--blacklist</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;file&gt;</span></span><a class="headerlink" href="#cmdoption-littledarwin-blacklist" title="Link to this definition"></a></dt>
+<dd><p>Analyze everything except packages or files defined in this file (one
+package name or path to file per line).</p>
+</dd></dl>
+
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>Here are some examples of how to use LittleDarwin.</p>
+<section id="generating-traditional-mutants">
+<h3>Generating Traditional Mutants<a class="headerlink" href="#generating-traditional-mutants" title="Link to this heading"></a></h3>
+<p>To generate traditional mutants for a project, you can use the following
+command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>littledarwin<span class="w"> </span>-m<span class="w"> </span>-p<span class="w"> </span>/path/to/your/project/src/main<span class="w"> </span>-t<span class="w"> </span>/path/to/your/project
+</pre></div>
+</div>
+<p>This will create a directory called <code class="docutils literal notranslate"><span class="pre">LittleDarwinResults</span></code> in your project’s
+root directory, which will contain the generated mutants.</p>
+</section>
+<section id="generating-higher-order-mutants">
+<h3>Generating Higher-Order Mutants<a class="headerlink" href="#generating-higher-order-mutants" title="Link to this heading"></a></h3>
+<p>To generate second-order mutants, you can use the <code class="docutils literal notranslate"><span class="pre">--higher-order</span></code> option:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>littledarwin<span class="w"> </span>-m<span class="w"> </span>-p<span class="w"> </span>/path/to/your/project/src/main<span class="w"> </span>-t<span class="w"> </span>/path/to/your/project<span class="w"> </span>--higher-order<span class="o">=</span><span class="m">2</span>
+</pre></div>
+</div>
+</section>
+<section id="running-a-full-mutation-analysis">
+<h3>Running a Full Mutation Analysis<a class="headerlink" href="#running-a-full-mutation-analysis" title="Link to this heading"></a></h3>
+<p>To run a full mutation analysis, you need to activate both the mutation and
+build phases, and you need to provide a build command. For example, if you
+are using Maven, you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>littledarwin<span class="w"> </span>-m<span class="w"> </span>-b<span class="w"> </span>-p<span class="w"> </span>/path/to/your/project/src/main<span class="w"> </span>-t<span class="w"> </span>/path/to/your/project<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;mvn,clean,test&quot;</span><span class="w"> </span>--timeout<span class="o">=</span><span class="m">600</span>
+</pre></div>
+</div>
+<p>This will first generate the mutants, and then it will run <code class="docutils literal notranslate"><span class="pre">mvn</span> <span class="pre">clean</span> <span class="pre">test</span></code>
+for each mutant. It will then generate a report of the results in the
+<code class="docutils literal notranslate"><span class="pre">LittleDarwinResults</span></code> directory.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="LittleDarwin: A Java Mutation Analysis Framework" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ali Parsai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
