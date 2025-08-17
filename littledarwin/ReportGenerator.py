@@ -4,29 +4,41 @@ import shelve
 
 class ReportGenerator(object):
     """
-
+    This class generates the HTML reports for LittleDarwin. It creates a
+    summary report for the entire project, as well as detailed reports for
+    each file that was mutated.
     """
     def __init__(self, littleDarwinVersion=None):
+        """
+        Initializes the ReportGenerator object.
+
+        :param littleDarwinVersion: The version of LittleDarwin.
+        :type littleDarwinVersion: str
+        """
         self.database = None
         self.ldVersion = littleDarwinVersion
 
     def initiateDatabase(self, databasePath):
         """
+        Initiates the results database.
 
-        :param databasePath:
-        :type databasePath:
+        :param databasePath: The path to the results database.
+        :type databasePath: str
         """
         self.database = shelve.open(databasePath, "c")
 
     def generateHTMLFinalReport(self, resultData, reportPath):
         """
+        Generates the final HTML report for the entire project.
 
-        :param resultData:
-        :type resultData:
-        :param reportPath:
-        :type reportPath:
-        :return:
-        :rtype:
+        :param resultData: A list of lists, where each inner list contains
+                           the file path, the number of survived mutants, and
+                           the total number of mutants for a file.
+        :type resultData: list
+        :param reportPath: The path to the report file.
+        :type reportPath: str
+        :return: The HTML report as a string.
+        :rtype: str
         """
         reportBeginning = """<!DOCTYPE html><html><head><title>LittleDarwin Mutation Coverage Report</title>
              <style type='text/css'> body { font-family: "Carlito", "Calibri", "Helvetica Neue", sans-serif; } 
@@ -84,17 +96,18 @@ class ReportGenerator(object):
 
     def generateHTMLReportPerFile(self, filePath, reportPath, survived, killed):
         """
+        Generates an HTML report for a single file.
 
-        :param filePath:
-        :type filePath:
-        :param reportPath:
-        :type reportPath:
-        :param survived:
-        :type survived:
-        :param killed:
-        :type killed:
-        :return:
-        :rtype:
+        :param filePath: The path to the file.
+        :type filePath: str
+        :param reportPath: The path to the report file.
+        :type reportPath: str
+        :param survived: A list of the names of the survived mutants.
+        :type survived: list
+        :param killed: A list of the names of the killed mutants.
+        :type killed: list
+        :return: The HTML report as a string.
+        :rtype: str
         """
         def xstr(inputVar):
             """

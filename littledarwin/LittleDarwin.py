@@ -1,28 +1,8 @@
-################################################################################################################
-##                                                                                                            ##
-##           __     _  __   __   __       ____                          _                                     ##
-##          / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____                                ##
-##         / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \                               ##
-##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##
-##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##
-##                                                                                                            ##
-##       Copyright (c) 2014-2022 Ali Parsai                                                                   ##
-##                                                                                                            ##
-##       This program is free software: you can redistribute it and/or modify it under the terms of           ##
-##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##
-##       of the License, or (at your option) any later version.                                               ##
-##                                                                                                            ##
-##       This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;            ##
-##       without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            ##
-##       See the GNU General Public License for more details.                                                 ##
-##                                                                                                            ##
-##       You should have received a copy of the GNU General Public License along with this program.           ##
-##       If not, see <https://www.gnu.org/licenses/>.                                                         ##
-##                                                                                                            ##
-##       Find me at:                                                                                          ##
-##       https://www.parsai.net/                                                                              ##
-##                                                                                                            ##
-################################################################################################################
+"""
+This module is the main entry point for the LittleDarwin mutation analysis
+framework. It contains the logic for parsing command-line arguments, running the
+mutation phase, and running the build phase.
+"""
 
 import datetime
 import io
@@ -56,7 +36,14 @@ littleDarwinVersion = '0.10.9'
 
 def main(mockArgs: list = None):
     """
-    Main LittleDarwin Function
+    The main entry point for the LittleDarwin application.
+
+    This function parses the command-line arguments and then calls the
+    appropriate functions to perform the mutation and/or build phases.
+
+    :param mockArgs: A list of command-line arguments for testing purposes.
+                     If None, the arguments are read from ``sys.argv``.
+    :type mockArgs: list, optional
     """
     print("""
     __     _  __   __   __       ____                          _
@@ -107,15 +94,19 @@ def main(mockArgs: list = None):
 
 def mutationPhase(options, filterType, filterList, higherOrder):
     """
+    Performs the mutation phase of LittleDarwin.
 
-    :param options:
-    :type options:
-    :param filterType:
-    :type filterType:
-    :param filterList:
-    :type filterList:
-    :param higherOrder:
-    :type higherOrder:
+    This function finds all the Java files in the source directory,
+    parses them, generates mutants, and stores them in a database.
+
+    :param options: The command-line options.
+    :type options: optparse.Values
+    :param filterType: The type of filter to use ("whitelist" or "blacklist").
+    :type filterType: str
+    :param filterList: A list of files or packages to include or exclude.
+    :type filterList: list
+    :param higherOrder: The order of mutation to perform.
+    :type higherOrder: int
     """
     # creating our module objects.
     javaIO = JavaIO(options.isVerboseActive)
@@ -225,9 +216,15 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
 def buildPhase(options):
     """
+    Performs the build phase of LittleDarwin.
 
-    :param options:
-    :type options:
+    This function iterates through the mutants in the database, and for each
+    mutant, it replaces the original file with the mutant, runs the build
+    command, and records whether the build succeeded or failed. It then
+    generates a report of the results.
+
+    :param options: The command-line options.
+    :type options: optparse.Values
     """
     # let's tell the user upfront that this may corrupt the source code.
     print("\n\n!!! CAUTION !!!")
@@ -461,13 +458,16 @@ def buildPhase(options):
 
 def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
     """
+    Parses the command-line arguments for LittleDarwin.
 
-    :param mockArgs:
-    :type mockArgs:
-    :param optionParser:
-    :type optionParser:
-    :return:
-    :rtype:
+    :param optionParser: The OptionParser instance to use.
+    :type optionParser: optparse.OptionParser
+    :param mockArgs: A list of command-line arguments for testing purposes.
+                     If None, the arguments are read from ``sys.argv``.
+    :type mockArgs: list, optional
+    :return: A tuple containing the parsed options, the filter type, the filter
+             list, and the higher-order mutation value.
+    :rtype: tuple
     """
     # parsing input options
     optionParser.add_option("-m", "--mutate", action="store_true", dest="isMutationActive", default=False,
@@ -549,12 +549,22 @@ def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
 # after the timeout is passed.
 def timeoutAlternative(commandString, workingDirectory, timeout, inputData=None):
     """
+    Runs a command with a timeout, and kills it if it takes too long.
 
-    :param commandString: command to run
-    :param workingDirectory: the directory that the command is supposed to run in
-    :param timeout: timeout in seconds
-    :param inputData: the data that the run process may need. defaults to None.
-    :return: returns kill status, process return code and the output of the system
+    This function uses a watchdog thread to kill the process if the timeout
+    expires. It is used to prevent the build process from hanging.
+
+    :param commandString: The command to run, as a list of strings.
+    :type commandString: list
+    :param workingDirectory: The directory in which to run the command.
+    :type workingDirectory: str
+    :param timeout: The timeout in seconds.
+    :type timeout: int
+    :param inputData: Input data to pass to the process's stdin.
+    :type inputData: bytes, optional
+    :return: A tuple containing a boolean indicating if the process was
+             killed, the process's return code, and the process's stdout.
+    :rtype: tuple
     """
 
     killCheck = threading.Event()
