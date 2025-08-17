@@ -3,7 +3,7 @@
 # LittleDarwin 
 
 Java Mutation Analysis Framework
-Copyright (C) 2014-2023 Ali Parsai
+Copyright (C) 2014-2025 Ali Parsai
 
 ## How to Use:
 On your selected python platform use:
@@ -21,6 +21,9 @@ For a maven project, all you need to do is to pass the required arguments to Lit
 			    -t [path to build directory (usually the one containing pom.xml)] \
 			    --timeout=[in seconds, the duration of a normal test execution] \
 			    -c [build command separated by commas (usually mvn,clean,test)]
+
+## Documentation
+You can find user documentation and API reference at: <https://aliparsai.github.io/LittleDarwin/>
 
 
 ------------------------------------------------------------------------------------
