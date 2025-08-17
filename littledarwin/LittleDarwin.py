@@ -1,3 +1,30 @@
+################################################################################################################
+##                                                                                                            ##
+##           __     _  __   __   __       ____                          _                                     ##
+##          / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____                                ##
+##         / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \                               ##
+##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##
+##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##
+##                                                                                                            ##
+##       Copyright (c) 2014-2025 Ali Parsai                                                                   ##
+##                                                                                                            ##
+##       This program is free software: you can redistribute it and/or modify it under the terms of           ##
+##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##
+##       of the License, or (at your option) any later version.                                               ##
+##                                                                                                            ##
+##       This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;            ##
+##       without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            ##
+##       See the GNU General Public License for more details.                                                 ##
+##                                                                                                            ##
+##       You should have received a copy of the GNU General Public License along with this program.           ##
+##       If not, see <https://www.gnu.org/licenses/>.                                                         ##
+##                                                                                                            ##
+##       Find me at:                                                                                          ##
+##       https://www.parsai.net/                                                                              ##
+##                                                                                                            ##
+################################################################################################################
+
+
 """
 This module is the main entry point for the LittleDarwin mutation analysis
 framework. It contains the logic for parsing command-line arguments, running the
@@ -58,7 +85,7 @@ def main(mockArgs: list = None):
                                   /
 
 
-    LittleDarwin version %s Copyright (C) 2014-2022 Ali Parsai
+    LittleDarwin version %s Copyright (C) 2014-2025 Ali Parsai
 
     LittleDarwin comes with ABSOLUTELY NO WARRANTY.
     This is free software, and you are welcome to redistribute it
