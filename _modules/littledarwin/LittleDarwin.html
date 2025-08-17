@@ -1,0 +1,743 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>littledarwin.LittleDarwin &mdash; LittleDarwin 0.10.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=058d9255"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            LittleDarwin
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">LittleDarwin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">littledarwin.LittleDarwin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for littledarwin.LittleDarwin</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################################################</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##           __     _  __   __   __       ____                          _                                     ##</span>
+<span class="c1">##          / /    (_)/ /_ / /_ / /___   / __ \ ____ _ _____ _      __ (_)____                                ##</span>
+<span class="c1">##         / /    / // __// __// // _ \ / / / // __ `// ___/| | /| / // // __ \                               ##</span>
+<span class="c1">##        / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /                               ##</span>
+<span class="c1">##       /_____//_/ \__/ \__//_/ \___//_____/ \__,_//_/     |__/|__//_//_/ /_/                                ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##       Copyright (c) 2014-2022 Ali Parsai                                                                   ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##       This program is free software: you can redistribute it and/or modify it under the terms of           ##</span>
+<span class="c1">##       the GNU General Public License as published by the Free Software Foundation, either version 3        ##</span>
+<span class="c1">##       of the License, or (at your option) any later version.                                               ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##       This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;            ##</span>
+<span class="c1">##       without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.            ##</span>
+<span class="c1">##       See the GNU General Public License for more details.                                                 ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##       You should have received a copy of the GNU General Public License along with this program.           ##</span>
+<span class="c1">##       If not, see &lt;https://www.gnu.org/licenses/&gt;.                                                         ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">##       Find me at:                                                                                          ##</span>
+<span class="c1">##       https://www.parsai.net/                                                                              ##</span>
+<span class="c1">##                                                                                                            ##</span>
+<span class="c1">################################################################################################################</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shelve</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptionParser</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">littledarwin</span><span class="w"> </span><span class="kn">import</span> <span class="n">License</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.JavaIO</span><span class="w"> </span><span class="kn">import</span> <span class="n">JavaIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.JavaMutate</span><span class="w"> </span><span class="kn">import</span> <span class="n">JavaMutate</span>
+<span class="c1"># LittleDarwin modules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.JavaParse</span><span class="w"> </span><span class="kn">import</span> <span class="n">JavaParse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ReportGenerator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReportGenerator</span>
+
+<span class="c1">### DEBUG ###</span>
+<span class="c1"># def trace(frame, event, arg):</span>
+<span class="c1">#     print(&quot;%s, %s:%d&quot; % (event, frame.f_code.co_filename, frame.f_lineno))</span>
+<span class="c1">#     return trace</span>
+<span class="c1"># sys.settrace(trace)</span>
+<span class="c1">#############</span>
+
+<span class="n">littleDarwinVersion</span> <span class="o">=</span> <span class="s1">&#39;0.10.9&#39;</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">mockArgs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main LittleDarwin Function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    __     _  __   __   __       ____                          _</span>
+<span class="s2">   / /    (_)/ /_ / /_ / /___   / __ </span><span class="se">\\</span><span class="s2"> ____ _ _____ _      __ (_)____</span>
+<span class="s2">  / /    / // __// __// // _ </span><span class="se">\\</span><span class="s2"> / / / // __ `// ___/| | /| / // // __ </span><span class="se">\\</span>
+<span class="s2"> / /___ / // /_ / /_ / //  __// /_/ // /_/ // /    | |/ |/ // // / / /</span>
+<span class="s2">/_____//_/ </span><span class="se">\\</span><span class="s2">__/ </span><span class="se">\\</span><span class="s2">__//_/ </span><span class="se">\\</span><span class="s2">___//_____/ </span><span class="se">\\</span><span class="s2">__,_//_/     |__/|__//_//_/ /_/</span>
+
+<span class="s2">      _                     _                 ___</span>
+<span class="s2">     /_|  /|/|  _/__/&#39;     /_|   _ /   _ &#39; _ (_  _ _ _  _      _ /</span>
+<span class="s2">    (  | /   |(//(///()/) (  |/)(/((/_) /_)  /  / (///)(-((/()/ /(</span>
+<span class="s2">                                  /</span>
+
+
+<span class="s2">    LittleDarwin version </span><span class="si">%s</span><span class="s2"> Copyright (C) 2014-2022 Ali Parsai</span>
+
+<span class="s2">    LittleDarwin comes with ABSOLUTELY NO WARRANTY.</span>
+<span class="s2">    This is free software, and you are welcome to redistribute it</span>
+<span class="s2">    under certain conditions; run LittleDarwin --license for details.</span>
+
+
+<span class="s2">    &quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">littleDarwinVersion</span><span class="p">)</span>
+
+    <span class="n">optionParser</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s2">&quot;littledarwin&quot;</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">,</span> <span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="p">,</span> <span class="n">higherOrder</span> <span class="o">=</span> <span class="n">parseCmdArgs</span><span class="p">(</span><span class="n">optionParser</span><span class="p">,</span> <span class="n">mockArgs</span><span class="p">)</span>
+
+    <span class="c1"># *****************************************************************************************************************</span>
+    <span class="c1"># ---------------------------------------- mutant generation phase ------------------------------------------------</span>
+    <span class="c1"># *****************************************************************************************************************</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isMutationActive</span><span class="p">:</span>
+        <span class="n">mutationPhase</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="p">,</span> <span class="n">higherOrder</span><span class="p">)</span>
+
+    <span class="c1"># *****************************************************************************************************************</span>
+    <span class="c1"># ---------------------------------------- test suite running phase -----------------------------------------------</span>
+    <span class="c1"># *****************************************************************************************************************</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isBuildActive</span><span class="p">:</span>
+        <span class="n">buildPhase</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+
+    <span class="c1"># if neither build nor mutation phase is active, let&#39;s help the user.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">isBuildActive</span> <span class="ow">or</span> <span class="n">options</span><span class="o">.</span><span class="n">isMutationActive</span><span class="p">):</span>
+        <span class="n">optionParser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example:</span><span class="se">\n</span><span class="s2">  LittleDarwin -m -b -t ./ -p ./src/main -c mvn,clean,test --timeout=120</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="mutationPhase">
+<a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.mutationPhase">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mutationPhase</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="p">,</span> <span class="n">higherOrder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param options:</span>
+<span class="sd">    :type options:</span>
+<span class="sd">    :param filterType:</span>
+<span class="sd">    :type filterType:</span>
+<span class="sd">    :param filterList:</span>
+<span class="sd">    :type filterList:</span>
+<span class="sd">    :param higherOrder:</span>
+<span class="sd">    :type higherOrder:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># creating our module objects.</span>
+    <span class="n">javaIO</span> <span class="o">=</span> <span class="n">JavaIO</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">isVerboseActive</span><span class="p">)</span>
+    <span class="n">javaParse</span> <span class="o">=</span> <span class="n">JavaParse</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">isVerboseActive</span><span class="p">)</span>
+    <span class="n">totalMutantCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Source path must be a directory.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># getting the list of files.</span>
+    <span class="n">javaIO</span><span class="o">.</span><span class="n">listFiles</span><span class="p">(</span><span class="n">targetPath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">),</span> <span class="n">buildPath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">),</span>
+                     <span class="n">filterType</span><span class="o">=</span><span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="o">=</span><span class="n">filterList</span><span class="p">)</span>
+    <span class="n">fileCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">fileCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">javaIO</span><span class="o">.</span><span class="n">fileList</span><span class="p">)</span>
+    <span class="c1"># creating a database for generated mutants. the format of this database is different on different platforms,</span>
+    <span class="c1"># so it cannot be simply copied from a platform to another.</span>
+    <span class="n">databasePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">javaIO</span><span class="o">.</span><span class="n">targetDirectory</span><span class="p">,</span> <span class="s2">&quot;mutationdatabase&quot;</span><span class="p">)</span>
+    <span class="n">densityResultsPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">javaIO</span><span class="o">.</span><span class="n">targetDirectory</span><span class="p">,</span> <span class="s2">&quot;ProjectDensityReport.csv&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Source Path: &quot;</span><span class="p">,</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">sourceDirectory</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Target Path: &quot;</span><span class="p">,</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">targetDirectory</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating Mutation Database: &quot;</span><span class="p">,</span> <span class="n">databasePath</span><span class="p">)</span>
+    <span class="n">mutationDatabase</span> <span class="o">=</span> <span class="n">shelve</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">databasePath</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span>
+    <span class="n">mutantTypeDatabase</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">averageDensityDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># go through each file, parse it, calculate all mutations, and generate files accordingly.</span>
+    <span class="k">for</span> <span class="n">srcFile</span> <span class="ow">in</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">fileList</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileCounter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) Source file: &quot;</span><span class="p">,</span> <span class="n">srcFile</span><span class="p">)</span>
+        <span class="n">targetList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># parsing the source file into a tree.</span>
+            <span class="n">sourceCode</span> <span class="o">=</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">getFileContent</span><span class="p">(</span><span class="n">srcFile</span><span class="p">)</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">javaParse</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sourceCode</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in parsing Java code, skipping the file.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">continue</span>
+
+        <span class="n">fileCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">enabledMutators</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Traditional&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isNullCheck</span><span class="p">:</span>
+            <span class="n">enabledMutators</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Null&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isAll</span><span class="p">:</span>
+            <span class="n">enabledMutators</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;All&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isMethodLevel</span><span class="p">:</span>
+            <span class="n">enabledMutators</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Method&quot;</span><span class="p">]</span>
+
+        <span class="c1"># apply mutations on the tree and receive the resulting mutants as a list of strings, and a detailed</span>
+        <span class="c1"># list of which operators created how many mutants.</span>
+
+        <span class="n">javaMutate</span> <span class="o">=</span> <span class="n">JavaMutate</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">sourceCode</span><span class="p">,</span> <span class="n">javaParse</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">isVerboseActive</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">higherOrder</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">mutated</span><span class="p">,</span> <span class="n">mutantTypes</span> <span class="o">=</span> <span class="n">javaMutate</span><span class="o">.</span><span class="n">gatherMutants</span><span class="p">(</span><span class="n">enabledMutators</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mutated</span><span class="p">,</span> <span class="n">mutantTypes</span> <span class="o">=</span> <span class="n">javaMutate</span><span class="o">.</span><span class="n">gatherHigherOrderMutants</span><span class="p">(</span><span class="n">higherOrder</span><span class="p">,</span> <span class="n">enabledMutators</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt; Mutations found: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mutated</span><span class="p">))</span>
+
+        <span class="c1"># go through all mutant types, and add them in total. also output the info to the user.</span>
+        <span class="k">for</span> <span class="n">mutantType</span> <span class="ow">in</span> <span class="n">mutantTypes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">mutantTypes</span><span class="p">[</span><span class="n">mutantType</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----&gt;&quot;</span><span class="p">,</span> <span class="n">mutantType</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">mutantTypes</span><span class="p">[</span><span class="n">mutantType</span><span class="p">])</span>
+            <span class="n">mutantTypeDatabase</span><span class="p">[</span><span class="n">mutantType</span><span class="p">]</span> <span class="o">=</span> <span class="n">mutantTypes</span><span class="p">[</span><span class="n">mutantType</span><span class="p">]</span> <span class="o">+</span> <span class="n">mutantTypeDatabase</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mutantType</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">totalMutantCount</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mutated</span><span class="p">)</span>
+
+        <span class="c1"># for each mutant, generate the file, and add it to the list.</span>
+        <span class="n">fileRelativePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">srcFile</span><span class="p">,</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">sourceDirectory</span><span class="p">)</span>
+        <span class="n">densityReport</span> <span class="o">=</span> <span class="n">javaMutate</span><span class="o">.</span><span class="n">aggregateReport</span><span class="p">(</span><span class="n">littleDarwinVersion</span><span class="p">)</span>
+        <span class="n">averageDensityDict</span><span class="p">[</span><span class="n">fileRelativePath</span><span class="p">]</span> <span class="o">=</span> <span class="n">javaMutate</span><span class="o">.</span><span class="n">averageDensity</span>
+        <span class="n">aggregateComplexity</span> <span class="o">=</span> <span class="n">javaIO</span><span class="o">.</span><span class="n">getAggregateComplexityReport</span><span class="p">(</span><span class="n">javaMutate</span><span class="o">.</span><span class="n">mutantsPerMethod</span><span class="p">,</span>
+                                                                  <span class="n">javaParse</span><span class="o">.</span><span class="n">getCyclomaticComplexityAllMethods</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span>
+                                                                  <span class="n">javaParse</span><span class="o">.</span><span class="n">getLinesOfCodePerMethod</span><span class="p">(</span><span class="n">tree</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">mutatedFile</span> <span class="ow">in</span> <span class="n">mutated</span><span class="p">:</span>
+            <span class="n">targetList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">javaIO</span><span class="o">.</span><span class="n">generateNewFile</span><span class="p">(</span><span class="n">srcFile</span><span class="p">,</span> <span class="n">mutatedFile</span><span class="p">,</span> <span class="n">javaMutate</span><span class="o">.</span><span class="n">mutantsPerLine</span><span class="p">,</span>
+                                                     <span class="n">densityReport</span><span class="p">,</span> <span class="n">aggregateComplexity</span><span class="p">))</span>
+
+        <span class="c1"># if the list is not empty (some mutants were found), put the data in the database.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">targetList</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mutationDatabase</span><span class="p">[</span><span class="n">fileRelativePath</span><span class="p">]</span> <span class="o">=</span> <span class="n">targetList</span>
+
+        <span class="k">del</span> <span class="n">javaMutate</span>
+
+    <span class="n">mutationDatabase</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total mutations found: &quot;</span><span class="p">,</span> <span class="n">totalMutantCount</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">totalMutantCount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No mutants generated? Something must be wrong.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">densityResultsPath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">densityReportHandle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">averageDensityDict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">densityReportHandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">averageDensityDict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">mutantType</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">mutantTypeDatabase</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">mutantTypeDatabase</span><span class="p">[</span><span class="n">mutantType</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--&gt;&quot;</span><span class="p">,</span> <span class="n">mutantType</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">mutantTypeDatabase</span><span class="p">[</span><span class="n">mutantType</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="buildPhase">
+<a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.buildPhase">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">buildPhase</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param options:</span>
+<span class="sd">    :type options:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># let&#39;s tell the user upfront that this may corrupt the source code.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">!!! CAUTION !!!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Code can be changed accidentally. Create a backup first.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">reportGenerator</span> <span class="o">=</span> <span class="n">ReportGenerator</span><span class="p">(</span><span class="n">littleDarwinVersion</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">alternateDb</span> <span class="o">==</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+        <span class="n">databasePath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">,</span> <span class="s2">&quot;LittleDarwinResults&quot;</span><span class="p">,</span> <span class="s2">&quot;mutationdatabase&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">databasePath</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">alternateDb</span>
+    <span class="n">mutantsPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">databasePath</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">)</span>
+    <span class="n">resultsDatabasePath</span> <span class="o">=</span> <span class="n">databasePath</span> <span class="o">+</span> <span class="s2">&quot;-results&quot;</span>
+    <span class="n">reportGenerator</span><span class="o">.</span><span class="n">initiateDatabase</span><span class="p">(</span><span class="n">resultsDatabasePath</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;pom.xml&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span>
+            <span class="n">buildDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span>
+            <span class="n">buildDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Build system working directory should be a directory.&quot;</span><span class="p">)</span>
+    <span class="c1"># check if we have separate test-suite</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">testCommand</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+        <span class="n">separateTestSuite</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">testPath</span> <span class="o">==</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+            <span class="n">testDir</span> <span class="o">=</span> <span class="n">buildDir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;pom.xml&quot;</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span>
+                    <span class="n">testDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">testPath</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">buildPath</span><span class="p">)</span>
+                    <span class="n">testDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">testPath</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test project build system working directory should be a directory.&quot;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">separateTestSuite</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># try to open the database. if it can&#39;t be opened, it means that it does not exist or it is corrupt.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">mutationDatabase</span> <span class="o">=</span> <span class="n">shelve</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">databasePath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">databaseKeys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mutationDatabase</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">databaseKeys</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="c1"># let&#39;s sort the mutants by name to create the possibility of following the flow of the process by user.</span>
+    <span class="n">databaseKeys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="c1"># only here for debugging purposes</span>
+    <span class="c1"># for desired in databaseKeys:</span>
+    <span class="c1">#     if &quot;PluginMap.java&quot; in desired:</span>
+    <span class="c1">#         desiredIndex = databaseKeys.index(desired)</span>
+    <span class="c1">#         break</span>
+    <span class="c1">#</span>
+    <span class="c1"># databaseKeys.insert(0, databaseKeys.pop(desiredIndex))</span>
+    <span class="c1">#</span>
+    <span class="n">mutationDatabaseLength</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">databaseKeys</span><span class="p">)</span>
+    <span class="n">textReportData</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">htmlReportData</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">fileCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># initial build check to avoid false results. the system must be able to build cleanly without errors.</span>
+    <span class="c1"># use build command for the initial build unless it is explicitly provided.</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">initialBuildCommand</span> <span class="o">==</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+        <span class="n">commandString</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">buildCommand</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">commandString</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">initialBuildCommand</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial build...&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">processKilled</span><span class="p">,</span> <span class="n">processExitCode</span><span class="p">,</span> <span class="n">initialOutput</span> <span class="o">=</span> <span class="n">timeoutAlternative</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span>
+                                                                           <span class="n">workingDirectory</span><span class="o">=</span><span class="n">buildDir</span><span class="p">,</span>
+                                                                           <span class="n">timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">timeout</span><span class="p">))</span>
+
+        <span class="c1"># initialOutput = subprocess.check_output(commandString, stderr=subprocess.STDOUT, cwd=buildDir)</span>
+        <span class="c1"># workaround for older python versions</span>
+        <span class="k">if</span> <span class="n">processKilled</span> <span class="ow">or</span> <span class="n">processExitCode</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">processKilled</span> <span class="k">else</span> <span class="n">processExitCode</span><span class="p">,</span> <span class="n">commandString</span><span class="p">,</span>
+                                                <span class="n">initialOutput</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="s2">&quot;initialbuild.txt&quot;</span><span class="p">)),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+            <span class="n">contentFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">initialOutput</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+        <span class="n">initialOutput</span> <span class="o">=</span> <span class="n">exception</span><span class="o">.</span><span class="n">output</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="s2">&quot;initialbuild.txt&quot;</span><span class="p">)),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+            <span class="n">contentFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">initialOutput</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;failed.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial build failed. Try building the system manually first to make sure it can be built. &quot;</span> <span class="o">+</span>
+              <span class="s2">&quot;Take a look at &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="s2">&quot;initialbuild.txt&quot;</span><span class="p">))</span>
+              <span class="o">+</span> <span class="s2">&quot; to find out why this happened.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">totalMutantCount</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">totalMutantCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">databaseKeys</span><span class="p">:</span>
+        <span class="n">totalMutantCount</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mutationDatabase</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="c1"># running the build system for each mutant.</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">databaseKeys</span><span class="p">:</span>
+
+        <span class="n">fileCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileCounter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutationDatabaseLength</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) collecting results for &quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="n">mutantCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mutationDatabase</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="n">mutantCounter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">successList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">failureList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="c1"># for each mutant, replace the original file, run the build, store the results</span>
+        <span class="k">for</span> <span class="n">replacementFileRel</span> <span class="ow">in</span> <span class="n">mutationDatabase</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="n">replacementFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="n">replacementFileRel</span><span class="p">))</span>
+            <span class="n">mutantCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">totalMutantCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># let&#39;s make sure that runOutput is empty, and not None to begin with.</span>
+            <span class="n">runOutput</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">runOutputTest</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># replace the original file with the mutant</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+            <span class="n">commandString</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">buildCommand</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">separateTestSuite</span><span class="p">:</span>
+                <span class="n">testCommandString</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">testCommand</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># if we have timeout support, simply run the command with timeout support from subprocess32</span>
+                <span class="c1"># if timeoutSupport:</span>
+                <span class="c1">#     runOutput = subprocess.check_output(commandString, stderr=subprocess.STDOUT, cwd=buildDir,</span>
+                <span class="c1">#                                         timeout=int(options.timeout))</span>
+                <span class="c1">#     if separateTestSuite:</span>
+                <span class="c1">#         runOutput += subprocess.check_output(testCommandString, stderr=subprocess.STDOUT, cwd=testDir,</span>
+                <span class="c1">#                                         timeout=int(options.timeout))</span>
+
+                <span class="c1"># else, run our alternative method</span>
+                <span class="c1"># else:</span>
+                <span class="n">processKilled</span><span class="p">,</span> <span class="n">processExitCode</span><span class="p">,</span> <span class="n">runOutput</span> <span class="o">=</span> <span class="n">timeoutAlternative</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span>
+                                                                               <span class="n">workingDirectory</span><span class="o">=</span><span class="n">buildDir</span><span class="p">,</span>
+                                                                               <span class="n">timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">timeout</span><span class="p">))</span>
+
+                <span class="c1"># raise the same exception as the original check_output.</span>
+                <span class="k">if</span> <span class="n">processKilled</span> <span class="ow">or</span> <span class="n">processExitCode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">processKilled</span> <span class="k">else</span> <span class="n">processExitCode</span><span class="p">,</span> <span class="n">commandString</span><span class="p">,</span>
+                                                        <span class="n">runOutput</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">separateTestSuite</span><span class="p">:</span>
+                    <span class="n">processKilled</span><span class="p">,</span> <span class="n">processExitCode</span><span class="p">,</span> <span class="n">runOutputTest</span> <span class="o">=</span> <span class="n">timeoutAlternative</span><span class="p">(</span><span class="n">testCommandString</span><span class="p">,</span>
+                                                                                       <span class="n">workingDirectory</span><span class="o">=</span><span class="n">testDir</span><span class="p">,</span>
+                                                                                       <span class="n">timeout</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">timeout</span><span class="p">))</span>
+
+                    <span class="c1"># raise the same exception as the original check_output.</span>
+                    <span class="k">if</span> <span class="n">processKilled</span> <span class="ow">or</span> <span class="n">processExitCode</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">processKilled</span> <span class="k">else</span> <span class="n">processExitCode</span><span class="p">,</span>
+                                                            <span class="n">commandString</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">runOutput</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">runOutputTest</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># if we are here, it means no exceptions happened, so let&#39;s add this to our success list.</span>
+                <span class="n">runOutput</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">runOutput</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">runOutputTest</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">successList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">))</span>
+
+            <span class="c1"># putting two exceptions in one except clause, specially when one of them is not defined on some</span>
+            <span class="c1"># platforms does not look like a good idea; even though both of them do exactly the same thing.</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+                <span class="n">runOutput</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="o">.</span><span class="n">output</span><span class="p">)</span> <span class="k">if</span> <span class="n">exception</span><span class="o">.</span><span class="n">output</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="c1"># oops, error. let&#39;s add this to failure list.</span>
+                <span class="n">failureList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">))</span>
+
+            <span class="c1"># except subprocess.TimeoutExpired as exception:</span>
+            <span class="c1">#     runOutput = exception.output</span>
+            <span class="c1">#     failureList.append(os.path.basename(replacementFile))</span>
+
+            <span class="n">targetTextOutputFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;elapsed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)))</span> <span class="o">+</span> <span class="s2">&quot; remaining: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">startTime</span><span class="p">)</span> <span class="o">/</span> <span class="n">totalMutantCounter</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+                    <span class="n">totalMutantCount</span> <span class="o">-</span> <span class="n">totalMutantCounter</span><span class="p">))))</span> <span class="o">+</span> <span class="s2">&quot; total: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">totalMutantCounter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">totalMutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; current: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">mutantCounter</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; *** survived: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">successList</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; - killed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">failureList</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;         </span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># writing the build output to disk.</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">targetTextOutputFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+                <span class="n">contentFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">runOutput</span><span class="p">))</span>
+
+            <span class="c1"># if there&#39;s a cleanup option, execute it. the results will be ignored because we don&#39;t want our process</span>
+            <span class="c1">#  to be interrupted if there&#39;s nothing to clean up.</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">cleanUp</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">cleanUp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="n">cwd</span><span class="o">=</span><span class="n">buildDir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">separateTestSuite</span><span class="p">:</span>
+                    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">cleanUp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="n">cwd</span><span class="o">=</span><span class="n">testDir</span><span class="p">)</span>
+
+            <span class="c1"># workaround:</span>
+            <span class="c1"># shutil.rmtree(os.path.join(testDir,&quot;VolumetryLoggerTest&quot;),ignore_errors=True)</span>
+
+        <span class="c1"># all mutants must be checked by now, so we should have a complete divide between success and failure.</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">successList</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">failureList</span><span class="p">)</span> <span class="o">==</span> <span class="n">mutantCount</span>
+
+        <span class="c1"># append the information for this file to the reports.</span>
+        <span class="n">textReportData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;: survived (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">successList</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) -&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">successList</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; - killed (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">failureList</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) -&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">failureList</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">htmlReportData</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">successList</span><span class="p">),</span> <span class="n">mutantCount</span><span class="p">])</span>
+
+        <span class="c1"># we are done with the file. let&#39;s return it to the original state.</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">),</span> <span class="s2">&quot;original.java&quot;</span><span class="p">),</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">sourcePath</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+        <span class="c1"># generate an HTML report for the file.</span>
+        <span class="n">targetHTMLOutputFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">replacementFile</span><span class="p">),</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">targetHTMLOutputFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+            <span class="n">contentFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="n">reportGenerator</span><span class="o">.</span><span class="n">generateHTMLReportPerFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">targetHTMLOutputFile</span><span class="p">,</span> <span class="n">successList</span><span class="p">,</span> <span class="n">failureList</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># write final text report.</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="s2">&quot;report.txt&quot;</span><span class="p">)),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">textReportFile</span><span class="p">:</span>
+        <span class="n">textReportFile</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">textReportData</span><span class="p">)</span>
+    <span class="c1"># write final HTML report.</span>
+    <span class="n">targetHTMLReportFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mutantsPath</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">targetHTMLReportFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">htmlReportFile</span><span class="p">:</span>
+        <span class="n">htmlReportFile</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">reportGenerator</span><span class="o">.</span><span class="n">generateHTMLFinalReport</span><span class="p">(</span><span class="n">htmlReportData</span><span class="p">,</span> <span class="n">targetHTMLReportFile</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="parseCmdArgs">
+<a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.parseCmdArgs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parseCmdArgs</span><span class="p">(</span><span class="n">optionParser</span><span class="p">:</span> <span class="n">OptionParser</span><span class="p">,</span> <span class="n">mockArgs</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param mockArgs:</span>
+<span class="sd">    :type mockArgs:</span>
+<span class="sd">    :param optionParser:</span>
+<span class="sd">    :type optionParser:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    :rtype:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># parsing input options</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--mutate&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isMutationActive&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Activate the mutation phase.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;--build&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isBuildActive&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Activate the build phase.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isVerboseActive&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Verbose output.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="s2">&quot;--path&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;sourcePath&quot;</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to source files.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--build-path&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;buildPath&quot;</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to build system working directory.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--build-command&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;buildCommand&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;mvn,test&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Command to run the build system. If it includes more than a single argument, they should be seperated by comma. For example: mvn,install&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--test-path&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;testPath&quot;</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to test project build system working directory&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--test-command&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;testCommand&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Command to run the test-suite. If it includes more than a single argument, they should be seperated by comma. For example: mvn,test&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--initial-build-command&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;initialBuildCommand&quot;</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Command to run the initial build.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--timeout&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Timeout value for the build process.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--cleanup&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;cleanUp&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Commands to run after each build.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--use-alternate-database&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;alternateDb&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to alternative database.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--license&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isLicenseActive&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output the license and exit.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--higher-order&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;higherOrder&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Define order of mutation. Use -1 to dynamically adjust per class.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--null-check&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isNullCheck&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use null check mutation operators.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--method-level&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isMethodLevel&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use method level mutation operators.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--all&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;isAll&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use all mutation operators.&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--whitelist&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;whitelist&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Analyze only included packages or files defined in this file (one package name or path to file per line).&quot;</span><span class="p">)</span>
+    <span class="n">optionParser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;--blacklist&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;blacklist&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;***dummy***&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Analyze everything except packages or files defined in this file (one package name or path to file per line).&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mockArgs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">optionParser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">optionParser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">mockArgs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">whitelist</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span> <span class="ow">and</span> <span class="n">options</span><span class="o">.</span><span class="n">blacklist</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You can either define a whitelist or a blacklist but not both.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">filterList</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">filterType</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">whitelist</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">whitelist</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">whitelist</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+            <span class="n">filterList</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">contentFile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+            <span class="n">filterType</span> <span class="o">=</span> <span class="s2">&quot;whitelist&quot;</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">blacklist</span> <span class="o">!=</span> <span class="s2">&quot;***dummy***&quot;</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">blacklist</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">blacklist</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">contentFile</span><span class="p">:</span>
+            <span class="n">filterList</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">contentFile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+            <span class="n">filterType</span> <span class="o">=</span> <span class="s2">&quot;blacklist&quot;</span>
+    <span class="k">if</span> <span class="n">filterList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filterList</span> <span class="o">=</span> <span class="p">[</span><span class="n">_f</span> <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="n">filterList</span> <span class="k">if</span> <span class="n">_f</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isLicenseActive</span><span class="p">:</span>
+        <span class="n">License</span><span class="o">.</span><span class="n">outputLicense</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">higherOrder</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">options</span><span class="o">.</span><span class="n">higherOrder</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">higherOrder</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">higherOrder</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">higherOrder</span>
+    <span class="c1"># there is an upside in not running two phases together. we may include the ability to edit some mutants later.</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">isBuildActive</span> <span class="ow">and</span> <span class="n">options</span><span class="o">.</span><span class="n">isMutationActive</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;it is strongly recommended to do the analysis in two different phases.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">options</span><span class="p">,</span> <span class="n">filterType</span><span class="p">,</span> <span class="n">filterList</span><span class="p">,</span> <span class="n">higherOrder</span></div>
+
+
+
+<span class="c1"># Alternative to subprocess32</span>
+
+<span class="c1"># this method uses threading backend to create a watchdog thread that kills the build system and any child processes</span>
+<span class="c1"># after the timeout is passed.</span>
+<div class="viewcode-block" id="timeoutAlternative">
+<a class="viewcode-back" href="../../api.html#littledarwin.LittleDarwin.timeoutAlternative">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">timeoutAlternative</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span> <span class="n">workingDirectory</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">inputData</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param commandString: command to run</span>
+<span class="sd">    :param workingDirectory: the directory that the command is supposed to run in</span>
+<span class="sd">    :param timeout: timeout in seconds</span>
+<span class="sd">    :param inputData: the data that the run process may need. defaults to None.</span>
+<span class="sd">    :return: returns kill status, process return code and the output of the system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">killCheck</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+
+    <span class="c1"># this method is run in another thread when the timeout is expired to kill the process.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">killProcess</span><span class="p">(</span><span class="n">pipe</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param pipe:</span>
+<span class="sd">        :type pipe:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">)</span>
+
+        <span class="c1"># there is no support for os.killpg on windows, neither does it have SIGKILL.</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+            <span class="c1"># this utility is not included in windows XP Home edition, however, there is no other alternative either.</span>
+            <span class="c1"># therefore, don&#39;t run LittleDarwin on windows XP Home edition; he gets sad.</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s2">&quot;taskkill /F /T /PID </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pipe</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># posix systems all support this call.</span>
+            <span class="c1"># pipe.terminate()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">killpg</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpgid</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pipe</span><span class="o">.</span><span class="n">pid</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">)</span>
+
+        <span class="c1"># we just killed the process. let everyone know.</span>
+        <span class="n">killCheck</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+
+    <span class="c1"># timeout must be int, otherwise problems arise.</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">reliableCommandString</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">commandString</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+    <span class="n">reliableCommandString</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workingDirectory</span><span class="p">,</span> <span class="n">commandString</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span> \
+        <span class="k">if</span> <span class="n">reliableCommandString</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">reliableCommandString</span>
+
+    <span class="n">reliableCommandString</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">commandString</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> \
+        <span class="k">if</span> <span class="n">reliableCommandString</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">reliableCommandString</span>
+
+    <span class="k">if</span> <span class="n">reliableCommandString</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Build command not correct. Cannot find the executable: &quot;</span> <span class="o">+</span> <span class="n">commandString</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">commandString</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">reliableCommandString</span>
+
+    <span class="c1"># starting the process with the given parameters.</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">workingDirectory</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                   <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">preexec_fn</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">setsid</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># in Windows</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">commandString</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">workingDirectory</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                   <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+
+    <span class="c1"># passing the process and timeout references to threading&#39;s timer method, so that it kills the process</span>
+    <span class="c1"># if timeout expires.</span>
+    <span class="n">timerWatchdog</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">killProcess</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">process</span><span class="p">])</span>
+    <span class="n">timerWatchdog</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="c1"># do the stuff in the process.</span>
+    <span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">inputData</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="c1"># if the process is done, no need to kill it.</span>
+    <span class="n">timerWatchdog</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+
+    <span class="n">isKilled</span> <span class="o">=</span> <span class="n">killCheck</span><span class="o">.</span><span class="n">is_set</span><span class="p">()</span>
+    <span class="n">killCheck</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">isKilled</span><span class="p">,</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">output</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ali Parsai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

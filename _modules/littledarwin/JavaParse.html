@@ -1,0 +1,637 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>littledarwin.JavaParse &mdash; LittleDarwin 0.10.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=058d9255"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            LittleDarwin
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">LittleDarwin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">littledarwin.JavaParse</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for littledarwin.JavaParse</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">antlr4</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">antlr4.InputStream</span><span class="w"> </span><span class="kn">import</span> <span class="n">InputStream</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">antlr4.error.ErrorStrategy</span><span class="w"> </span><span class="kn">import</span> <span class="n">BailErrorStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">antlr4.tree.Tree</span><span class="w"> </span><span class="kn">import</span> <span class="n">TerminalNodeImpl</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.JavaLexer</span><span class="w"> </span><span class="kn">import</span> <span class="n">JavaLexer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.JavaParser</span><span class="w"> </span><span class="kn">import</span> <span class="n">JavaParser</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">graphviz</span>
+
+    <span class="n">noGraphviz</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">noGraphviz</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="LittleDarwinErrorStrategy">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.LittleDarwinErrorStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LittleDarwinErrorStrategy</span><span class="p">(</span><span class="n">BailErrorStrategy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle parsing exceptions. Throws exceptions when occured so that the file can safely be ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LittleDarwinErrorStrategy.recover">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.LittleDarwinErrorStrategy.recover">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">recover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">:</span> <span class="n">Parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">:</span> <span class="n">RecognitionException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param parser:</span>
+<span class="sd">        :type parser:</span>
+<span class="sd">        :param exception:</span>
+<span class="sd">        :type exception:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">_errHandler</span><span class="o">.</span><span class="n">reportError</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">recover</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="JavaParse">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JavaParse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that uses ANTLR4 to parse Java source code. It provides methods for traversing and analyzing the parse tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the JavaParse object.</span>
+<span class="sd">        :param verbose: A boolean indicating whether to print verbose output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># antlr-based parser</span>
+<div class="viewcode-block" id="JavaParse.parse">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.parse">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileContent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the given Java source code and returns a parse tree.</span>
+<span class="sd">        :param fileContent: A string containing the Java source code.</span>
+<span class="sd">        :return: A parse tree representing the Java source code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lexer</span> <span class="o">=</span> <span class="n">JavaLexer</span><span class="p">(</span><span class="n">InputStream</span><span class="p">(</span><span class="n">fileContent</span><span class="p">))</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">JavaParser</span><span class="p">(</span><span class="n">CommonTokenStream</span><span class="p">(</span><span class="n">lexer</span><span class="p">))</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">_errHandler</span> <span class="o">=</span> <span class="n">LittleDarwinErrorStrategy</span><span class="p">()</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">compilationUnit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numerify</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tree</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.numerify">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.numerify">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">numerify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a unique nodeIndex to each node in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">RuleContext</span><span class="p">)</span>
+
+        <span class="n">numerifyCounter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">=</span> <span class="n">numerifyCounter</span>
+            <span class="n">numerifyCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="p">[]))</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.toString">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.toString">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the text of all nodes in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">getChildren</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Index: &quot;</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">,</span> <span class="s2">&quot;Text: &quot;</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.seekAllNodes">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.seekAllNodes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">seekAllNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds all nodes of a specific type in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param nodeType: The type of node to search for.</span>
+<span class="sd">        :return: A list of nodes of the specified type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resultList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">seekStack</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">seekStack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">seekStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
+                <span class="n">resultList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">seekStack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">getChildren</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">resultList</span></div>
+
+
+    <span class="c1">## Deprecated</span>
+<div class="viewcode-block" id="JavaParse.seek">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.seek">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DEPRECATED. Finds all nodes of a specific type in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param type: The type of node to search for.</span>
+<span class="sd">        :return: A list of node indices of the specified type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seekList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="n">seekList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">getChildren</span><span class="p">():</span>
+                <span class="n">seekList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">seekList</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.seekFirstMatchingParent">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.seekFirstMatchingParent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">seekFirstMatchingParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds the first parent of a node that matches the specified type.</span>
+<span class="sd">        :param node: The node to start the search from.</span>
+<span class="sd">        :param nodeType: The type of parent node to search for.</span>
+<span class="sd">        :return: The first matching parent node, or None if no matching parent is found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parentCtx</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">parent</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">nodeType</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.seekNode">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.seekNode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">seekNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds a node in the parse tree by its index.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param nodeIndex: The index of the node to find.</span>
+<span class="sd">        :return: The depth of the node in the tree, or None if the node is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">==</span> <span class="n">nodeIndex</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">getChildren</span><span class="p">():</span>
+                <span class="n">nodeFound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nodeFound</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">nodeFound</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getNode">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getNode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a node from the parse tree by its index.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param index: The index of the node to get.</span>
+<span class="sd">        :return: The node with the specified index, or None if the node is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="n">stack</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lookupTable</span><span class="p">[</span><span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+
+            <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">tmp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">getChildCount</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.setNode">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.setNode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a node in the parse tree at a specific index.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param index: The index of the node to set.</span>
+<span class="sd">        :param node: The new node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">node</span>
+
+        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">getChildCount</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="c1"># print myTree.nodeIndex, child.nodeIndex</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setNode</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.distance">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.distance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the distance between two nodes in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param node1: The index of the first node.</span>
+<span class="sd">        :param node2: The index of the second node.</span>
+<span class="sd">        :return: The distance between the two nodes, or -1 if they are not in the same subtree.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rootDistance1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node1</span><span class="p">)</span>
+        <span class="n">rootDistance2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rootDistance1</span> <span class="o">&gt;</span> <span class="n">rootDistance2</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node2</span><span class="p">),</span> <span class="n">node1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rootDistance1</span> <span class="o">&lt;</span> <span class="n">rootDistance2</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekNode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">node1</span><span class="p">),</span> <span class="n">node2</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">node1</span> <span class="o">==</span> <span class="n">node2</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">distance</span> <span class="k">if</span> <span class="n">distance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getInMethodLines">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getInMethodLines">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getInMethodLines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of all line numbers that are within a method.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :return: A sorted list of line numbers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methodBodyList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span>
+        <span class="n">methodBodyList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">))</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">methodBody</span> <span class="ow">in</span> <span class="n">methodBodyList</span><span class="p">:</span>
+            <span class="n">terminalNodeList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">terminalNode</span> <span class="ow">in</span> <span class="n">terminalNodeList</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">terminalNode</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getLinesOfCodePerMethod">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getLinesOfCodePerMethod">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getLinesOfCodePerMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the number of lines of code for each method in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :return: A dictionary mapping method names to the number of lines of code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methodBodyList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span>
+        <span class="n">methodBodyList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">))</span>
+
+        <span class="n">linesOfCodePerMethod</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">methodBody</span> <span class="ow">in</span> <span class="n">methodBodyList</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">terminalNodeList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">terminalNode</span> <span class="ow">in</span> <span class="n">terminalNodeList</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">terminalNode</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+
+            <span class="n">linesOfCodePerMethod</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">getMethodNameForNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">methodBody</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">linesOfCodePerMethod</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getText">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getText">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">RuleContext</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the text of a node and all its children.</span>
+<span class="sd">        :param tree: The root of the node.</span>
+<span class="sd">        :return: A string containing the text of the node and its children.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">resultList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">childQueue</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">childQueue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">child</span> <span class="o">=</span> <span class="n">childQueue</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">):</span>
+                <span class="n">resultList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">getText</span><span class="p">()))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">childQueue</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">getChildren</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resultList</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getMethodRanges">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getMethodRanges">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getMethodRanges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the start and end character indices for each method in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :return: A dictionary mapping method names to a tuple of (start, stop) character indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methodDeclarationList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
+        <span class="n">methodDeclarationList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorDeclarationContext</span><span class="p">))</span>
+        <span class="n">resultDict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">methodDeclaration</span> <span class="ow">in</span> <span class="n">methodDeclarationList</span><span class="p">:</span>
+            <span class="n">gotName</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">gotStartStop</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">FormalParametersContext</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span>
+                    <span class="n">methodName</span> <span class="o">=</span> <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getText</span><span class="p">(</span>
+                        <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                    <span class="n">gotName</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">):</span>
+                    <span class="n">methodStartStop</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+                    <span class="n">gotStartStop</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">gotName</span> <span class="ow">and</span> <span class="n">gotStartStop</span><span class="p">:</span>
+                <span class="n">resultDict</span><span class="p">[</span><span class="n">methodName</span><span class="p">]</span> <span class="o">=</span> <span class="n">methodStartStop</span>
+
+        <span class="k">return</span> <span class="n">resultDict</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getMethodNameForNode">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getMethodNameForNode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getMethodNameForNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">:</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the name of the method that contains the node with the specified index.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :param nodeIndex: The index of the node.</span>
+<span class="sd">        :return: The name of the method, or &quot;***not in a method***&quot; if the node is not in a method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">methodName</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">nodeIndex</span><span class="p">)</span>
+        <span class="n">methodDeclaration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">methodDeclaration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">methodDeclaration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorDeclarationContext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">methodDeclaration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;***not in a method***&quot;</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">FormalParametersContext</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span>
+                <span class="n">methodName</span> <span class="o">=</span> <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">getText</span><span class="p">(</span>
+                    <span class="n">methodDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+
+        <span class="n">classDeclaration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ClassDeclarationContext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">classDeclaration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">methodName</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">classDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">classDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">classDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">classDeclaration</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">methodName</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getMethodTypeForNode">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getMethodTypeForNode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getMethodTypeForNode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the return type of the method that contains the specified node.</span>
+<span class="sd">        :param node: The node to check.</span>
+<span class="sd">        :return: The return type of the method, or None if the node is not in a method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parentMethod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekFirstMatchingParent</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parentMethod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parentMethod</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodDeclarationContext</span><span class="p">)</span>
+        <span class="n">parentType</span> <span class="o">=</span> <span class="n">parentMethod</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parentType</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">JTypeContext</span><span class="p">):</span>
+            <span class="n">methodType</span> <span class="o">=</span> <span class="n">parentType</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodType</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">PrimitiveTypeContext</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodType</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ClassOrInterfaceTypeContext</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">methodType</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parentType</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;void&quot;</span> <span class="k">if</span> <span class="n">parentType</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;void&quot;</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getCyclomaticComplexity">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getCyclomaticComplexity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getCyclomaticComplexity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">methodBody</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the cyclomatic complexity of a method.</span>
+<span class="sd">        :param methodBody: The MethodBodyContext or ConstructorBodyContext of the method.</span>
+<span class="sd">        :return: The cyclomatic complexity of the method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span> <span class="ow">or</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">)</span>
+
+        <span class="n">cyclomaticComplexity</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">keywordList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">methodBody</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywordList</span><span class="p">:</span>
+            <span class="n">keywordText</span> <span class="o">=</span> <span class="n">keyword</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;if&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;case&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;for&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;while&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;catch&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;&amp;&amp;&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;||&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;?&quot;</span> <span class="ow">or</span> \
+                    <span class="n">keywordText</span> <span class="o">==</span> <span class="s2">&quot;foreach&quot;</span><span class="p">:</span>
+                <span class="n">cyclomaticComplexity</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">cyclomaticComplexity</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.getCyclomaticComplexityAllMethods">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.getCyclomaticComplexityAllMethods">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getCyclomaticComplexityAllMethods</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the cyclomatic complexity for all methods in the parse tree.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :return: A dictionary mapping method names to their cyclomatic complexity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span>
+        <span class="n">cyclomaticComplexityPerMethod</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="n">methodBodyList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">MethodBodyContext</span><span class="p">)</span>
+        <span class="n">methodBodyList</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seekAllNodes</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">ConstructorBodyContext</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">methodBody</span> <span class="ow">in</span> <span class="n">methodBodyList</span><span class="p">:</span>
+            <span class="n">cyclomaticComplexityPerMethod</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">getMethodNameForNode</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">methodBody</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCyclomaticComplexity</span><span class="p">(</span><span class="n">methodBody</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cyclomaticComplexityPerMethod</span></div>
+
+
+<div class="viewcode-block" id="JavaParse.tree2DOT">
+<a class="viewcode-back" href="../../api.html#littledarwin.JavaParse.JavaParse.tree2DOT">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tree2DOT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a parse tree to a DOT representation for visualization with Graphviz.</span>
+<span class="sd">        :param tree: The root of the parse tree.</span>
+<span class="sd">        :return: A Graphviz Digraph object, or None if Graphviz is not installed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">noGraphviz</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">JavaParser</span><span class="o">.</span><span class="n">CompilationUnitContext</span><span class="p">)</span>
+
+        <span class="n">nodeStack</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="n">nodeStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodeStack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">nodeStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">getChildCount</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">nodeStack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="n">childID</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">child</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)</span>
+                    <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">childID</span><span class="p">)</span>
+                    <span class="n">parent</span><span class="p">[</span><span class="n">childID</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">TerminalNodeImpl</span><span class="p">):</span>
+                <span class="n">tokenID</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2"> &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)</span>
+                <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tokenID</span><span class="p">)</span>
+                <span class="n">parent</span><span class="p">[</span><span class="n">tokenID</span><span class="p">]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">nodeIndex</span><span class="p">)</span>
+
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">graphviz</span><span class="o">.</span><span class="n">Digraph</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="n">parent</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">node</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">graph</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;img/tree&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ali Parsai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

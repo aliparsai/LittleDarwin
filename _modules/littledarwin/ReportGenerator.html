@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>littledarwin.ReportGenerator &mdash; LittleDarwin 0.10.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=058d9255"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            LittleDarwin
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">LittleDarwin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">littledarwin.ReportGenerator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for littledarwin.ReportGenerator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shelve</span>
+
+
+<div class="viewcode-block" id="ReportGenerator">
+<a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReportGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">littleDarwinVersion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ldVersion</span> <span class="o">=</span> <span class="n">littleDarwinVersion</span>
+
+<div class="viewcode-block" id="ReportGenerator.initiateDatabase">
+<a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.initiateDatabase">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initiateDatabase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">databasePath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param databasePath:</span>
+<span class="sd">        :type databasePath:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">shelve</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">databasePath</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReportGenerator.generateHTMLFinalReport">
+<a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.generateHTMLFinalReport">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generateHTMLFinalReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resultData</span><span class="p">,</span> <span class="n">reportPath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param resultData:</span>
+<span class="sd">        :type resultData:</span>
+<span class="sd">        :param reportPath:</span>
+<span class="sd">        :type reportPath:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reportBeginning</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;LittleDarwin Mutation Coverage Report&lt;/title&gt;</span>
+<span class="s2">             &lt;style type=&#39;text/css&#39;&gt; body { font-family: &quot;Carlito&quot;, &quot;Calibri&quot;, &quot;Helvetica Neue&quot;, sans-serif; } </span>
+<span class="s2">             table { border-collapse: collapse; } th, td { text-align: left; padding: 1em; }</span>
+<span class="s2">             th { background-color: #f0f0f0; color: black; } tr:hover { background-color: #b2daf5; } </span>
+<span class="s2">             a:link, a:visited { color: black; text-decoration: none; display: inline-block; } </span>
+<span class="s2">             a:hover, a:active { font-weight: bold; } .coverage_bar { display: inline-block; border-radius: 0.3em; </span>
+<span class="s2">             height: 1.1em; width: 9em; background: #ff8482; margin: 0 5px; vertical-align: middle; </span>
+<span class="s2">             border: 1px solid #888; position: relative } .coverage_complete { display: inline-block; </span>
+<span class="s2">             border-radius: 0.3em; height: 100%; background: #acff8b; float: left } </span>
+<span class="s2">             .coverage_legend { position: absolute; height: 100%; width: 100%; left: 0; top: 0; text-align: center }</span>
+<span class="s2">             &lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;LittleDarwin Mutation Coverage Report&lt;/h1&gt;</span>
+<span class="s2">             &lt;h2&gt;Project Summary&lt;/h2&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Number of Files&lt;/th&gt;</span>
+<span class="s2">             &lt;th colspan=2&gt;Mutation Coverage&lt;/th&gt;&lt;/tr&gt; &lt;/thead&gt; &lt;tbody&gt;&quot;&quot;&quot;</span>
+
+        <span class="n">reportMiddle</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;/tbody&gt;&lt;/table&gt;&lt;h2&gt;Breakdown by File&lt;/h2&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;</span>
+<span class="s2">                          &lt;th colspan=2 &gt;Mutation Coverage&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&quot;&quot;&quot;</span>
+
+        <span class="n">reportEnd</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;/tbody&gt;&lt;/table&gt;&lt;footer&gt;&lt;p style=&quot;font-size: small&quot;&gt;Report generated by LittleDarwin </span><span class="si">{}</span><span class="s2"> &lt;/p&gt;</span>
+<span class="s2">                       &lt;/footer&gt;&lt;/body&gt;&lt;/html&gt;&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ldVersion</span><span class="p">)</span>
+
+        <span class="n">totalMutantCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">survivedMutantCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">breakdownFile</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">mutationResult</span> <span class="ow">in</span> <span class="n">resultData</span><span class="p">:</span>
+            <span class="n">survivedMutantCount</span> <span class="o">+=</span> <span class="n">mutationResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">totalMutantCount</span> <span class="o">+=</span> <span class="n">mutationResult</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">breakdownFile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;tr&gt;&lt;td&gt;&lt;a href=</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">mutationResult</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;index.html&quot;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2"> &gt;&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">mutationResult</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/a&gt;&lt;/td&gt; &lt;td&gt; &quot;</span> <span class="o">+</span>
+                                 <span class="p">(</span><span class="s2">&quot;</span><span class="si">{:3.1f}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)))</span>
+                         <span class="o">+</span> <span class="s2">&quot; &lt;/td&gt; &lt;td&gt; &lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_bar</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_complete</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">width:&quot;</span> <span class="o">+</span>
+                         <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)))</span>
+                         <span class="o">+</span> <span class="s2">&quot;%</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;/div&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_legend</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">mutationResult</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                         <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mutationResult</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">)</span>
+
+        <span class="n">killedMutantCount</span> <span class="o">=</span> <span class="n">totalMutantCount</span> <span class="o">-</span> <span class="n">survivedMutantCount</span>
+
+        <span class="n">projectOverallStats</span> <span class="o">=</span> <span class="s2">&quot;&lt;tr&gt;&lt;td&gt;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resultData</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &lt;/td&gt; &lt;td&gt; &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%3.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span>
+                              <span class="n">killedMutantCount</span><span class="p">)</span> <span class="o">/</span> <span class="n">totalMutantCount</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> \
+                              <span class="o">+</span> <span class="s2">&quot; &lt;/td&gt; &lt;td&gt; &lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_bar</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_complete</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">width:&quot;</span>\
+                              <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">killedMutantCount</span><span class="p">)</span> <span class="o">/</span> <span class="n">totalMutantCount</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> \
+                              <span class="o">+</span> <span class="s2">&quot;%</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;/div&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_legend</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">killedMutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> \
+                              <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">totalMutantCount</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&quot;</span>
+
+        <span class="n">reportOutput</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">reportBeginning</span><span class="p">,</span> <span class="n">projectOverallStats</span><span class="p">,</span> <span class="n">reportMiddle</span><span class="p">])</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">breakdownFile</span><span class="p">)</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reportEnd</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reportOutput</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ReportGenerator.generateHTMLReportPerFile">
+<a class="viewcode-back" href="../../api.html#littledarwin.ReportGenerator.ReportGenerator.generateHTMLReportPerFile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generateHTMLReportPerFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="p">,</span> <span class="n">reportPath</span><span class="p">,</span> <span class="n">survived</span><span class="p">,</span> <span class="n">killed</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param filePath:</span>
+<span class="sd">        :type filePath:</span>
+<span class="sd">        :param reportPath:</span>
+<span class="sd">        :type reportPath:</span>
+<span class="sd">        :param survived:</span>
+<span class="sd">        :type survived:</span>
+<span class="sd">        :param killed:</span>
+<span class="sd">        :type killed:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">xstr</span><span class="p">(</span><span class="n">inputVar</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">            :param inputVar:</span>
+<span class="sd">            :type inputVar:</span>
+<span class="sd">            :return:</span>
+<span class="sd">            :rtype:</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">inputVar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">inputVar</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">[</span><span class="n">filePath</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">survived</span><span class="p">,</span> <span class="n">killed</span><span class="p">)</span>
+
+        <span class="n">reportBeginning</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;LittleDarwin Mutation Coverage Report&lt;/title&gt;</span>
+<span class="s2">             &lt;style type=&#39;text/css&#39;&gt; body { font-family: &quot;Carlito&quot;, &quot;Calibri&quot;, &quot;Helvetica Neue&quot;, sans-serif; } </span>
+<span class="s2">             table { border-collapse: collapse; } th, td { text-align: left; padding: 1em; }</span>
+<span class="s2">             th { background-color: #f0f0f0; color: black; } tr:hover { background-color: #b2daf5; } </span>
+<span class="s2">             a:link, a:visited { color: black; text-decoration: none; display: inline-block; } </span>
+<span class="s2">             a:hover, a:active { font-weight: bold; } .coverage_bar { display: inline-block; border-radius: 0.3em; </span>
+<span class="s2">             height: 1.1em; width: 9em; background: #ff8482; margin: 0 5px; vertical-align: middle; </span>
+<span class="s2">             border: 1px solid #888; position: relative } .coverage_complete { display: inline-block; </span>
+<span class="s2">             border-radius: 0.3em; height: 100%; background: #acff8b; float: left } </span>
+<span class="s2">             .coverage_legend { position: absolute; height: 100%; width: 100%; left: 0; top: 0; text-align: center }</span>
+<span class="s2">             &lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;LittleDarwin Mutation Coverage Report&lt;/h1&gt;&lt;h2&gt;File Summary&lt;/h2&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;</span>
+<span class="s2">             &lt;th&gt;Number of Mutants&lt;/th&gt;&lt;th&gt;Mutation Coverage&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&quot;&quot;&quot;</span>
+
+        <span class="n">reportMiddle</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;tr&gt;&lt;td colspan=2 style=&quot;text-align:center&quot;&gt;&lt;a href=&quot;aggregate.html&quot;&gt;Aggregate Report&lt;/a&gt;&lt;/td&gt;</span>
+<span class="s2">                          &lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;h2&gt;Detailed List&lt;/h2&gt;&lt;br&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Survived Mutant&lt;/th&gt;</span>
+<span class="s2">                          &lt;th&gt;Build Output&lt;/th&gt;&lt;th&gt;Killed Mutant&lt;/th&gt;&lt;th&gt;Build Output&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&quot;&quot;&quot;</span>
+
+        <span class="n">reportEnd</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;/tbody&gt;&lt;/table&gt;&lt;footer&gt;&lt;p style=&quot;font-size: small&quot;&gt;Report generated by LittleDarwin </span><span class="si">%s</span><span class="s2"> &lt;/p&gt;</span>
+<span class="s2">                               &lt;/footer&gt;&lt;/body&gt;&lt;/html&gt;&quot;&quot;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ldVersion</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">joinedList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">):</span>
+            <span class="n">maxIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">maxIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">survived</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">killed</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxIndex</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">survivedItem</span> <span class="o">=</span> <span class="n">survived</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">survivedItem</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">killedItem</span> <span class="o">=</span> <span class="n">killed</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">killedItem</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">joinedList</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">survivedItem</span><span class="p">),</span>
+                                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="k">if</span> <span class="n">survivedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">survivedItem</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">survivedItem</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">),</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="k">if</span> <span class="n">survivedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">survivedItem</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span> <span class="k">if</span> <span class="n">survivedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">killedItem</span><span class="p">),</span>
+                                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="k">if</span> <span class="n">killedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">killedItem</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">killedItem</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">),</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">reportPath</span><span class="p">))</span> <span class="k">if</span> <span class="n">killedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">killedItem</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span> <span class="k">if</span> <span class="n">killedItem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">])</span>
+
+        <span class="n">fileOverallStats</span> <span class="o">=</span> <span class="s2">&quot;&lt;tr&gt;&lt;td&gt;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; &lt;/td&gt; &lt;td&gt; &quot;</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">{:3.1f}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">killed</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;  &lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_bar</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_complete</span><span class="se">\&quot;</span><span class="s2"> style=</span><span class="se">\&quot;</span><span class="s2">width:&quot;</span> <span class="o">+</span> <span class="p">(</span>
+                                   <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span>
+                               <span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;%</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;/div&gt;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">coverage_legend</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                               <span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">killed</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">survived</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;&lt;/div&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&quot;</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">joinedList</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;&lt;tr&gt;&lt;td&gt;&lt;a href=</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&lt;/a&gt;&lt;/td&gt; &lt;td&gt;&lt;a href=</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span>
+                    <span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span>
+                    <span class="n">item</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&gt;&quot;</span> <span class="o">+</span> <span class="n">xstr</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">)</span>
+
+        <span class="n">reportOutput</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">reportBeginning</span><span class="p">,</span> <span class="n">fileOverallStats</span><span class="p">,</span> <span class="n">reportMiddle</span><span class="p">])</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">reportOutput</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reportEnd</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reportOutput</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ali Parsai.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
