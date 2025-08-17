@@ -959,76 +959,113 @@ class Test
 }
  """
         cls.java9SourceCode = """
-package open.module.module;
+    public interface Java9Interface {
+        private void p() {}
+        static void s() {}
+        default void d() {
+            p();
+            s();
+        }
+    }
+    """
 
-import java.module.moduleTest;
-import java.open.openTest;
+        cls.java10SourceCode = """
+    import java.util.ArrayList;
 
+    public class Java10 {
+        public void test() {
+            var list = new ArrayList<String>();
+            list.add("test");
+        }
+    }
+    """
 
-module com.example.foo {
- requires com.example.foo.http;
- requires java.logging;
- requires transitive com.example.foo.network;
- exports com.example.foo.bar;
- exports com.example.foo.internal to com.example.foo.probe;
- opens com.example.foo.quux;
- opens com.example.foo.internal to com.example.foo.network,
- com.example.foo.probe;
- uses com.example.foo.spi.Intf;
- provides com.example.foo.spi.Intf with com.example.foo.Impl;
-}
+        cls.java11SourceCode = """
+    import java.util.function.BiConsumer;
 
+    public class Java11 {
+        public void test() {
+            BiConsumer<String, String> consumer = (var s1, var s2) -> System.out.println(s1 + s2);
+        }
+    }
+    """
 
-public class HelloWorld { 
-   public static void main(String[] args) { 
-      System.out.println("Hello, World");
-   }
-}
+        cls.java12SourceCode = """
+        class Java12 {
+            public void test(int day) {
+                var s = switch (day) {
+                    case 1 -> "Monday";
+                    case 2 -> "Tuesday";
+                    default -> "Other";
+                };
+            }
+        }
+        """
 
+        cls.java13SourceCode = """
+        class Java13 {
+            public void test(int day) {
+                var s = switch (day) {
+                    case 1:
+                        yield "Monday";
+                    case 2:
+                        yield "Tuesday";
+                    default:
+                        yield "Other";
+                };
+            }
+        }
+        """
 
-class module {
- java.module.moduleTest module(){
-  return module();
- }
-}
-class open {
- java.module.moduleTest module(){
-  return module();
- }
-}
+        cls.java14SourceCode = """
+        record Point(int x, int y) {}
 
-public class to {
- to with = null;
-  public to to() {
-   return with.to();
-  }
-  public to to() {
-   to exports = null;
-   to provides = null;
-   to requires = null;
-   to uses = null;
-   return to();
-  }
+        class Java14 {
+            public void test(Object obj) {
+                if (obj instanceof Point p) {
+                    System.out.println(p.x());
+                }
+            }
+        }
+        """
 
-}
+        cls.java15SourceCode = """
+        sealed class Shape permits Circle, Square {
+        }
 
-public class TryWithResourceDemo implements AutoCloseable{
- public static void main(String[] args){
-  TryWithResourceDemo demo=new TryWithResourceDemo();
-  try(demo){demo.doSomething();}
-  /* Prior to Java 9, you should write something like
-   try(TryWithResourceDemo demo=new TryWithResourceDemo()){demo.doSomething();}
-  */
- }
- public void doSomething(){
-  System.out.println("Hello world!");
- }
- @Override
- public void close(){
-  System.out.println("I am going to be closed");
- }
-}
-"""
+        final class Circle extends Shape {
+        }
+
+        final class Square extends Shape {
+        }
+        """
+
+        cls.java16SourceCode = """
+        record Point(int x, int y) {}
+
+        class Java16 {
+            public void test(Object obj) {
+                if (obj instanceof Point p) {
+                    System.out.println(p.x());
+                }
+            }
+        }
+        """
+
+        cls.java17SourceCode = """
+        sealed class Shape permits Circle, Square {}
+        final class Circle extends Shape {}
+        final class Square extends Shape {}
+
+        class Java17 {
+            public void test(Shape s) {
+                switch (s) {
+                    case Circle c -> System.out.println("Circle");
+                    case Square sq -> System.out.println("Square");
+                }
+            }
+        }
+        """
 
         cls.issue13Code = """
 package x;
@@ -1064,8 +1101,44 @@ public class SyntaxError {
         parsedTree = self.javaParse.parse(self.methodTypesSourceCode)
         self.assertIsNotNone(parsedTree)
 
-    # def test_parseJava9(self):
-    #     parsedTree = self.javaParse.parse(self.java9SourceCode)
+    def test_parseJava9(self):
+        parsedTree = self.javaParse.parse(self.java9SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava10(self):
+        parsedTree = self.javaParse.parse(self.java10SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava11(self):
+        parsedTree = self.javaParse.parse(self.java11SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava12(self):
+        parsedTree = self.javaParse.parse(self.java12SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava13(self):
+        parsedTree = self.javaParse.parse(self.java13SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava14(self):
+        parsedTree = self.javaParse.parse(self.java14SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava15(self):
+        parsedTree = self.javaParse.parse(self.java15SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava16(self):
+        parsedTree = self.javaParse.parse(self.java16SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseJava17(self):
+        parsedTree = self.javaParse.parse(self.java17SourceCode)
+        self.assertIsNotNone(parsedTree)
+
+    def test_parseUnderscore(self):
+        self.assertRaises(ParseCancellationException, self.javaParse.parse, "int _ = 0;")
 
     ## Too slow
     # def test_parseManyStrings(self):
