@@ -7,15 +7,17 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
 
+from littledarwin import __version__, __author__
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'LittleDarwin'
-copyright = '2025, Ali Parsai'
-author = 'Ali Parsai'
+project = "LittleDarwin"
+copyright = "2025, Ali Parsai. All rights reserved."
+author = __author__
 
-version = '0.10.9'
-release = '0.10.9'
+version = __version__
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
