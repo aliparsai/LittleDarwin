@@ -14,20 +14,32 @@ sys.setrecursionlimit(100000)
 
 class Mutation(object):
     """
-    Defines a single mutation.
+    This class represents a single mutation, which is a change to a small
+    section of the source code. It contains information about the location of
+    the mutation, the type of mutator used, and the text to replace the
+    original code with.
     """
 
     def __init__(self, startPos: int, endPos: int, lineNumber: int, nodeID: int, mutatorType: str,
                  replacementText: str, color: str = "#FFFFFF"):
         """
         Initializes a Mutation object.
-        :param startPos: The starting position of the mutation in the source code.
+
+        :param startPos: The starting position of the mutation in the source
+                         code.
+        :type startPos: int
         :param endPos: The ending position of the mutation in the source code.
+        :type endPos: int
         :param lineNumber: The line number of the mutation.
+        :type lineNumber: int
         :param nodeID: The ID of the node being mutated.
+        :type nodeID: int
         :param mutatorType: The type of mutator being used.
+        :type mutatorType: str
         :param replacementText: The text to replace the original code with.
+        :type replacementText: str
         :param color: The color to use for highlighting the mutation.
+        :type color: str
         """
         assert endPos >= startPos
 
@@ -48,9 +60,15 @@ class Mutation(object):
     def applyMutation(self, sourceCode: str, byteOffset: int = 0) -> str:
         """
         Applies the mutation to the given source code.
+
         :param sourceCode: The source code to apply the mutation to.
-        :param byteOffset: The byte offset to apply to the start and end positions.
+        :type sourceCode: str
+        :param byteOffset: The byte offset to apply to the start and end
+                           positions. This is used when applying multiple
+                           mutations to the same file.
+        :type byteOffset: int
         :return: The mutated source code.
+        :rtype: str
         """
         return sourceCode[:self.startPos + byteOffset] + self.replacementText + sourceCode[
                                                                                 self.endPos + byteOffset + 1:]
@@ -58,9 +76,13 @@ class Mutation(object):
     def isInRange(self, start, end):
         """
         Checks if the mutation is within the given range.
+
         :param start: The start of the range.
+        :type start: int
         :param end: The end of the range.
+        :type end: int
         :return: True if the mutation is within the range, False otherwise.
+        :rtype: bool
         """
         return end >= self.startPos >= start
 
@@ -77,15 +99,22 @@ class Mutation(object):
 
 class Mutant(object):
     """
-    Defines a mutant consisting of one or several mutations.
+    This class represents a mutant, which is a version of the source code
+    that has been modified by one or more mutations. It contains a list of
+    mutations and the original source code, and it can be used to generate
+    the mutated source code.
     """
 
     def __init__(self, mutantID: int, mutationList: List[Mutation], sourceCode: str):
         """
         Initializes a Mutant object.
-        :param mutantID: the ID of mutant
-        :param mutationList: The list containing all Mutation objects
-        :param sourceCode: The source code for the current file
+
+        :param mutantID: The ID of the mutant.
+        :type mutantID: int
+        :param mutationList: The list of mutations to apply.
+        :type mutationList: list
+        :param sourceCode: The original source code.
+        :type sourceCode: str
         """
         self.mutantID = mutantID
         self.sourceCode = sourceCode
@@ -99,9 +128,14 @@ class Mutant(object):
     def getLine(self, lineNumber: int, code: str = None) -> str:
         """
         Gets a specific line from the source code.
+
         :param lineNumber: The line number to get.
-        :param code: The code to get the line from. If None, the original source code is used.
+        :type lineNumber: int
+        :param code: The code to get the line from. If None, the original
+                     source code is used.
+        :type code: str, optional
         :return: The specified line of code.
+        :rtype: str
         """
         if code is None:
             code = self.sourceCode
@@ -110,7 +144,8 @@ class Mutant(object):
 
     def mutateCode(self):
         """
-        Applies the mutations in mutationList to the source code.
+        Applies the mutations in the mutation list to the source code to
+        generate the mutated code.
         """
         code = self.sourceCode
         byteOffsetDict = dict()
@@ -179,7 +214,9 @@ class Mutant(object):
 
 class MutationOperator(object):
     """
-    A base class for all mutation operators.
+    This is a base class for all mutation operators. A mutation operator is a
+    class that knows how to find specific nodes in a parse tree and generate
+    mutants from them.
     """
     instantiable = True
     metaTypes = ["Generic"]
@@ -188,10 +225,15 @@ class MutationOperator(object):
                  generateMutants=True):
         """
         Initializes a MutationOperator object.
+
         :param sourceTree: The root of the parse tree.
+        :type sourceTree: antlr4.tree.Tree.ParseTree
         :param sourceCode: The source code to mutate.
+        :type sourceCode: str
         :param javaParseObject: The JavaParse object to use for parsing.
+        :type javaParseObject: littledarwin.JavaParse.JavaParse
         :param generateMutants: A boolean indicating whether to generate mutants.
+        :type generateMutants: bool
         """
         self.sourceTree = sourceTree
         self.sourceCode = sourceCode
@@ -238,7 +280,9 @@ class MutationOperator(object):
 
 class RemoveMethod(MutationOperator):
     """
-    A mutation operator that removes the body of a method and replaces it with a default return value.
+    This mutation operator removes the body of a method and replaces it with a
+    default return value. For example, a method that returns an ``int`` will be
+    replaced with ``return 0;``.
     """
     instantiable = True
     metaTypes = ["Method", "All"]
@@ -362,7 +406,9 @@ class RemoveMethod(MutationOperator):
 
 class RemoveNullCheck(MutationOperator):
     """
-    A mutation operator that removes null checks by replacing them with true or false.
+    This mutation operator removes null checks by replacing them with ``true`` or
+    ``false``. For example, ``if (x != null)`` will be replaced with ``if
+    (true)``.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -430,7 +476,8 @@ class RemoveNullCheck(MutationOperator):
 
 class NullifyObjectInitialization(MutationOperator):
     """
-    A mutation operator that nullifies object initializations.
+    This mutation operator nullifies object initializations by replacing them
+    with ``null``. For example, ``new Foo()`` will be replaced with ``null``.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -498,7 +545,8 @@ class NullifyObjectInitialization(MutationOperator):
 
 class NullifyReturnValue(MutationOperator):
     """
-    A mutation operator that nullifies the return value of a method.
+    This mutation operator nullifies the return value of a method by
+    replacing the return statement with ``return null;``.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -568,7 +616,8 @@ class NullifyReturnValue(MutationOperator):
 
 class NullifyInputVariable(MutationOperator):
     """
-    A mutation operator that nullifies input variables to a method.
+    This mutation operator nullifies input variables to a method by adding a
+    statement at the beginning of the method to set the variable to ``null``.
     """
     instantiable = True
     metaTypes = ["Null", "All"]
@@ -646,13 +695,26 @@ class NullifyInputVariable(MutationOperator):
 
 class TraditionalMutationOperator(MutationOperator):
     """
-    A base class for all traditional mutation operators.
+    A base class for all traditional mutation operators. These operators
+    perform simple mutations, such as replacing one operator with another.
     """
 
     metaTypes = ["Traditional", "All"]
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
                  generateMutants: bool = True):
+        """
+        Initializes a TraditionalMutationOperator object.
+
+        :param sourceTree: The root of the parse tree.
+        :type sourceTree: antlr4.tree.Tree.ParseTree
+        :param sourceCode: The source code to mutate.
+        :type sourceCode: str
+        :param javaParseObject: The JavaParse object to use for parsing.
+        :type javaParseObject: littledarwin.JavaParse.JavaParse
+        :param generateMutants: A boolean indicating whether to generate mutants.
+        :type generateMutants: bool
+        """
         super().__init__(sourceTree, sourceCode, javaParseObject)
         self.mutatorType = "GenericTraditionalMutationOperator"
 
@@ -747,7 +809,8 @@ class TraditionalMutationOperator(MutationOperator):
 
 class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
     """
-    A mutation operator that replaces binary arithmetic operators.
+    This mutation operator replaces binary arithmetic operators. For example,
+    ``+`` is replaced with ``-``.
     """
     instantiable = True
 
@@ -783,7 +846,8 @@ class ArithmeticOperatorReplacementBinary(TraditionalMutationOperator):
 
 class RelationalOperatorReplacement(TraditionalMutationOperator):
     """
-    A mutation operator that replaces relational operators.
+    This mutation operator replaces relational operators. For example, ``>`` is
+    replaced with ``<=``.
     """
     instantiable = True
 
@@ -819,7 +883,8 @@ class RelationalOperatorReplacement(TraditionalMutationOperator):
 
 class ConditionalOperatorReplacement(TraditionalMutationOperator):
     """
-    A mutation operator that replaces conditional operators.
+    This mutation operator replaces conditional operators. For example, ``&&``
+    is replaced with ``||``.
     """
     instantiable = True
 
@@ -854,7 +919,8 @@ class ConditionalOperatorReplacement(TraditionalMutationOperator):
 
 class LogicalOperatorReplacement(TraditionalMutationOperator):
     """
-    A mutation operator that replaces logical operators.
+    This mutation operator replaces logical operators. For example, ``&`` is
+    replaced with ``|``.
     """
     instantiable = True
 
@@ -889,7 +955,8 @@ class LogicalOperatorReplacement(TraditionalMutationOperator):
 
 class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
     """
-    A mutation operator that replaces shortcut assignment operators.
+    This mutation operator replaces shortcut assignment operators. For example,
+    ``+=`` is replaced with ``-=``.
     """
     instantiable = True
 
@@ -927,7 +994,8 @@ class AssignmentOperatorReplacementShortcut(TraditionalMutationOperator):
 
 class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
     """
-    A mutation operator that replaces unary arithmetic operators.
+    This mutation operator replaces unary arithmetic operators. For example, a
+    unary ``+`` is replaced with a unary ``-``.
     """
 
     instantiable = True
@@ -963,7 +1031,8 @@ class ArithmeticOperatorReplacementUnary(TraditionalMutationOperator):
 
 class ConditionalOperatorDeletion(TraditionalMutationOperator):
     """
-    A mutation operator that deletes conditional operators.
+    This mutation operator deletes conditional operators. For example, ``!a``
+    is replaced with ``a``.
     """
     instantiable = True
 
@@ -998,7 +1067,8 @@ class ConditionalOperatorDeletion(TraditionalMutationOperator):
 
 class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
     """
-    A mutation operator that replaces shortcut arithmetic operators.
+    This mutation operator replaces shortcut arithmetic operators. For example,
+    ``++`` is replaced with ``--``.
     """
     instantiable = True
 
@@ -1062,7 +1132,8 @@ class ArithmeticOperatorReplacementShortcut(TraditionalMutationOperator):
 
 class ShiftOperatorReplacement(TraditionalMutationOperator):
     """
-    A mutation operator that replaces shift operators.
+    This mutation operator replaces shift operators. For example, ``<<`` is
+    replaced with ``>>``.
     """
     instantiable = True
 
@@ -1170,17 +1241,24 @@ def getAllInstantiableSubclasses(parentClass):
 
 class JavaMutate(object):
     """
-    Main entry point for mutation of a Java source file.
+    This class is the main entry point for the mutation of a Java source file.
+    It takes a parse tree and the original source code, and then uses a
+    collection of mutation operators to generate a list of mutants.
     """
 
     def __init__(self, sourceTree: JavaParser.CompilationUnitContext, sourceCode: str, javaParseObject: JavaParse,
                  verbose: bool = False):
         """
         Initializes a JavaMutate object.
+
         :param sourceTree: The root of the parse tree.
+        :type sourceTree: antlr4.tree.Tree.ParseTree
         :param sourceCode: The source code to mutate.
+        :type sourceCode: str
         :param javaParseObject: The JavaParse object to use for parsing.
+        :type javaParseObject: littledarwin.JavaParse.JavaParse
         :param verbose: A boolean indicating whether to print verbose output.
+        :type verbose: bool
         """
         self.verbose = verbose
         self.sourceCode = sourceCode
@@ -1203,8 +1281,11 @@ class JavaMutate(object):
     def instantiateMutationOperators(self, metaTypes: List[str] = ["Traditional"], generateMutants: bool = True):
         """
         Instantiates all mutation operators of the specified meta types.
+
         :param metaTypes: A list of meta types to instantiate.
+        :type metaTypes: list
         :param generateMutants: A boolean indicating whether to generate mutants.
+        :type generateMutants: bool
         """
         for MO in getAllInstantiableSubclasses(MutationOperator):
             for metaType in metaTypes:
@@ -1215,8 +1296,12 @@ class JavaMutate(object):
     def countMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
         Counts the number of mutants for each mutation operator type.
-        :param metaTypes: types of mutation operators to use
-        :return: A dictionary mapping mutation operator types to the number of mutants.
+
+        :param metaTypes: The types of mutation operators to use.
+        :type metaTypes: list
+        :return: A dictionary mapping mutation operator types to the number of
+                 mutants.
+        :rtype: dict
         """
         mutationTypeCount = dict()
         self.instantiateMutationOperators(metaTypes, generateMutants=False)
@@ -1240,8 +1325,13 @@ class JavaMutate(object):
     def gatherMutants(self, metaTypes: List[str] = ["Traditional"]):
         """
         Gathers all mutants of the specified meta types.
-        :param metaTypes: types of mutation operators to use
-        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.
+
+        :param metaTypes: The types of mutation operators to use.
+        :type metaTypes: list
+        :return: A tuple containing a list of mutated source code and a
+                 dictionary mapping mutation operator types to the number of
+                 mutants.
+        :rtype: tuple
         """
         mutationTypeCount = dict()
         mutantTexts = list()
@@ -1269,9 +1359,15 @@ class JavaMutate(object):
     def gatherHigherOrderMutants(self, higherOrderDirective: int, metaTypes: List[str] = ["Traditional"]):
         """
         Gathers all mutants and creates higher-order mutants.
-        :param higherOrderDirective: The requested higher-order order
-        :param metaTypes: type of mutation operators to use
-        :return: A tuple containing a list of mutated source code and a dictionary mapping mutation operator types to the number of mutants.
+
+        :param higherOrderDirective: The requested higher-order order.
+        :type higherOrderDirective: int
+        :param metaTypes: The type of mutation operators to use.
+        :type metaTypes: list
+        :return: A tuple containing a list of mutated source code and a
+                 dictionary mapping mutation operator types to the number of
+                 mutants.
+        :rtype: tuple
         """
         selectedMutants = list()
 
@@ -1334,8 +1430,11 @@ class JavaMutate(object):
     def aggregateReport(self, littleDarwinVersion: str):
         """
         Generates an HTML report of all mutations for a file.
-        :param littleDarwinVersion: LittleDarwin Version
-        :return: Aggregate report on all mutations for a file
+
+        :param littleDarwinVersion: The version of LittleDarwin.
+        :type littleDarwinVersion: str
+        :return: An HTML report of all mutations for a file.
+        :rtype: str
         """
         lineNumber = 1
         col = 0

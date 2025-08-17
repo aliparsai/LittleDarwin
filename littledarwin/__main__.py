@@ -9,6 +9,10 @@ import sys
 
 
 def entryPoint():
+    """
+    This function is the entry point for the ``littledarwin`` package when it
+    is run as a module.
+    """
     LittleDarwin.main()
 
 

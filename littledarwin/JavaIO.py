@@ -7,10 +7,18 @@ from typing import Dict, List
 
 class JavaIO(object):
     """
-
+    This class handles all the file I/O operations for LittleDarwin, such as
+    finding Java files, reading their content, and writing the mutated files
+    to disk.
     """
 
     def __init__(self, verbose=False):
+        """
+        Initializes the JavaIO object.
+
+        :param verbose: Whether to print verbose output.
+        :type verbose: bool
+        """
         self.verbose = False
         self.sourceDirectory = None
         self.targetDirectory = None
@@ -18,13 +26,12 @@ class JavaIO(object):
 
     def filterFiles(self, mode="blacklist", filterList=None):
         """
+        Filters the list of files based on a whitelist or blacklist.
 
-        :param mode:
-        :type mode:
-        :param filterList:
-        :type filterList:
-        :return:
-        :rtype:
+        :param mode: The filter mode, either "whitelist" or "blacklist".
+        :type mode: str
+        :param filterList: A list of package names or file paths to filter by.
+        :type filterList: list
         """
         if filterList is None:
             return
@@ -66,17 +73,19 @@ class JavaIO(object):
 
     def listFiles(self, targetPath=None, buildPath=None, filterList=None, filterType="blacklist", desiredType="*.java"):
         """
+        Lists all the files in a directory that match a given type, and
+        optionally filters them.
 
-        :param targetPath:
-        :type targetPath:
-        :param buildPath:
-        :type buildPath:
-        :param filterList:
-        :type filterList:
-        :param filterType:
-        :type filterType:
-        :param desiredType:
-        :type desiredType:
+        :param targetPath: The path to the source files.
+        :type targetPath: str
+        :param buildPath: The path to the build directory.
+        :type buildPath: str
+        :param filterList: A list of package names or file paths to filter by.
+        :type filterList: list
+        :param filterType: The filter mode, either "whitelist" or "blacklist".
+        :type filterType: str
+        :param desiredType: The type of files to list (e.g., "``*.java``").
+        :type desiredType: str
         """
         # print targetPath, desiredType
         self.sourceDirectory = targetPath
@@ -93,11 +102,12 @@ class JavaIO(object):
 
     def getFileContent(self, filePath=None):
         """
+        Reads the content of a file and returns it as a string.
 
-        :param filePath:
-        :type filePath:
-        :return:
-        :rtype:
+        :param filePath: The path to the file.
+        :type filePath: str
+        :return: The content of the file.
+        :rtype: str
         """
         with io.open(filePath, mode='r', errors='replace') as contentFile:
             file_data = contentFile.read()
@@ -108,15 +118,20 @@ class JavaIO(object):
                                      cyclomaticComplexityPerMethod: Dict[str, int],
                                      linesOfCodePerMethod: Dict[str, int]) -> Dict[str, List[int]]:
         """
+        Aggregates complexity metrics for each method in a class.
 
-        :param mutantDensityPerMethod:
-        :type mutantDensityPerMethod:
-        :param cyclomaticComplexityPerMethod:
-        :type cyclomaticComplexityPerMethod:
-        :param linesOfCodePerMethod:
-        :type linesOfCodePerMethod:
-        :return:
-        :rtype:
+        :param mutantDensityPerMethod: A dictionary mapping method names to the
+                                       number of mutants in that method.
+        :type mutantDensityPerMethod: dict
+        :param cyclomaticComplexityPerMethod: A dictionary mapping method names
+                                              to their cyclomatic complexity.
+        :type cyclomaticComplexityPerMethod: dict
+        :param linesOfCodePerMethod: A dictionary mapping method names to their
+                                     lines of code.
+        :type linesOfCodePerMethod: dict
+        :return: A dictionary mapping method names to a list containing the
+                 mutant density, cyclomatic complexity, and lines of code.
+        :rtype: dict
         """
         aggregateReport = dict()
         methodList = set(mutantDensityPerMethod.keys())
@@ -132,19 +147,27 @@ class JavaIO(object):
 
     def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
         """
+        Generates a new file containing a mutant.
 
-        :param originalFile:
-        :type originalFile:
-        :param fileData:
-        :type fileData:
-        :param mutantsPerLine:
-        :type mutantsPerLine:
-        :param densityReport:
-        :type densityReport:
-        :param aggregateComplexity:
-        :type aggregateComplexity:
-        :return:
-        :rtype:
+        This function creates a new directory for the mutated file, copies the
+        original file to that directory, and then writes the mutated code to a
+        new file in that directory. It also writes out a number of reports
+        about the mutation.
+
+        :param originalFile: The path to the original file.
+        :type originalFile: str
+        :param fileData: The content of the mutated file.
+        :type fileData: str
+        :param mutantsPerLine: A dictionary mapping line numbers to the number
+                               of mutants on that line.
+        :type mutantsPerLine: dict
+        :param densityReport: The HTML report of the mutant density.
+        :type densityReport: str
+        :param aggregateComplexity: A dictionary containing the aggregate
+                                    complexity report for the class.
+        :type aggregateComplexity: dict
+        :return: The relative path to the new file.
+        :rtype: str
         """
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
