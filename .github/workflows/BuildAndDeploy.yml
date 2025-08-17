@@ -42,9 +42,20 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF/refs/tags/v}" >> $GITHUB_ENV
 
+      - uses: actions/ch build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Get Version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF/refs/tags/v}" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}   # checkout the tag, not just master
+          ref: ${{ github.ref }}
 
       - name: Set Up Python 3
         uses: actions/setup-python@v5
@@ -62,14 +73,14 @@ jobs:
 
       - name: Package Binary
         run: |
-          mkdir -p binaries/${{ env.VERSION }}/${{ runner.os }}
-          mv ./dist/LittleDarwin* ./binaries/${{ env.VERSION }}/${{ runner.os }}
+          mkdir -p binaries/${{ env.VERSION }}
+          mv ./dist/LittleDarwin* ./binaries/${{ env.VERSION }}/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ runner.os }}
-          path: binaries/
+          path: binaries/${{ env.VERSION }}/
 
   create-pr:
     runs-on: ubuntu-latest
@@ -86,7 +97,8 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: binaries
+          path: binaries/${{ env.VERSION }}
+          merge-multiple: true
 
       - name: Commit Changes
         run: |
