@@ -1,5 +1,6 @@
 import os
-import shelve
+
+from .MutationDatabase import MutationDatabase
 
 
 class ReportGenerator(object):
@@ -25,7 +26,7 @@ class ReportGenerator(object):
         :param databasePath: The path to the results database.
         :type databasePath: str
         """
-        self.database = shelve.open(databasePath, "c")
+        self.database = MutationDatabase(databasePath, "c")
 
     def generateHTMLFinalReport(self, resultData, reportPath):
         """
@@ -122,7 +123,7 @@ class ReportGenerator(object):
             else:
                 return str(inputVar)
 
-        self.database[filePath] = (survived, killed)
+        self.database.set(filePath, (survived, killed))
 
         reportBeginning = """<!DOCTYPE html><html><head><title>LittleDarwin Mutation Coverage Report</title>
              <style type='text/css'> body { font-family: "Carlito", "Calibri", "Helvetica Neue", sans-serif; } 

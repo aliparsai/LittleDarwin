@@ -35,7 +35,6 @@ import datetime
 import io
 import os
 import platform
-import shelve
 import shutil
 import signal
 import subprocess
@@ -49,6 +48,7 @@ from .JavaIO import JavaIO
 from .JavaMutate import JavaMutate
 # LittleDarwin modules
 from .JavaParse import JavaParse
+from .MutationDatabase import MutationDatabase
 from .ReportGenerator import ReportGenerator
 
 ### DEBUG ###
@@ -157,7 +157,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     print("Source Path: ", javaIO.sourceDirectory)
     print("Target Path: ", javaIO.targetDirectory)
     print("Creating Mutation Database: ", databasePath)
-    mutationDatabase = shelve.open(databasePath, "c")
+    mutationDatabase = MutationDatabase(databasePath, "c")
     mutantTypeDatabase = dict()
     averageDensityDict = dict()
 
@@ -222,7 +222,7 @@ def mutationPhase(options, filterType, filterList, higherOrder):
 
         # if the list is not empty (some mutants were found), put the data in the database.
         if len(targetList) != 0:
-            mutationDatabase[fileRelativePath] = targetList
+            mutationDatabase.set(fileRelativePath, targetList)
 
         del javaMutate
 
@@ -297,7 +297,7 @@ def buildPhase(options):
         separateTestSuite = False
     # try to open the database. if it can't be opened, it means that it does not exist or it is corrupt.
     try:
-        mutationDatabase = shelve.open(databasePath, "r")
+        mutationDatabase = MutationDatabase(databasePath, "r")
     except:
         print(
             "Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.")
@@ -354,7 +354,7 @@ def buildPhase(options):
     totalMutantCount = 0
     totalMutantCounter = 0
     for key in databaseKeys:
-        totalMutantCount += len(mutationDatabase[key])
+        totalMutantCount += len(mutationDatabase.get(key))
     startTime = time.time()
     # running the build system for each mutant.
     for key in databaseKeys:
@@ -363,14 +363,14 @@ def buildPhase(options):
 
         print("(" + str(fileCounter) + "/" + str(mutationDatabaseLength) + ") collecting results for ", key)
 
-        mutantCount = len(mutationDatabase[key])
+        mutantCount = len(mutationDatabase.get(key))
         mutantCounter = 0
 
         successList = list()
         failureList = list()
 
         # for each mutant, replace the original file, run the build, store the results
-        for replacementFileRel in mutationDatabase[key]:
+        for replacementFileRel in mutationDatabase.get(key):
             replacementFile = os.path.abspath(os.path.join(mutantsPath, replacementFileRel))
             mutantCounter += 1
             totalMutantCounter += 1
@@ -481,6 +481,10 @@ def buildPhase(options):
     targetHTMLReportFile = os.path.abspath(os.path.join(mutantsPath, "index.html"))
     with open(targetHTMLReportFile, 'w', encoding="utf-8") as htmlReportFile:
         htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
+
+    # close the databases so their files are released (important on Windows before cleanup).
+    mutationDatabase.close()
+    reportGenerator.database.close()
 
 
 def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
