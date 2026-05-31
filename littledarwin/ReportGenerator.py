@@ -1,7 +1,5 @@
 import os
 
-from .MutationDatabase import MutationDatabase
-
 
 class ReportGenerator(object):
     """
@@ -16,17 +14,7 @@ class ReportGenerator(object):
         :param littleDarwinVersion: The version of LittleDarwin.
         :type littleDarwinVersion: str
         """
-        self.database = None
         self.ldVersion = littleDarwinVersion
-
-    def initiateDatabase(self, databasePath):
-        """
-        Initiates the results database.
-
-        :param databasePath: The path to the results database.
-        :type databasePath: str
-        """
-        self.database = MutationDatabase(databasePath, "c")
 
     def generateHTMLFinalReport(self, resultData, reportPath):
         """
@@ -122,8 +110,6 @@ class ReportGenerator(object):
                 return ''
             else:
                 return str(inputVar)
-
-        self.database.set(filePath, (survived, killed))
 
         reportBeginning = """<!DOCTYPE html><html><head><title>LittleDarwin Mutation Coverage Report</title>
              <style type='text/css'> body { font-family: "Carlito", "Calibri", "Helvetica Neue", sans-serif; } 
