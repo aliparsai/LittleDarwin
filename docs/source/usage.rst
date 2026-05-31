@@ -90,7 +90,10 @@ Here is a list of the available command-line options:
 
 .. option:: --use-alternate-database <path>
 
-    Path to alternative database.
+    Path to a previously generated mutation database (SQLite). Useful for
+    running the build phase against a database produced by a different
+    mutation run, or pointing external tooling at the relational schema
+    (see ``MutationDatabase`` for the table layout).
 
 .. option:: --license
 

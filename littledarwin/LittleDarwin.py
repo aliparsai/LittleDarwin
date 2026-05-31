@@ -35,7 +35,6 @@ import datetime
 import io
 import os
 import platform
-import shelve
 import shutil
 import signal
 import subprocess
@@ -49,6 +48,7 @@ from .JavaIO import JavaIO
 from .JavaMutate import JavaMutate
 # LittleDarwin modules
 from .JavaParse import JavaParse
+from .MutationDatabase import MutationDatabase
 from .ReportGenerator import ReportGenerator
 
 ### DEBUG ###
@@ -123,8 +123,11 @@ def mutationPhase(options, filterType, filterList, higherOrder):
     """
     Performs the mutation phase of LittleDarwin.
 
-    This function finds all the Java files in the source directory,
-    parses them, generates mutants, and stores them in a database.
+    Finds all the Java files in the source directory, parses them, generates
+    mutants on disk, and records each mutant in the relational
+    ``MutationDatabase`` (SQLite). Per-line mutant density and per-method
+    complexity are written to the same database alongside the existing
+    side-car CSV files.
 
     :param options: The command-line options.
     :type options: optparse.Values
@@ -150,21 +153,20 @@ def mutationPhase(options, filterType, filterList, higherOrder):
                      filterType=filterType, filterList=filterList)
     fileCounter = 0
     fileCount = len(javaIO.fileList)
-    # creating a database for generated mutants. the format of this database is different on different platforms,
-    # so it cannot be simply copied from a platform to another.
+    # creating a single SQLite database for the whole run. relational schema (see MutationDatabase),
+    # so it's portable across platforms and queryable with any SQL client.
     databasePath = os.path.join(javaIO.targetDirectory, "mutationdatabase")
     densityResultsPath = os.path.join(javaIO.targetDirectory, "ProjectDensityReport.csv")
     print("Source Path: ", javaIO.sourceDirectory)
     print("Target Path: ", javaIO.targetDirectory)
     print("Creating Mutation Database: ", databasePath)
-    mutationDatabase = shelve.open(databasePath, "c")
+    mutationDatabase = MutationDatabase(databasePath, "n")
     mutantTypeDatabase = dict()
     averageDensityDict = dict()
 
     # go through each file, parse it, calculate all mutations, and generate files accordingly.
     for srcFile in javaIO.fileList:
         print("\n(" + str(fileCounter + 1) + "/" + str(fileCount) + ") Source file: ", srcFile)
-        targetList = list()
 
         try:
             # parsing the source file into a tree.
@@ -216,13 +218,20 @@ def mutationPhase(options, filterType, filterList, higherOrder):
                                                                   javaParse.getCyclomaticComplexityAllMethods(tree),
                                                                   javaParse.getLinesOfCodePerMethod(tree))
 
+        mutantIndex = 0
         for mutatedFile in mutated:
-            targetList.append(javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine,
-                                                     densityReport, aggregateComplexity))
+            mutantIndex += 1
+            mutantRelPath = javaIO.generateNewFile(srcFile, mutatedFile, javaMutate.mutantsPerLine,
+                                                   densityReport, aggregateComplexity)
+            mutationDatabase.add_mutant(fileRelativePath, mutantIndex, mutantRelPath)
 
-        # if the list is not empty (some mutants were found), put the data in the database.
-        if len(targetList) != 0:
-            mutationDatabase[fileRelativePath] = targetList
+        # mirror the per-file density/complexity side-car CSVs into the DB so the SQLite file is
+        # a self-contained artifact of the run.
+        if len(mutated) != 0:
+            mutationDatabase.record_line_densities(fileRelativePath, javaMutate.mutantsPerLine.items())
+            mutationDatabase.record_method_complexities(
+                fileRelativePath,
+                [(name, vals[0], vals[1], vals[2]) for name, vals in aggregateComplexity.items()])
 
         del javaMutate
 
@@ -245,10 +254,11 @@ def buildPhase(options):
     """
     Performs the build phase of LittleDarwin.
 
-    This function iterates through the mutants in the database, and for each
-    mutant, it replaces the original file with the mutant, runs the build
-    command, and records whether the build succeeded or failed. It then
-    generates a report of the results.
+    Iterates through the mutants stored in the relational ``MutationDatabase``
+    and, for each one, replaces the original source file with the mutant,
+    runs the build command, and updates the mutant's ``build_status`` to
+    ``survived`` or ``killed`` directly in the database. Then generates the
+    HTML/text reports of the results.
 
     :param options: The command-line options.
     :type options: optparse.Values
@@ -264,8 +274,6 @@ def buildPhase(options):
         databasePath = options.alternateDb
     mutantsPath = os.path.dirname(databasePath)
     assert os.path.isdir(mutantsPath)
-    resultsDatabasePath = databasePath + "-results"
-    reportGenerator.initiateDatabase(resultsDatabasePath)
     try:
         if os.path.basename(options.buildPath) == "pom.xml":
             assert os.path.isfile(options.buildPath)
@@ -295,14 +303,18 @@ def buildPhase(options):
 
     else:
         separateTestSuite = False
-    # try to open the database. if it can't be opened, it means that it does not exist or it is corrupt.
-    try:
-        mutationDatabase = shelve.open(databasePath, "r")
-    except:
+    # open the database read/write so we can record build results. fail loudly if it isn't there.
+    if not os.path.exists(databasePath):
         print(
             "Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.")
         sys.exit(2)
-    databaseKeys = list(mutationDatabase.keys())
+    try:
+        mutationDatabase = MutationDatabase(databasePath, "c")
+    except Exception:
+        print(
+            "Cannot open mutation database. It may be corrupted or unavailable. Delete all generated files and run the mutant generation phase again.")
+        sys.exit(2)
+    databaseKeys = list(mutationDatabase.source_paths())
     assert isinstance(databaseKeys, list)
     # let's sort the mutants by name to create the possibility of following the flow of the process by user.
     databaseKeys.sort()
@@ -354,7 +366,7 @@ def buildPhase(options):
     totalMutantCount = 0
     totalMutantCounter = 0
     for key in databaseKeys:
-        totalMutantCount += len(mutationDatabase[key])
+        totalMutantCount += mutationDatabase.mutant_count_for(key)
     startTime = time.time()
     # running the build system for each mutant.
     for key in databaseKeys:
@@ -363,14 +375,15 @@ def buildPhase(options):
 
         print("(" + str(fileCounter) + "/" + str(mutationDatabaseLength) + ") collecting results for ", key)
 
-        mutantCount = len(mutationDatabase[key])
+        mutantsForKey = mutationDatabase.mutants_for(key)
+        mutantCount = len(mutantsForKey)
         mutantCounter = 0
 
         successList = list()
         failureList = list()
 
         # for each mutant, replace the original file, run the build, store the results
-        for replacementFileRel in mutationDatabase[key]:
+        for replacementFileRel in mutantsForKey:
             replacementFile = os.path.abspath(os.path.join(mutantsPath, replacementFileRel))
             mutantCounter += 1
             totalMutantCounter += 1
@@ -419,6 +432,7 @@ def buildPhase(options):
                 # if we are here, it means no exceptions happened, so let's add this to our success list.
                 runOutput = f"{runOutput}\n{runOutputTest}"
                 successList.append(os.path.basename(replacementFile))
+                mutationDatabase.record_result(replacementFileRel, "survived")
 
             # putting two exceptions in one except clause, specially when one of them is not defined on some
             # platforms does not look like a good idea; even though both of them do exactly the same thing.
@@ -426,6 +440,7 @@ def buildPhase(options):
                 runOutput = str(exception.output) if exception.output else ""
                 # oops, error. let's add this to failure list.
                 failureList.append(os.path.basename(replacementFile))
+                mutationDatabase.record_result(replacementFileRel, "killed")
 
             # except subprocess.TimeoutExpired as exception:
             #     runOutput = exception.output
@@ -481,6 +496,9 @@ def buildPhase(options):
     targetHTMLReportFile = os.path.abspath(os.path.join(mutantsPath, "index.html"))
     with open(targetHTMLReportFile, 'w', encoding="utf-8") as htmlReportFile:
         htmlReportFile.writelines(reportGenerator.generateHTMLFinalReport(htmlReportData, targetHTMLReportFile))
+
+    # close the database so its file is released (important on Windows before cleanup).
+    mutationDatabase.close()
 
 
 def parseCmdArgs(optionParser: OptionParser, mockArgs: list = None) -> object:
