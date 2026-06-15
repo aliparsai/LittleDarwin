@@ -133,7 +133,7 @@ class JavaIO(object):
 
         return aggregateReport
 
-    def generateNewFile(self, originalFile=None, fileData=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
+    def generateNewFile(self, originalFile=None, mutatedFile=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
         """
 
         :param originalFile:
@@ -179,13 +179,12 @@ class JavaIO(object):
                 with open(densityReportFile, 'w', encoding="utf-8") as densityFileHandle:
                     densityFileHandle.write(densityReport)
 
-        counter = 1
-        while os.path.isfile(os.path.join(targetDir, str(counter) + ".java")):
-            counter += 1
-
-        targetFile = os.path.abspath(os.path.join(targetDir, str(counter) + ".java"))
-        with open(targetFile, 'w', encoding="utf-8") as contentFile:
-            contentFile.write(fileData)
+        targetFile = os.path.abspath(
+            os.path.join(targetDir, str(mutatedFile.mutantID) + ".java")
+        )
+        with open(targetFile, "w") as contentFile:
+            contentFile.write(mutatedFile.mutatedCode +
+                              "\n" + mutatedFile.stub)
 
         if self.verbose:
             print("--> generated file: ", targetFile)
