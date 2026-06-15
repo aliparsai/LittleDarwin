@@ -1,3 +1,4 @@
+"""I/O utilities for Java source discovery, reading, and writing."""
 import fnmatch
 import io
 import os
@@ -6,12 +7,10 @@ from typing import Dict, List
 
 
 class JavaIO(object):
-    """
-
-    """
+    """ """
 
     def __init__(self, verbose=False):
-        self.verbose = False
+        self.verbose = verbose
         self.sourceDirectory = None
         self.targetDirectory = None
         self.fileList = list()
