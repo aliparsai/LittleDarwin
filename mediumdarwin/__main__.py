@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
 """
-__main__ script for mediumdarwin package
+__main__ script for littledarwin package
 """
 
-from mediumdarwin import LittleDarwin
+from mediumdarwin import MediumDarwin
 import sys
+import os
 
 
 def entryPoint():
-    LittleDarwin.main()
+    ld = MediumDarwin()
+    ld.main()
 
 
 if __name__ == "__main__":
