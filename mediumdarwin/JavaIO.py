@@ -102,7 +102,7 @@ class JavaIO(object):
         :return:
         :rtype:
         """
-        with io.open(filePath, mode='r', errors='replace') as contentFile:
+        with io.open(os.path.abspath(filePath), mode='r', errors='replace') as contentFile:
             file_data = contentFile.read()
         normalizedData = str(file_data)
         return normalizedData

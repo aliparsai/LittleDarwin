@@ -1,3 +1,4 @@
+"""High-level helpers for parsing Java code using ANTLR-generated classes."""
 from typing import Dict
 
 from antlr4 import *
@@ -149,7 +150,7 @@ class JavaParse(object):
         """
         try:
             parent = node.parentCtx
-        except:
+        except Exception:
             return None
 
         if isinstance(parent, nodeType):
