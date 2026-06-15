@@ -87,8 +87,12 @@ class JavaIO(object):
 
         self.filterFiles(mode=filterType, filterList=filterList)
 
+        # Sort fileList to ensure consistent ordering across platforms
+        self.fileList.sort()
+
         if not os.path.exists(self.targetDirectory):
             os.makedirs(self.targetDirectory)
+            os.makedirs(os.path.join(self.targetDirectory, "test-reports"))
 
     def getFileContent(self, filePath=None):
         """
