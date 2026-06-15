@@ -1,0 +1,4 @@
+include mediumdarwin/jar/clover_db_extractor.jar
+include mediumdarwin/jar/clover.jar
+include mediumdarwin/jar/hamcrest-2.2.jar
+include mediumdarwin/jar/junit-4.13.2.jar
