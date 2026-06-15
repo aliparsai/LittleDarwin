@@ -57,7 +57,7 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
+debug.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -141,3 +141,46 @@ cython_debug/
 # static files generated from Django application using `collectstatic`
 media
 static
+
+# test files
+test_project/
+
+# vscode
+.vscode/
+.aider*
+
+# tool paper
+tool paper/littledarwin/
+tool paper/antomology/
+tool paper/commons-cli/
+tool paper/commons-csv/
+tool paper/commons-dbutils/
+tool paper/commons-lang/
+tool paper/commons-net/
+tool paper/commons-validator/
+tool paper/jackson-core/
+tool paper/jackson-databind/
+tool paper/jackson-dataformat-xml/
+tool paper/jettison/
+tool paper/jra/
+tool paper/jterminal/
+tool paper/jaxen/
+tool paper/triangle-example/
+tool paper/XChart/
+
+# mutation 2026 paper reproduction data (downloaded from Google Drive)
+mutation 2026/triangle-example/
+mutation 2026/jra/
+mutation 2026/antomology/
+mutation 2026/jterminal/
+mutation 2026/commons-csv/
+mutation 2026/results/
+mutation 2026/logs/
+
+# local test projects  –  cloned at runtime by integration tests
+test_projects/
+tests/integration_runs/
+
+.wsl-venv/
+test
+test_coverage.json
