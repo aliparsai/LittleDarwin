@@ -6,8 +6,8 @@ from typing import List, Tuple, Dict
 
 from antlr4 import Token
 from antlr4.tree.Tree import TerminalNodeImpl
-from littledarwin.JavaParse import JavaParse
-from littledarwin.JavaParser import JavaParser
+from mediumdarwin.JavaParse import JavaParse
+from mediumdarwin.JavaParser import JavaParser
 
 sys.setrecursionlimit(100000)
 

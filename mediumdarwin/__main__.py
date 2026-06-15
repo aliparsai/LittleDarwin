@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 """
-__main__ script for littledarwin package
+__main__ script for mediumdarwin package
 """
 
-from littledarwin import LittleDarwin
+from mediumdarwin import LittleDarwin
 import sys
 
 

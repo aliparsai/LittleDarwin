@@ -9,7 +9,7 @@ import zipfile
 import time
 from io import BytesIO
 
-from littledarwin import LittleDarwin
+from mediumdarwin import LittleDarwin
 
 
 class TestLittleDarwin(unittest.TestCase):

@@ -2,7 +2,7 @@ import base64
 import bz2
 import unittest
 
-from littledarwin.JavaParse import JavaParse
+from mediumdarwin.JavaParse import JavaParse
 from antlr4.error.Errors import ParseCancellationException
 
 

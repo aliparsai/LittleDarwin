@@ -37,7 +37,7 @@ import threading
 import time
 from optparse import OptionParser
 
-from littledarwin import License
+from mediumdarwin import License
 from .JavaIO import JavaIO
 from .JavaMutate import JavaMutate
 # LittleDarwin modules
@@ -80,7 +80,7 @@ def main(mockArgs: list = None):
 
     """ % littleDarwinVersion)
 
-    optionParser = OptionParser(prog="littledarwin")
+    optionParser = OptionParser(prog="mediumdarwin")
     options, filterType, filterList, higherOrder = parseCmdArgs(optionParser, mockArgs)
 
     # *****************************************************************************************************************
