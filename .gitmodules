@@ -1,0 +1,3 @@
+[submodule "utils/Clover_Coverage/clover_db_extractor"]
+	path = utils/Clover_Coverage/clover_db_extractor
+	url = https://github.com/sajjadhesami/clover_db_extractor
