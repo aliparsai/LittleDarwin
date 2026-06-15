@@ -36,7 +36,7 @@ class JavaIO(object):
         cuList = list()
 
         for statement in filterList:
-            if '\\' in statement or '/' in statement:
+            if "\\" in statement or "/" in statement:
                 cuList.append(statement)
             else:
                 packageList.append(statement)
@@ -53,7 +53,10 @@ class JavaIO(object):
             dirList.append("")
             dirName = os.sep.join(dirList)
 
-            alteredList.extend([x for x in self.fileList if dirName in os.sep.join(["", x, ""])])
+            alteredList.extend(
+                [x for x in self.fileList if dirName in os.sep.join([
+                                                                    "", x, ""])]
+            )
 
         for cuName in cuList:
             alteredList.extend([x for x in self.fileList if cuName in x])
@@ -63,7 +66,14 @@ class JavaIO(object):
         elif mode == "blacklist":
             self.fileList = list(set(self.fileList) - set(alteredList))
 
-    def listFiles(self, targetPath=None, buildPath=None, filterList=None, filterType="blacklist", desiredType="*.java"):
+    def listFiles(
+        self,
+        targetPath=None,
+        buildPath=None,
+        filterList=None,
+        filterType="blacklist",
+        desiredType="*.java",
+    ):
         """
 
         :param targetPath:
@@ -79,7 +89,9 @@ class JavaIO(object):
         """
         # print targetPath, desiredType
         self.sourceDirectory = targetPath
-        self.targetDirectory = os.path.abspath(os.path.join(buildPath, "LittleDarwinResults"))
+        self.targetDirectory = os.path.abspath(
+            os.path.join(buildPath, "LittleDarwinResults")
+        )
 
         for root, dirnames, filenames in os.walk(self.sourceDirectory):
             for filename in fnmatch.filter(filenames, desiredType):
@@ -102,14 +114,17 @@ class JavaIO(object):
         :return:
         :rtype:
         """
-        with io.open(os.path.abspath(filePath), mode='r', errors='replace') as contentFile:
+        with io.open(os.path.abspath(filePath), mode="r", errors="replace") as contentFile:
             file_data = contentFile.read()
         normalizedData = str(file_data)
         return normalizedData
 
-    def getAggregateComplexityReport(self, mutantDensityPerMethod: Dict[str, int],
-                                     cyclomaticComplexityPerMethod: Dict[str, int],
-                                     linesOfCodePerMethod: Dict[str, int]) -> Dict[str, List[int]]:
+    def getAggregateComplexityReport(
+        self,
+        mutantDensityPerMethod: Dict[str, int],
+        cyclomaticComplexityPerMethod: Dict[str, int],
+        linesOfCodePerMethod: Dict[str, int],
+    ) -> Dict[str, List[int]]:
         """
 
         :param mutantDensityPerMethod:
@@ -127,13 +142,22 @@ class JavaIO(object):
         methodList.update(linesOfCodePerMethod.keys())
 
         for method in methodList:
-            aggregateReport[method] = [mutantDensityPerMethod.get(method, 0),
-                                       cyclomaticComplexityPerMethod.get(method, 1),
-                                       linesOfCodePerMethod.get(method, 0)]
+            aggregateReport[method] = [
+                mutantDensityPerMethod.get(method, 0),
+                cyclomaticComplexityPerMethod.get(method, 1),
+                linesOfCodePerMethod.get(method, 0),
+            ]
 
         return aggregateReport
 
-    def generateNewFile(self, originalFile=None, mutatedFile=None, mutantsPerLine=None, densityReport=None, aggregateComplexity=None):
+    def generateNewFile(
+        self,
+        originalFile=None,
+        mutatedFile=None,
+        mutantsPerLine=None,
+        densityReport=None,
+        aggregateComplexity=None,
+    ):
         """
 
         :param originalFile:
@@ -151,32 +175,51 @@ class JavaIO(object):
         """
         originalFileRoot, originalFileName = os.path.split(originalFile)
 
-        targetDir = os.path.join(self.targetDirectory, os.path.relpath(originalFileRoot, self.sourceDirectory),
-                                 originalFileName)
+        targetDir = os.path.join(
+            self.targetDirectory,
+            os.path.relpath(originalFileRoot, self.sourceDirectory),
+            originalFileName,
+        )
 
         if not os.path.exists(targetDir):
             os.makedirs(targetDir)
         if not os.path.isfile(os.path.join(targetDir, "original.java")):
-            shutil.copyfile(originalFile, os.path.join(targetDir, "original.java"))
+            shutil.copyfile(originalFile, os.path.join(
+                targetDir, "original.java"))
 
-        if mutantsPerLine is not None and densityReport is not None and aggregateComplexity is not None:
-            densityPerLineCSVFile = os.path.abspath(os.path.join(targetDir, "MutantDensityPerLine.csv"))
-            complexityPerMethodCSVFile = os.path.abspath(os.path.join(targetDir, "ComplexityPerMethod.csv"))
-            densityReportFile = os.path.abspath(os.path.join(targetDir, "aggregate.html"))
+        if (
+            mutantsPerLine is not None
+            and densityReport is not None
+            and aggregateComplexity is not None
+        ):
+            densityPerLineCSVFile = os.path.abspath(
+                os.path.join(targetDir, "MutantDensityPerLine.csv")
+            )
+            complexityPerMethodCSVFile = os.path.abspath(
+                os.path.join(targetDir, "ComplexityPerMethod.csv")
+            )
+            densityReportFile = os.path.abspath(
+                os.path.join(targetDir, "aggregate.html")
+            )
 
-            if not os.path.isfile(complexityPerMethodCSVFile) or not os.path.isfile(
-                    densityPerLineCSVFile) or not os.path.isfile(densityReportFile):
-                with open(densityPerLineCSVFile, 'w', encoding="utf-8") as densityFileHandle:
+            if (
+                not os.path.isfile(complexityPerMethodCSVFile)
+                or not os.path.isfile(densityPerLineCSVFile)
+                or not os.path.isfile(densityReportFile)
+            ):
+                with open(densityPerLineCSVFile, "w") as densityFileHandle:
                     for key in sorted(mutantsPerLine.keys()):
-                        densityFileHandle.write(str(key) + ',' + str(mutantsPerLine[key]) + '\n')
+                        densityFileHandle.write(
+                            str(key) + "," + str(mutantsPerLine[key]) + "\n"
+                        )
 
-                with open(complexityPerMethodCSVFile, 'w', encoding="utf-8") as densityFileHandle:
+                with open(complexityPerMethodCSVFile, "w") as densityFileHandle:
                     for key in sorted(aggregateComplexity.keys()):
                         line = [str(key)]
                         line.extend([str(x) for x in aggregateComplexity[key]])
-                        densityFileHandle.write(";".join(line) + '\n')
+                        densityFileHandle.write(";".join(line) + "\n")
 
-                with open(densityReportFile, 'w', encoding="utf-8") as densityFileHandle:
+                with open(densityReportFile, "w") as densityFileHandle:
                     densityFileHandle.write(densityReport)
 
         targetFile = os.path.abspath(
