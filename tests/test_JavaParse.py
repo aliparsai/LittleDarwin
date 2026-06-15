@@ -1113,7 +1113,7 @@ public class SyntaxError {
     def test_numerifyHelloWorld(self):
         tree = self.javaParse.parse(
             "class HelloWorld { public static void main( String [] args ) { System.out.println( \"Hello World!\" );  } }")
-        self.javaParse.numerify(tree)
+        self.javaParse.numerify(tree, 0, 0, 0)
 
         nodeStack = [tree]
         while len(nodeStack) > 0:
@@ -1123,7 +1123,7 @@ public class SyntaxError {
 
     def test_numerifyEmptyTree(self):
         tree = self.javaParse.parse("")
-        self.javaParse.numerify(tree)
+        self.javaParse.numerify(tree, 0, 0, 0)
 
         nodeStack = [tree]
         while len(nodeStack) > 0:
@@ -1134,7 +1134,7 @@ public class SyntaxError {
     def test_numerifyWrongTree(self):
         tree = ['This is the wrong type for a tree']
         try:
-            self.javaParse.numerify(tree)
+            self.javaParse.numerify(tree, 0, 0, 0)
             raise ValueError
 
         except ValueError as e:

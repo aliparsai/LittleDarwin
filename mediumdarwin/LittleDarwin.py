@@ -1937,3 +1937,10 @@ class MediumDarwin:
                 "it is strongly recommended to do the analysis in two different phases.\n\n"
             )
         return options, filterType, filterList, higherOrder
+
+
+# Module-level entry point for backwards compatibility with test suite
+def main(argList):
+    mediumDarwin = MediumDarwin()
+    return mediumDarwin.main(mockArgs=argList)
+
